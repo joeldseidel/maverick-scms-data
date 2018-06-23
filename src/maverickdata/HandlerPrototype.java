@@ -1,21 +1,27 @@
 package maverickdata;
 
 import com.sun.net.httpserver.HttpExchange;
+import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.List;
+import java.io.*;
 
 public abstract class HandlerPrototype {
-    protected String GetQuery(HttpExchange httpExchange) throws IOException {
-        BufferedReader parameterReader = new BufferedReader(new InputStreamReader(httpExchange.getRequestBody(), "utf-8"));
-        return parameterReader.readLine();
-    }
-    protected List<Parameter> ParseQuery(String query){
-        if(query.equals("")){
+    protected JSONObject GetParameterObject(HttpExchange httpExchange) throws IOException {
+        //Fetch the parameter text from the request
+        InputStream paramInStream = httpExchange.getRequestBody();
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        byte[] inBuffer = new byte[2048];
+        int readBytes;
+        //Read the parameter text in to the byte array and convert to string
+        while ((readBytes = paramInStream.read(inBuffer)) != -1) {
+            byteArrayOutputStream.write(inBuffer, 0, readBytes);
+        }
+        String jsonString = byteArrayOutputStream.toString();
+        if(!jsonString.equals("")){
+            return new JSONObject(jsonString);
+        } else {
             return null;
         }
-        return null;
     }
+    protected abstract boolean isRequestValid(JSONObject requestParams);
 }
