@@ -1,4 +1,4 @@
-package maverickdata;
+package maverick_data;
 
 public class Parameter {
     String key = ""; String value = "";

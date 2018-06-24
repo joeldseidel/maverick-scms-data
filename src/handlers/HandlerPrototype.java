@@ -1,4 +1,4 @@
-package maverickdata;
+package handlers;
 
 import com.sun.net.httpserver.HttpExchange;
 import org.json.JSONObject;
@@ -24,4 +24,6 @@ public abstract class HandlerPrototype {
         }
     }
     protected abstract boolean isRequestValid(JSONObject requestParams);
+
+    protected abstract void fulfillRequest(JSONObject requestParams);
 }
