@@ -9,8 +9,11 @@ import java.sql.SQLException;
 public class UserDataQuery {
 
     public static int getUserCount(String username){
-        DatabaseInteraction database = new DatabaseInteraction();
-        database.createConnection();
+        String host = "staging-itemdb.mavericksystems.us";
+        int port = 3306;
+        String user = "MavAdmin";
+        String pass = "CurrentPass";
+        DatabaseInteraction database = new DatabaseInteraction(host, port, user, pass);
         String isUserValidSql = "SELECT COUNT(*) AS userCount FROM users WHERE Username = ?";
         PreparedStatement isUserValidStatement = database.prepareStatement(isUserValidSql);
         int userCount = 0;
@@ -30,8 +33,11 @@ public class UserDataQuery {
     }
 
     public static long getUserUUID(String username){
-        DatabaseInteraction database = new DatabaseInteraction();
-        database.createConnection();
+        String host = "staging-itemdb.mavericksystems.us";
+        int port = 3306;
+        String user = "MavAdmin";
+        String pass = "CurrentPass";
+        DatabaseInteraction database = new DatabaseInteraction(host, port, user, pass);
         String getUserUUIDSql = "SELECT UUID FROM user_data WHERE Username = ?";
         PreparedStatement getUUIDStatement = database.prepareStatement(getUserUUIDSql);
         long userUUID = 0;
