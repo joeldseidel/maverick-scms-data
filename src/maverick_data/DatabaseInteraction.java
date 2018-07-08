@@ -1,6 +1,7 @@
 package maverick_data;
 
 import java.sql.*;
+import Config;
 
 /**
  * A class for interacting with a MySQL database
@@ -40,7 +41,7 @@ public class DatabaseInteraction {
         try{
             Class.forName("com.mysql.jdbc.Driver");
             // build host string
-            String url = "jdbc:mysql://" + host + ":" + Integer.toString(port) + "/innodb";
+            String url = "jdbc:mysql://" + host + ":" + Integer.toString(port) + "/" + Config.databaseName;
             // create connection
             return DriverManager.getConnection(url, username, password);
         }

@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 
 import maverick_data.DatabaseInteraction;
 import maverick_types.MaverickItem;
+import maverick_data.Config;
 
 /**
  * Abstracts away all of the database interaction necessary to work with items in our databases
@@ -19,11 +20,7 @@ public class ItemDataManager {
      * Constructor for the ItemDataManager class
      */
     public ItemDataManager() {
-        String host = "staging-itemdb.mavericksystems.us";
-        int port = 3306;
-        String user = "MavAdmin";
-        String pass = "Lt7e^PV%6vRi5l4BcSw";
-        this.database = new DatabaseInteraction(host, port, user, pass);
+        this.database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass);
     }
 
     /**

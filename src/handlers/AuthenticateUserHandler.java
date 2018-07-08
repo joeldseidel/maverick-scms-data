@@ -82,11 +82,7 @@ public class AuthenticateUserHandler extends HandlerPrototype implements HttpHan
     }
 
     private JSONObject getUserData(String username){
-        String host = "staging-itemdb.mavericksystems.us";
-        int port = 3306;
-        String user = "MavAdmin";
-        String pass = "CurrentPass";
-        DatabaseInteraction database = new DatabaseInteraction(host, port, user, pass);
+        DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass);
         String getUserDataSql = "SELECT * FROM user_data WHERE Username = ?";
         PreparedStatement getUserDataStatement = database.prepareStatement(getUserDataSql);
         JSONObject userDataObject;

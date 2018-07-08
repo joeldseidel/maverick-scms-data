@@ -1,6 +1,7 @@
 package managers;
 
 import maverick_data.DatabaseInteraction;
+import maverick_data.Config;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -9,11 +10,7 @@ import java.sql.SQLException;
 public class UserDataManager {
 
     public static int getUserCount(String username){
-        String host = "staging-itemdb.mavericksystems.us";
-        int port = 3306;
-        String user = "MavAdmin";
-        String pass = "CurrentPass";
-        DatabaseInteraction database = new DatabaseInteraction(host, port, user, pass);
+        DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass);
         String isUserValidSql = "SELECT COUNT(*) AS userCount FROM users WHERE Username = ?";
         PreparedStatement isUserValidStatement = database.prepareStatement(isUserValidSql);
         int userCount = 0;
@@ -33,11 +30,7 @@ public class UserDataManager {
     }
 
     public static long getUserUUID(String username){
-        String host = "staging-itemdb.mavericksystems.us";
-        int port = 3306;
-        String user = "MavAdmin";
-        String pass = "CurrentPass";
-        DatabaseInteraction database = new DatabaseInteraction(host, port, user, pass);
+        DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass);
         String getUserUUIDSql = "SELECT UUID FROM user_data WHERE Username = ?";
         PreparedStatement getUUIDStatement = database.prepareStatement(getUserUUIDSql);
         long userUUID = 0;
