@@ -1,5 +1,7 @@
 package managers;
 
+import java.sql.PreparedStatement;
+
 import maverick_data.DatabaseInteraction;
 import maverick_types.MaverickItem;
 
@@ -28,9 +30,15 @@ public class ItemDataManager {
      * addItem adds an item to the database
      */
     public void addItem(MaverickItem item) {
-        // TODO: generate a Maverick-ID for the item
+        String qryString = "INSERT INTO table_items (mid, fdaid, name, category, cid) " + "VALUES (\"" +
+                item.getMaverickID() + "\", \"" +
+                Integer.toString(item.getFdaID()) + "\", \"" +
+                item.getItemName() + "\", \"" +
+                item.getItemCategory() + "\", \"" +
+                item.getCustomerID() + "\")";
 
-        // TODO: build a query against the DBd
+        PreparedStatement qryStatement = this.database.prepareStatement(qryString);
+        this.database.nonQuery(qryStatement);
     }
 
 }
