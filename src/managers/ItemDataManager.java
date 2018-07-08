@@ -1,6 +1,7 @@
 package managers;
 
 import maverick_data.DatabaseInteraction;
+import maverick_types.MaverickItem;
 
 /**
  * Abstracts away all of the database interaction necessary to work with items in our databases
@@ -26,10 +27,10 @@ public class ItemDataManager {
     /**
      * addItem adds an item to the database
      */
-    public void addItem() {
+    public void addItem(MaverickItem item) {
         // TODO: generate a Maverick-ID for the item
-        // TODO: grab the FDA-ID for the item
-        // TODO: build a query against the DB
+
+        // TODO: build a query against the DBd
     }
 
 }

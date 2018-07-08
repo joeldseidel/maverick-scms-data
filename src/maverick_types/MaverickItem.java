@@ -30,4 +30,44 @@ public class MaverickItem {
     public void setMaverickID(String maverickID) {
         this.maverickID = maverickID;
     }
+
+    /**
+     * Getter for maverickID
+     * @return maverickID
+     */
+    public String getMaverickID() {
+        return this.maverickID;
+    }
+
+    /**
+     * Getter for fdaID
+     * @return fdaID
+     */
+    public int getFdaID() {
+        return this.fdaID;
+    }
+
+    /**
+     * Getter for itemName
+     * @return itemName
+     */
+    public String getItemName() {
+        return this.itemName;
+    }
+
+    /**
+     * Getter for itemCategory
+     * @return itemCategory
+     */
+    public String getItemCategory() {
+        return this.itemCategory;
+    }
+
+    /**
+     * Getter for customerID
+     * @return customerID
+     */
+    public String getCustomerID() {
+        return this.customerID;
+    }
 }
