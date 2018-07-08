@@ -22,7 +22,7 @@ public class ItemDataManager {
         String host = "staging-itemdb.mavericksystems.us";
         int port = 3306;
         String user = "MavAdmin";
-        String pass = "CurrentPass";
+        String pass = "Lt7e^PV%6vRi5l4BcSw";
         this.database = new DatabaseInteraction(host, port, user, pass);
     }
 
