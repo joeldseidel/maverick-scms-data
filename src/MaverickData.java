@@ -9,6 +9,7 @@ import java.net.InetSocketAddress;
 import java.security.KeyStore;
 
 public class MaverickData {
+
     public static void main(String args[]){
         try{
             //Create socket address
@@ -60,4 +61,5 @@ public class MaverickData {
             ex.printStackTrace();
         }
     }
+    
 }

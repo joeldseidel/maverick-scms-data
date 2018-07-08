@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class UserDataQuery {
+
     public static int getUserCount(String username){
         DatabaseInteraction database = new DatabaseInteraction();
         database.createConnection();
@@ -27,6 +28,7 @@ public class UserDataQuery {
         }
         return userCount;
     }
+
     public static long getUserUUID(String username){
         DatabaseInteraction database = new DatabaseInteraction();
         database.createConnection();
@@ -45,4 +47,5 @@ public class UserDataQuery {
         }
         return userUUID;
     }
+
 }

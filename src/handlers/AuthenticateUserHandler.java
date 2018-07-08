@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AuthenticateUserHandler extends HandlerPrototype implements HttpHandler {
+
     private String[] requiredKeys = {"username", "password", "returnUserData"};
     private String response;
     public void handle(HttpExchange httpExchange) throws IOException {
@@ -108,4 +109,5 @@ public class AuthenticateUserHandler extends HandlerPrototype implements HttpHan
         }
         return null;
     }
+
 }

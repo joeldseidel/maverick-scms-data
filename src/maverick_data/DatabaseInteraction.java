@@ -2,12 +2,15 @@ package maverick_data;
 
 import java.sql.*;
 
+
 public class DatabaseInteraction {
+
     Connection dbConn = createConnection();
     public Connection createConnection(){
         try{
             Class.forName("com.mysql.jdbc.Driver");
-            Connection dbConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/maverick", "joel", "Maverick35");
+            Connection dbConn = DriverManager.getConnection("jdbc:mysql://staging-itemdb.mavericksystems.us:3306",
+                    "MavAdmin", "Lt7e^PV%6vRi5l4BcSw\\t");
             return dbConn;
         }
         catch(ClassNotFoundException cnfE){
@@ -20,6 +23,7 @@ public class DatabaseInteraction {
         }
         return null;
     }
+
     public void closeConnection(){
         try{
             dbConn.close();
@@ -27,6 +31,7 @@ public class DatabaseInteraction {
             System.out.println("Could not close data connection");
         }
     }
+
     public ResultSet query(PreparedStatement queryStatement){
         try{
             return queryStatement.executeQuery();
@@ -38,6 +43,7 @@ public class DatabaseInteraction {
             return null;
         }
     }
+
     public void nonQuery(PreparedStatement nonQueryStatement){
         try{
             nonQueryStatement.executeUpdate();
@@ -45,6 +51,7 @@ public class DatabaseInteraction {
             System.out.println(sqlException.getMessage());
         }
     }
+
     public PreparedStatement prepareStatement(String sql){
         PreparedStatement preparedStatement;
         try{
@@ -55,4 +62,5 @@ public class DatabaseInteraction {
         }
         return preparedStatement;
     }
+
 }
