@@ -36,11 +36,11 @@ public class DatabaseInteraction {
      * @param password the password to use
      * @return the created Connection object
      */
-    public Connection createConnection(String host, int port, String username, String password){
+    private Connection createConnection(String host, int port, String username, String password){
         try{
             Class.forName("com.mysql.jdbc.Driver");
             // build host string
-            String url = "jdbc:mysql://" + host + ":" + Integer.toString(port);
+            String url = "jdbc:mysql://" + host + ":" + Integer.toString(port) + "/innodb";
             // create connection
             return DriverManager.getConnection(url, username, password);
         }
