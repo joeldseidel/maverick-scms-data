@@ -2,7 +2,7 @@ package handlers;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import dataqueries.UserDataQuery;
+import managers.UserDataManager;
 import maverick_data.DatabaseInteraction;
 import org.json.JSONObject;
 
@@ -70,9 +70,9 @@ public class AuthenticateUserHandler extends HandlerPrototype implements HttpHan
 
     private boolean isUserValid(String username, String password){
         boolean userIsValid;
-        boolean userExists = UserDataQuery.getUserCount(username) == 1;
+        boolean userExists = UserDataManager.getUserCount(username) == 1;
         if(userExists){
-            long userUUID = UserDataQuery.getUserUUID(username);
+            long userUUID = UserDataManager.getUserUUID(username);
             //TODO: query the password from the user_auth table and see if it matches
             userIsValid = true;
         } else {

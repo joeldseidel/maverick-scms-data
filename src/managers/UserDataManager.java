@@ -1,4 +1,4 @@
-package dataqueries;
+package managers;
 
 import maverick_data.DatabaseInteraction;
 
@@ -6,7 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class UserDataQuery {
+public class UserDataManager {
 
     public static int getUserCount(String username){
         String host = "staging-itemdb.mavericksystems.us";
