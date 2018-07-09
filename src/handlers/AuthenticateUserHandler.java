@@ -18,15 +18,16 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import java.util.Calendar;
-import java.security.Key;
+import com.auth0.jwt.algorithms.*;
+import com.auth0.jwt.exceptions.*;
+import com.auth0.jwt.impl.*;
+import com.auth0.jwt.interfaces.*;
+import com.auth0.jwt.*;
 
 public class AuthenticateUserHandler extends HandlerPrototype implements HttpHandler {
 
     private String[] requiredKeys = {"username", "password", "returnUserData"};
-    private String response, token;
+    private String response;
     public void handle(HttpExchange httpExchange) throws IOException {
         System.out.println("Entered User Authentication Handler");
         JSONObject requestParams = GetParameterObject(httpExchange);
@@ -45,7 +46,7 @@ public class AuthenticateUserHandler extends HandlerPrototype implements HttpHan
         System.out.println("Response : " + this.response);
         OutputStream os = httpExchange.getResponseBody();
         os.write(this.response.getBytes());
-        os.write(this.token.getBytes());
+        os.write(createToken().getBytes());
         os.close();
     }
 
@@ -77,9 +78,6 @@ public class AuthenticateUserHandler extends HandlerPrototype implements HttpHan
             JSONObject userDataObject = getUserData(username);
             //If user data fetched, return data, otherwise say no
             this.response = userDataObject == null ? "invalid user" : userDataObject.toString();
-            if(userDataObject != null){
-                this.token = createToken(UserDataManager.getUserUUID(username));
-            }
         } else {
             //Either the request only wants the authentication result or authentication failed, either way, it doesn't matter, return it
             this.response = Boolean.toString(isUserValid);
@@ -149,22 +147,18 @@ public class AuthenticateUserHandler extends HandlerPrototype implements HttpHan
     }
 
     //Create a JSON Web Token to pass to client on authenticated login
-    private static String createToken(long uid){
-        byte[] key = getSignatureKey();
-
-        Calendar cal = Calendar.getInstance(); // creates calendar
-        cal.setTime(new Date()); // sets calendar time/date
-        cal.add(Calendar.HOUR_OF_DAY, 1); // adds one hour
- 
-        String jwt = 
-            Jwts.builder().setIssuer("http://localhost:6969/")
-                .setSubject("users/" + uid)
-                .setExpiration(cal.getTime())
-                .put("scope", "self api/buy") 
-                .signWith(SignatureAlgorithm.HS256,key)
-                .compact();
-
-        return jwt;
+    private static String createToken(){
+        String token = "";
+        try {
+            Algorithm algorithm = Algorithm.HMAC256("secret");
+            token = JWT.create()
+            .withIssuer("auth0")
+            .sign(algorithm);
+        } catch (Exception exception){
+            //Invalid Signing configuration / Couldn't convert Claims.
+        }
+        System.out.println("Created token : " + token);
+        return token;
     }
 
 }
