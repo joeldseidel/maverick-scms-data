@@ -152,7 +152,7 @@ public class AuthenticateUserHandler extends HandlerPrototype implements HttpHan
         try {
             Algorithm algorithm = Algorithm.HMAC256("secret");
             token = JWT.create()
-            .withIssuer("auth0")
+            .withIssuer("localhost:6969")
             .sign(algorithm);
         } catch (Exception exception){
             //Invalid Signing configuration / Couldn't convert Claims.
