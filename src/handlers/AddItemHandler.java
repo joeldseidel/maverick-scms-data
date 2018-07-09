@@ -70,6 +70,9 @@ public class AddItemHandler extends HandlerPrototype implements HttpHandler {
 
     @Override
     protected void fulfillRequest(JSONObject requestParams){
+
+        boolean isVerified;
+
         int fdaid = requestParams.getInt("fdaid");
         String cid = requestParams.getString("cid");
         String name = requestParams.getString("name");
@@ -77,22 +80,35 @@ public class AddItemHandler extends HandlerPrototype implements HttpHandler {
         String token = requestParams.getString("token");
 
         try {
+
             Algorithm algorithm = Algorithm.HMAC256("secret");
             JWTVerifier verifier = JWT.require(algorithm)
                 .withIssuer("localhost:6969")
                 .build(); //Reusable verifier instance
             DecodedJWT jwt = verifier.verify(token);
+            isVerified = true;
             System.out.println("Token " + token + " was verified");
+
         } catch (Exception exception){
             //Invalid signature/claims
+            isVerified = false;
             System.out.println("Token " + token + " was not verified");
         }
 
-        MaverickItem thisItem = new MaverickItem(fdaid, name, category, cid);
-        ItemDataManager itemDataManager = new ItemDataManager();
-        itemDataManager.addItem(thisItem);
+        if(isVerified){
 
-        this.response = "Success";
+            MaverickItem thisItem = new MaverickItem(fdaid, name, category, cid);
+            ItemDataManager itemDataManager = new ItemDataManager();
+            itemDataManager.addItem(thisItem);
+            this.response = "Success";
+
+        }
+        else{
+
+            this.response = "Failed to Add Item";
+
+        }
+
     }
 
 }
