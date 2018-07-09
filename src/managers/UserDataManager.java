@@ -26,6 +26,7 @@ public class UserDataManager {
         } finally {
             database.closeConnection();
         }
+        System.out.println("Got User Count : " + userCount);
         return userCount;
     }
 
@@ -44,6 +45,7 @@ public class UserDataManager {
         } finally {
             database.closeConnection();
         }
+        System.out.println("Got User UUID : " + userUUID);
         return userUUID;
     }
 

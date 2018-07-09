@@ -21,11 +21,14 @@ public class AuthenticateUserHandler extends HandlerPrototype implements HttpHan
     private String[] requiredKeys = {"username", "password", "returnUserData"};
     private String response;
     public void handle(HttpExchange httpExchange) throws IOException {
+        System.out.println("Entered User Authentication Handler");
         JSONObject requestParams = GetParameterObject(httpExchange);
         boolean isValidRequest = isRequestValid(requestParams);
         if(isValidRequest){
+            System.out.println("Valid Request");
             fulfillRequest(requestParams);
         } else {
+            System.out.println("Invalid Request");
             this.response = "invalid request";
         }
         int responseCode = isValidRequest ? 200 : 400;
@@ -40,11 +43,13 @@ public class AuthenticateUserHandler extends HandlerPrototype implements HttpHan
     protected boolean isRequestValid(JSONObject requestParams){
         if(requestParams == null){
             //Request did not come with parameters, is invalid
+            System.out.println("Request Params Null");
             return false;
         }
         for(String requiredKey : requiredKeys){
             if(!requestParams.has(requiredKey)){
                 //Missing a required key, request is invalid
+                System.out.println("Request Params Missing Key " + requiredKey);
                 return false;
             }
         }
@@ -79,6 +84,7 @@ public class AuthenticateUserHandler extends HandlerPrototype implements HttpHan
         } else {
             userIsValid = false;
         }
+        System.out.println("User Validity : " + userIsValid);
         return userIsValid;
     }
 
@@ -95,6 +101,7 @@ public class AuthenticateUserHandler extends HandlerPrototype implements HttpHan
             sqlEx.printStackTrace();
             userDataObject = null;
         }
+        System.out.println("Got User Data Object : " + userDataObject);
         return userDataObject;
     }
 

@@ -40,7 +40,9 @@ public class DatabaseInteraction {
         try{
             Class.forName("com.mysql.jdbc.Driver");
             // build host string
-            String url = "jdbc:mysql://" + host + ":" + Integer.toString(port) + "/" + Config.databaseName;
+            String url = "jdbc:mysql://" + host + ":" + port + "/" + Config.databaseName;
+            // debug attempted connection
+            System.out.println("Attempting connection to " + url);
             // create connection
             return DriverManager.getConnection(url, username, password);
         }
@@ -50,7 +52,7 @@ public class DatabaseInteraction {
         }
         catch(SQLException sqlE) {
             // Could not create connection
-            System.out.println("Data connection failed");
+            System.out.println("Data connection failed with exception : " + sqlE);
         }
         return null;
     }
