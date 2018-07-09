@@ -6,6 +6,7 @@ import managers.UserDataManager;
 import maverick_data.DatabaseInteraction;
 import maverick_data.Config;
 import org.json.JSONObject;
+import org.json.JSONArray;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -93,11 +94,17 @@ public class AuthenticateUserHandler extends HandlerPrototype implements HttpHan
         DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass);
         String getUserDataSql = "SELECT * FROM table_users WHERE username = ?";
         PreparedStatement getUserDataStatement = database.prepareStatement(getUserDataSql);
-        JSONObject userDataObject;
+        JSONObject userDataObject = new JSONObject();
         try{
             getUserDataStatement.setString(1, username);
             ResultSet getUserDataResults = database.query(getUserDataStatement);
-            userDataObject = getUserDataFormattedResponse(getUserDataResults);
+            try{
+            userDataObject.put("arrayResult",getUserDataFormattedResponse(getUserDataResults));
+            }
+            catch(Exception e){
+                System.out.println("Failed to get Formatted Response");
+                userDataObject = null;
+            }
         } catch(SQLException sqlEx){
             sqlEx.printStackTrace();
             userDataObject = null;
@@ -106,16 +113,27 @@ public class AuthenticateUserHandler extends HandlerPrototype implements HttpHan
         return userDataObject;
     }
 
-    private JSONObject getUserDataFormattedResponse(ResultSet userDataResults) throws SQLException{
-        ResultSetMetaData rsMeta = userDataResults.getMetaData();
-        int rsColumns = rsMeta.getColumnCount();
-        userDataResults.next();
-        List<String> columnList = new ArrayList<>();
-        for(int col = 1; col <= rsColumns; col++){
-            Object value = userDataResults.getObject(col);
-            columnList.add(value.toString());
+    /**
+     * Convert a result set into a JSON Array
+     * @param resultSet
+     * @return a JSONArray
+     * @throws Exception
+     */
+    public static JSONArray getUserDataFormattedResponse(ResultSet userDataResults) throws Exception {
+        System.out.println("Getting NEW Formatted Response");
+        JSONArray jsonArray = new JSONArray();
+        while (userDataResults.next()) {
+            int total_rows = userDataResults.getMetaData().getColumnCount();
+            for (int i = 0; i < total_rows; i++) {
+                JSONObject obj = new JSONObject();
+                System.out.println("Got " + userDataResults.getObject(i + 1) + " for " + userDataResults.getMetaData().getColumnLabel(i + 1)
+                        .toLowerCase());
+                obj.put(userDataResults.getMetaData().getColumnLabel(i + 1)
+                        .toLowerCase(), userDataResults.getObject(i + 1));
+                jsonArray.put(obj);
+            }
         }
-        return null;
+        return jsonArray;
     }
 
 }
