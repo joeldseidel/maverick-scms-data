@@ -18,10 +18,15 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import java.util.Calendar;
+import java.security.Key;
+
 public class AuthenticateUserHandler extends HandlerPrototype implements HttpHandler {
 
     private String[] requiredKeys = {"username", "password", "returnUserData"};
-    private String response;
+    private String response, token;
     public void handle(HttpExchange httpExchange) throws IOException {
         System.out.println("Entered User Authentication Handler");
         JSONObject requestParams = GetParameterObject(httpExchange);
@@ -40,6 +45,7 @@ public class AuthenticateUserHandler extends HandlerPrototype implements HttpHan
         System.out.println("Response : " + this.response);
         OutputStream os = httpExchange.getResponseBody();
         os.write(this.response.getBytes());
+        os.write(this.token.getBytes());
         os.close();
     }
 
@@ -71,6 +77,9 @@ public class AuthenticateUserHandler extends HandlerPrototype implements HttpHan
             JSONObject userDataObject = getUserData(username);
             //If user data fetched, return data, otherwise say no
             this.response = userDataObject == null ? "invalid user" : userDataObject.toString();
+            if(userDataObject != null){
+                this.token = createToken(UserDataManager.getUserUUID(username));
+            }
         } else {
             //Either the request only wants the authentication result or authentication failed, either way, it doesn't matter, return it
             this.response = Boolean.toString(isUserValid);
@@ -137,6 +146,25 @@ public class AuthenticateUserHandler extends HandlerPrototype implements HttpHan
             }
         }
         return jsonArray;
+    }
+
+    //Create a JSON Web Token to pass to client on authenticated login
+    private static String createToken(long uid){
+        byte[] key = getSignatureKey();
+
+        Calendar cal = Calendar.getInstance(); // creates calendar
+        cal.setTime(new Date()); // sets calendar time/date
+        cal.add(Calendar.HOUR_OF_DAY, 1); // adds one hour
+ 
+        String jwt = 
+            Jwts.builder().setIssuer("http://localhost:6969/")
+                .setSubject("users/" + uid)
+                .setExpiration(cal.getTime())
+                .put("scope", "self api/buy") 
+                .signWith(SignatureAlgorithm.HS256,key)
+                .compact();
+
+        return jwt;
     }
 
 }
