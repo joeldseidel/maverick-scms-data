@@ -57,6 +57,9 @@ public class MaverickData {
             //Create the context of the commands and the handlers in this line
             server.setExecutor(null);
             server.start();
+
+            //Debug 
+            System.out.println("Server Running and Listening On " + address);
         } catch(Exception ex){
             ex.printStackTrace();
         }

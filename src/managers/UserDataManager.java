@@ -11,7 +11,7 @@ public class UserDataManager {
 
     public static int getUserCount(String username){
         DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass);
-        String isUserValidSql = "SELECT COUNT(*) AS userCount FROM users WHERE Username = ?";
+        String isUserValidSql = "SELECT COUNT(*) AS userCount FROM table_users WHERE username = ?";
         PreparedStatement isUserValidStatement = database.prepareStatement(isUserValidSql);
         int userCount = 0;
         try{
@@ -31,14 +31,14 @@ public class UserDataManager {
 
     public static long getUserUUID(String username){
         DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass);
-        String getUserUUIDSql = "SELECT UUID FROM user_data WHERE Username = ?";
+        String getUserUUIDSql = "SELECT uid FROM table_users WHERE username = ?";
         PreparedStatement getUUIDStatement = database.prepareStatement(getUserUUIDSql);
         long userUUID = 0;
         try{
             getUUIDStatement.setString(1, username);
             ResultSet UUIDResults = database.query(getUUIDStatement);
             UUIDResults.next();
-            userUUID = UUIDResults.getLong("UUID");
+            userUUID = UUIDResults.getLong("uid");
         } catch(SQLException sqlEx){
             sqlEx.printStackTrace();
         } finally {
