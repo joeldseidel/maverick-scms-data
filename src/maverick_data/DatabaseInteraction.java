@@ -40,7 +40,7 @@ public class DatabaseInteraction {
         try{
             Class.forName("com.mysql.jdbc.Driver");
             // build host string
-            String url = "jdbc:mysql://" + host + ":" + port + "/" + Config.databaseName;
+            String url = "jdbc:mysql://" + host + ":" + port + "/scms_testing";
             // debug attempted connection
             System.out.println("Attempting connection to " + url);
             // create connection

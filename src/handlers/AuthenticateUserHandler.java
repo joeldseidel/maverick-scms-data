@@ -33,7 +33,7 @@ public class AuthenticateUserHandler extends HandlerPrototype implements HttpHan
         }
         int responseCode = isValidRequest ? 200 : 400;
         httpExchange.sendResponseHeaders(responseCode, this.response.length());
-        System.out.println(this.response);
+        System.out.println("Response : " + this.response);
         OutputStream os = httpExchange.getResponseBody();
         os.write(this.response.getBytes());
         os.close();
@@ -67,7 +67,6 @@ public class AuthenticateUserHandler extends HandlerPrototype implements HttpHan
             JSONObject userDataObject = getUserData(username);
             //If user data fetched, return data, otherwise say no
             this.response = userDataObject == null ? "invalid user" : userDataObject.toString();
-            this.response = getUserData(username).toString();
         } else {
             //Either the request only wants the authentication result or authentication failed, either way, it doesn't matter, return it
             this.response = Boolean.toString(isUserValid);
@@ -76,9 +75,10 @@ public class AuthenticateUserHandler extends HandlerPrototype implements HttpHan
 
     private boolean isUserValid(String username, String password){
         boolean userIsValid;
-        boolean userExists = UserDataManager.getUserCount(username) == 1;
+        boolean userExists = (UserDataManager.getUserCount(username) == 1);
         if(userExists){
-            long userUUID = UserDataManager.getUserUUID(username);
+            //No need to get UUID yet, it means nothing to us
+            //long userUUID = UserDataManager.getUserUUID(username);
             //TODO: query the password from the user_auth table and see if it matches
             userIsValid = true;
         } else {
@@ -89,6 +89,7 @@ public class AuthenticateUserHandler extends HandlerPrototype implements HttpHan
     }
 
     private JSONObject getUserData(String username){
+        System.out.println("Attempting to get user data for username : " + username);
         DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass);
         String getUserDataSql = "SELECT * FROM table_users WHERE username = ?";
         PreparedStatement getUserDataStatement = database.prepareStatement(getUserDataSql);

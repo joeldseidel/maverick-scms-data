@@ -10,8 +10,9 @@ import java.sql.SQLException;
 public class UserDataManager {
 
     public static int getUserCount(String username){
+        System.out.println("Attempting to get user count for username : " + username);
         DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass);
-        String isUserValidSql = "SELECT COUNT(*) AS userCount FROM table_users WHERE username = ?";
+        String isUserValidSql = "SELECT uid FROM table_users WHERE username = ?";
         PreparedStatement isUserValidStatement = database.prepareStatement(isUserValidSql);
         int userCount = 0;
         try{
