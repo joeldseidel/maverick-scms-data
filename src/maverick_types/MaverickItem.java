@@ -1,5 +1,4 @@
 package maverick_types;
-
 /**
  * A single item
  */
@@ -16,7 +15,8 @@ public class MaverickItem {
      */
     public MaverickItem(int fdaID, String itemName, String itemCategory, String customerID) {
         // TODO: generate a Maverick ID from a utility function, or something else
-        this.maverickID = "M-1111";
+        // ~Josh~ Using this for now so I can add more than one item to the database for testing
+        this.maverickID = "M-" + (int)((Math.random() * 10000) - 1);
         this.fdaID = fdaID;
         this.itemName = itemName;
         this.itemCategory = itemCategory;
