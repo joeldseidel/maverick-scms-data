@@ -2,6 +2,7 @@ package handlers;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.Headers;
 import managers.UserDataManager;
 import maverick_data.DatabaseInteraction;
 import maverick_data.Config;
@@ -33,6 +34,8 @@ public class AuthenticateUserHandler extends HandlerPrototype implements HttpHan
             this.response = "invalid request";
         }
         int responseCode = isValidRequest ? 200 : 400;
+        Headers headers = httpExchange.getResponseHeaders();
+        headers.add("Access-Control-Allow-Origin", "*");
         httpExchange.sendResponseHeaders(responseCode, this.response.length());
         System.out.println("Response : " + this.response);
         OutputStream os = httpExchange.getResponseBody();
