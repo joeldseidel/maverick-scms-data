@@ -28,7 +28,7 @@ import managers.ItemDataManager;
 
 public class AddItemHandler extends HandlerPrototype implements HttpHandler {
 
-    private String[] requiredKeys = {"fdaid", "name", "category", "cid"};
+    private String[] requiredKeys = {"fdaid", "name", "category", "cid", "token"};
     private String response;
     public void handle(HttpExchange httpExchange) throws IOException {
         JSONObject requestParams = GetParameterObject(httpExchange);
@@ -70,13 +70,29 @@ public class AddItemHandler extends HandlerPrototype implements HttpHandler {
 
     @Override
     protected void fulfillRequest(JSONObject requestParams){
-        String fdaid = requestParams.getString("fdaid");
+        int fdaid = requestParams.getInt("fdaid");
         String cid = requestParams.getString("cid");
         String name = requestParams.getString("name");
         String category = requestParams.getString("category");
+        String token = requestParams.getString("token");
+
+        try {
+            Algorithm algorithm = Algorithm.HMAC256("secret");
+            JWTVerifier verifier = JWT.require(algorithm)
+                .withIssuer("localhost:6969")
+                .build(); //Reusable verifier instance
+            DecodedJWT jwt = verifier.verify(token);
+            System.out.println("Token " + token + " was verified");
+        } catch (Exception exception){
+            //Invalid signature/claims
+            System.out.println("Token " + token + " was not verified");
+        }
 
         MaverickItem thisItem = new MaverickItem(fdaid, name, category, cid);
-        ItemDataManager.addItem(thisItem);
+        ItemDataManager itemDataManager = new ItemDataManager();
+        itemDataManager.addItem(thisItem);
+
+        this.response = "Success";
     }
 
 }

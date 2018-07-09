@@ -43,10 +43,9 @@ public class AuthenticateUserHandler extends HandlerPrototype implements HttpHan
         Headers headers = httpExchange.getResponseHeaders();
         headers.add("Access-Control-Allow-Origin", "*");
         httpExchange.sendResponseHeaders(responseCode, this.response.length());
-        System.out.println("Response to Add User Request : " + this.response);
+        System.out.println("Response to User Logon Request : " + this.response);
         OutputStream os = httpExchange.getResponseBody();
         os.write(this.response.getBytes());
-        os.write(createToken().getBytes());
         os.close();
     }
 
@@ -76,6 +75,7 @@ public class AuthenticateUserHandler extends HandlerPrototype implements HttpHan
         if(requestParams.getBoolean("returnUserData") && isUserValid){
             //Request wants the user data row in return
             JSONObject userDataObject = getUserData(username);
+            userDataObject.put("token",createToken());
             //If user data fetched, return data, otherwise say no
             this.response = userDataObject == null ? "invalid user" : userDataObject.toString();
         } else {
