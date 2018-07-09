@@ -37,7 +37,6 @@ public class UserDataManager {
     }
 
     public static boolean checkPasswordMatch(long uid, String password){
-        System.out.println("Checking password authentication");
         boolean isMatch;
         try{
             messageDigestSHA = MessageDigest.getInstance("SHA-256");
@@ -52,8 +51,10 @@ public class UserDataManager {
             matchPasswordStatement.setString(1, ""+uid);
             ResultSet matchPasswordResults = database.query(matchPasswordStatement);
             matchPasswordResults.next();
-            String gotPassword = matchPasswordResults.getString("password");
-            String thisPassword = new String(messageDigestSHA.digest(password.getBytes(StandardCharsets.UTF_8)));
+            String gotPassword = matchPasswordResults.getString("password").toLowerCase();
+            System.out.println("Got Password " + gotPassword);
+            String thisPassword = byteArrayToString(messageDigestSHA.digest(password.getBytes(StandardCharsets.UTF_8))).toLowerCase();
+            System.out.println("This Password " + thisPassword);
             isMatch = (gotPassword.equals(thisPassword));
             System.out.println("Got Password Match : " + isMatch);
         } catch(SQLException sqlEx){
@@ -82,6 +83,19 @@ public class UserDataManager {
         }
         System.out.println("Got User UUID : " + userUUID);
         return userUUID;
+    }
+
+    //Method to take byte array returned from hashing, and turn it into one string to compare with one from database
+    private static String byteArrayToString(byte[] hash){
+        StringBuffer outString = new StringBuffer();
+
+        for (int i = 0; i < hash.length; i++) {
+            String hex = Integer.toHexString(0xff & hash[i]);
+            if(hex.length() == 1) outString.append('0');
+            outString.append(hex);
+        }
+
+        return outString.toString();
     }
 
 }
