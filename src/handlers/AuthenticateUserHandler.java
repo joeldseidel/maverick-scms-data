@@ -4,6 +4,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import managers.UserDataManager;
 import maverick_data.DatabaseInteraction;
+import maverick_data.Config;
 import org.json.JSONObject;
 
 import java.io.IOException;

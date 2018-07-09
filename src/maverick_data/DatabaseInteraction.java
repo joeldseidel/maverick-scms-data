@@ -1,7 +1,6 @@
 package maverick_data;
 
 import java.sql.*;
-import Config;
 
 /**
  * A class for interacting with a MySQL database
