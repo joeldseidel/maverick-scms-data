@@ -26,7 +26,7 @@ public class ItemDataManager {
     /**
      * addItem adds an item to the database
      */
-    public void addItem(MaverickItem item) {
+    public static void addItem(MaverickItem item) {
         String qryString = "INSERT INTO table_items (mid, fdaid, name, category, cid) " + "VALUES (\"" +
                 item.getMaverickID() + "\", \"" +
                 Integer.toString(item.getFdaID()) + "\", \"" +

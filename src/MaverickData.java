@@ -2,6 +2,7 @@ import com.sun.net.httpserver.HttpsConfigurator;
 import com.sun.net.httpserver.HttpsParameters;
 import com.sun.net.httpserver.HttpsServer;
 import handlers.AuthenticateUserHandler;
+import handlers.AddItemHandler;
 
 import javax.net.ssl.*;
 import java.io.FileInputStream;
@@ -54,6 +55,7 @@ public class MaverickData {
                 }
             });
             server.createContext("/authenticate_user", new AuthenticateUserHandler());
+            server.createContext("/add_item", new AddItemHandler());
             //Create the context of the commands and the handlers in this line
             server.setExecutor(null);
             server.start();
