@@ -12,11 +12,7 @@ import java.nio.charset.StandardCharsets;
 
 public class UserDataManager {
 
-    try{
-        private static MessageDigest messageDigestSHA = MessageDigest.getInstance("SHA-256");
-    }catch(NoSuchAlgorithmException nsae){
-        System.out.println("Failed to load SHA256 into MessageDigest");
-    }
+    private static MessageDigest messageDigestSHA;
 
     public static int getUserCount(String username){
         System.out.println("Attempting to get user count for username : " + username);
@@ -43,6 +39,12 @@ public class UserDataManager {
     public static boolean checkPasswordMatch(long uid, String password){
         System.out.println("Checking password authentication");
         boolean isMatch;
+        try{
+            messageDigestSHA = MessageDigest.getInstance("SHA-256");
+        }
+        catch(Exception e){
+            System.out.println("Message Digest failed for : " + e);
+        }
         DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass);
         String isPasswordMatchSql = "SELECT password FROM table_users WHERE uid = ?";
         PreparedStatement matchPasswordStatement = database.prepareStatement(isPasswordMatchSql);
