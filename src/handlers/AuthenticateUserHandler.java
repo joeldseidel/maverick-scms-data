@@ -78,10 +78,10 @@ public class AuthenticateUserHandler extends HandlerPrototype implements HttpHan
         boolean userIsValid;
         boolean userExists = (UserDataManager.getUserCount(username) == 1);
         if(userExists){
-            //No need to get UUID yet, it means nothing to us
-            //long userUUID = UserDataManager.getUserUUID(username);
-            //TODO: query the password from the user_auth table and see if it matches
-            userIsValid = true;
+            //Get UUID for password checking
+            long userUUID = UserDataManager.getUserUUID(username);
+            //Query the password from the users table and see if it matches
+            userIsValid = UserDataManager.checkPasswordMatch(userUUID, password);
         } else {
             userIsValid = false;
         }
