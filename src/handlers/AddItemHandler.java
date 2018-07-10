@@ -100,12 +100,14 @@ public class AddItemHandler extends HandlerPrototype implements HttpHandler {
             MaverickItem thisItem = new MaverickItem(fdaid, name, category, cid);
             ItemDataManager itemDataManager = new ItemDataManager();
             itemDataManager.addItem(thisItem);
-            this.response = "Success";
+            JSONObject responseObject = new JSONObject();
+            responseObject.put("message","Success");
+            this.response = responseObject.toString();
 
         }
         else{
 
-            this.response = "Failed to Add Item";
+            this.response = Boolean.toString(false);
 
         }
 
