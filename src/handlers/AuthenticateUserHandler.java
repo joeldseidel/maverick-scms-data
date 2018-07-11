@@ -32,11 +32,10 @@ public class AuthenticateUserHandler extends HandlerPrototype implements HttpHan
         System.out.println("Entered User Authentication Handler");
         JSONObject requestParams = GetParameterObject(httpExchange);
         boolean isValidRequest = isRequestValid(requestParams);
+        displayRequestValidity(isValidRequest);
         if(isValidRequest){
-            System.out.println("Valid Request");
             fulfillRequest(requestParams);
         } else {
-            System.out.println("Invalid Request");
             this.response = "invalid request";
         }
         int responseCode = isValidRequest ? 200 : 400;

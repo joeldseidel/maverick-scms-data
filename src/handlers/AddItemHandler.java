@@ -33,11 +33,10 @@ public class AddItemHandler extends HandlerPrototype implements HttpHandler {
     public void handle(HttpExchange httpExchange) throws IOException {
         JSONObject requestParams = GetParameterObject(httpExchange);
         boolean isValidRequest = isRequestValid(requestParams);
+        displayRequestValidity(isValidRequest);
         if(isValidRequest){
-            System.out.println("Valid Request");
             fulfillRequest(requestParams);
         } else {
-            System.out.println("Invalid Request");
             this.response = "invalid request";
         }
         int responseCode = isValidRequest ? 200 : 400;

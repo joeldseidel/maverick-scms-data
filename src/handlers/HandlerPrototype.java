@@ -6,7 +6,7 @@ import org.json.JSONObject;
 import java.io.*;
 
 public abstract class HandlerPrototype {
-    protected JSONObject GetParameterObject(HttpExchange httpExchange) throws IOException {
+    JSONObject GetParameterObject(HttpExchange httpExchange) throws IOException {
         //Fetch the parameter text from the request
         InputStream paramInStream = httpExchange.getRequestBody();
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -23,6 +23,15 @@ public abstract class HandlerPrototype {
             return null;
         }
     }
+
+    void displayRequestValidity(boolean isValidRequest){
+        if(isValidRequest){
+            System.out.println("Valid Request");
+        } else {
+            System.out.println("Invalid Request");
+        }
+    }
+
     protected abstract boolean isRequestValid(JSONObject requestParams);
 
     protected abstract void fulfillRequest(JSONObject requestParams);

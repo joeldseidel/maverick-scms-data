@@ -36,6 +36,10 @@ public class UserDataManager {
         return userCount;
     }
 
+    public static boolean isUniqueUsername(String username){
+        return getUserCount(username) == 1;
+    }
+
     public static boolean checkPasswordMatch(long uid, String password){
         boolean isMatch;
         try{

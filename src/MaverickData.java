@@ -3,6 +3,8 @@ import com.sun.net.httpserver.HttpsParameters;
 import com.sun.net.httpserver.HttpsServer;
 import handlers.AuthenticateUserHandler;
 import handlers.AddItemHandler;
+import handlers.UserDataQueryHandler;
+import handlers.UserDataQueryHandler;
 
 import javax.net.ssl.*;
 import java.io.FileInputStream;
@@ -56,6 +58,7 @@ public class MaverickData {
             });
             server.createContext("/authenticate_user", new AuthenticateUserHandler());
             server.createContext("/add_item", new AddItemHandler());
+            server.createContext("/users/is_username_unique", new UserDataQueryHandler());
             //Create the context of the commands and the handlers in this line
             server.setExecutor(null);
             server.start();
