@@ -20,7 +20,7 @@ public class ItemDataManager {
      * Constructor for the ItemDataManager class
      */
     public ItemDataManager() {
-        this.database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass);
+        this.database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass, Config.databaseName);
     }
 
     /**

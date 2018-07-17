@@ -100,7 +100,7 @@ public class AuthenticateUserHandler extends HandlerPrototype implements HttpHan
 
     private JSONObject getUserData(String username){
         System.out.println("Attempting to get user data for username : " + username);
-        DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass);
+        DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass, Config.databaseName);
         String getUserDataSql = "SELECT * FROM table_users WHERE username = ?";
         PreparedStatement getUserDataStatement = database.prepareStatement(getUserDataSql);
         JSONObject userDataObject = new JSONObject();

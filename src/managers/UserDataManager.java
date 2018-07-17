@@ -16,7 +16,7 @@ public class UserDataManager {
 
     public static int getUserCount(String username){
         System.out.println("Attempting to get user count for username : " + username);
-        DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass);
+        DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass, Config.databaseName);
         String isUserValidSql = "SELECT uid FROM table_users WHERE username = ?";
         PreparedStatement isUserValidStatement = database.prepareStatement(isUserValidSql);
         int userCount = 0;
@@ -48,7 +48,7 @@ public class UserDataManager {
         catch(Exception e){
             System.out.println("Message Digest failed for : " + e);
         }
-        DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass);
+        DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass, Config.databaseName);
         String isPasswordMatchSql = "SELECT password FROM table_users WHERE uid = ?";
         PreparedStatement matchPasswordStatement = database.prepareStatement(isPasswordMatchSql);
         try{
@@ -71,7 +71,7 @@ public class UserDataManager {
     }
 
     public static long getUserUUID(String username){
-        DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass);
+        DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass, Config.databaseName);
         String getUserUUIDSql = "SELECT uid FROM table_users WHERE username = ?";
         PreparedStatement getUUIDStatement = database.prepareStatement(getUserUUIDSql);
         long userUUID = 0;

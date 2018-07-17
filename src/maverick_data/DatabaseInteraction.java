@@ -36,11 +36,11 @@ public class DatabaseInteraction {
      * @param password the password to use
      * @return the created Connection object
      */
-    private Connection createConnection(String host, int port, String username, String password){
+    private Connection createConnection(String host, int port, String username, String password, String database){
         try{
             Class.forName("com.mysql.jdbc.Driver");
             // build host string
-            String url = "jdbc:mysql://" + host + ":" + port + "/scms_testing";
+            String url = "jdbc:mysql://" + host + ":" + port + "/" + database;
             // debug attempted connection
             System.out.println("Attempting connection to " + url);
             // create connection
