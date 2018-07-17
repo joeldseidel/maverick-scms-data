@@ -113,4 +113,15 @@ public class DatabaseInteraction {
         }
     }
 
+    public int nonQueryWithIdCallback(PreparedStatement nonQueryIdCallbackStatement){
+        try{
+            nonQueryIdCallbackStatement.executeUpdate();
+            ResultSet idCallback = nonQueryIdCallbackStatement.getGeneratedKeys();
+            idCallback.next();
+            return idCallback.getInt(1);
+        } catch(SQLException sqlException){
+            return -1;
+        }
+    }
+
 }
