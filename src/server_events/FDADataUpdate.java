@@ -1,5 +1,7 @@
 package server_events;
 
+import maverick_data.Config;
+import maverick_data.DatabaseInteraction;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -10,6 +12,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
+import static java.util.Objects.isNull;
 
 /**
  * This class handles the server scheduled event to update the local FDA data
@@ -33,6 +37,91 @@ public class FDADataUpdate implements Runnable {
         while(!Thread.interrupted()){
             fetchFDAFiles();
         }
+    }
+
+    private void parseFDAFiles(){
+        //Get all local storage file contents (this will be all the data files)
+        File dataFilesList[] = new File(localDataFile).listFiles();
+        for(int i = 0; i < dataFilesList.length; i++){
+            System.out.println("Working on parsing data file " + (i + 1) + "/" + dataFilesList.length);
+            //It's going to be the only file in its parent, just get the path from it
+            File thisDataFilePath = new File(dataFilesList[i].listFiles()[0].getPath());
+            parseFDAFileToDatabase(thisDataFilePath);
+        }
+    }
+
+    private void parseFDAFileToDatabase(File parseFromFile){
+        JSONObject queryMetaDataObject = getMetaData(parseFromFile);
+        int totalRecordCount = queryMetaDataObject.getJSONObject("results").getInt("total") - queryMetaDataObject.getJSONObject("results").getInt("skip");
+        int recordCounter = 1;
+        boolean remainingObjectsInFile = true;
+        DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass);
+        do {
+            System.out.println("Parsing record " + recordCounter + "/" + totalRecordCount);
+            JSONObject readObject = getNextJsonObjectFromFile(parseFromFile);
+            if(!isNull(readObject)){
+                //Todo @Joel Seidel: write object to database and handle different names from JSON fields
+            } else {
+                remainingObjectsInFile = false;
+            }
+        } while(remainingObjectsInFile);
+    }
+
+    private JSONObject getNextJsonObjectFromFile(File parseFromFile){
+        String thisJsonObjectString = "";
+        try(BufferedReader br = new BufferedReader(new FileReader(parseFromFile))){
+            //Advance reader to the line we need
+            for(int i = 0; i <= lastLineIndex; i++){
+                br.readLine();
+            }
+            String thisLine;
+            int openObjectCount = 0; int closedOjectCount = 0;
+            //Check to see if we have to throw out that first line
+            if(resultIndex == 0){
+                //Yup, throw out that first line
+                br.readLine();
+            }
+            while((thisLine = br.readLine()) != null && (openObjectCount != closedOjectCount || openObjectCount == 0)){
+                if(thisLine.contains("{")){
+                    openObjectCount++;
+                }
+                if(thisLine.contains("}")){
+                    closedOjectCount++;
+                }
+                thisJsonObjectString += thisLine;
+                lastLineIndex++;
+            }
+        } catch(IOException ioE){
+            return null;
+        }
+        return new JSONObject(thisJsonObjectString);
+    }
+
+    //I hate to make this global but we need to return a few different values, I'm sorry programming gods
+    int lastLineIndex = 0; int resultIndex = 0;
+    private JSONObject getMetaData(File parseFromFile){
+        String metaDataObjectString = "{ ";
+        try(BufferedReader br = new BufferedReader(new FileReader(parseFromFile))){
+            String thisReadLine;
+            int openObjectCount = 0; int closedObjectCount = 0;
+            //Throw out the first line, it does not matter
+            br.readLine();
+            while((thisReadLine = br.readLine()) != null && (openObjectCount != closedObjectCount || openObjectCount == 0)){
+                if (thisReadLine.contains("{")) {
+                    openObjectCount++;
+                }
+                if(thisReadLine.contains("}")){
+                    closedObjectCount++;
+                }
+                metaDataObjectString += thisReadLine;
+                lastLineIndex++;
+            }
+        } catch(IOException ioExcept){
+            //This won't happen. bet.
+            return null;
+        }
+        metaDataObjectString += "}";
+        return new JSONObject(metaDataObjectString).getJSONObject("meta");
     }
 
     private void fetchFDAFiles(){
