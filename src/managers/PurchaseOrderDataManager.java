@@ -39,10 +39,9 @@ public class PurchaseOrderDataManager {
                 po.getCompany() + "\")";
 
         PreparedStatement qryStatement = this.database.prepareStatement(qryString);
-        this.database.nonQuery(qryStatement);
+        int poid = this.database.nonQueryWithIdCallback(qryStatement);
         for(MaverickPurchaseOrderLine line : po.getLines()){
-//~~TODO~~ Grab the returned ID from the purchase order creation to pass into the PO lines
-            this.addPurchaseOrderLine(line, 1);
+            this.addPurchaseOrderLine(line, poid);
         }
     }
 
