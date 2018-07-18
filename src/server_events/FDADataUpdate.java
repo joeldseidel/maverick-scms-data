@@ -55,7 +55,7 @@ public class FDADataUpdate implements Runnable {
         int totalRecordCount = queryMetaDataObject.getJSONObject("results").getInt("total") - queryMetaDataObject.getJSONObject("results").getInt("skip");
         int recordCounter = 1;
         boolean remainingObjectsInFile = true;
-        DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass);
+        DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass, Config.databaseName);
         do {
             System.out.println("Parsing record " + recordCounter + "/" + totalRecordCount);
             JSONObject readObject = getNextJsonObjectFromFile(parseFromFile);

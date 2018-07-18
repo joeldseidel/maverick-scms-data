@@ -3,12 +3,11 @@ package managers;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
 import java.util.ArrayList;
-import java.util.Date;
 
 import maverick_data.DatabaseInteraction;
-import maverick_types.MaverickItem;
+import maverick_types.MaverickPurchaseOrder;
+import maverick_types.MaverickPurchaseOrderLine;
 import maverick_data.Config;
 
 /**
@@ -33,7 +32,7 @@ public class PurchaseOrderDataManager {
      */
     public void addPurchaseOrder(MaverickPurchaseOrder po) {
         String qryString = "INSERT INTO table_po (cid, number, dateplaced, placingcompany) " + "VALUES (\"" +
-                po.getCustomer() + "\", \"" +=
+                po.getCustomer() + "\", \"" +
                 po.getNumber() + "\", \"" +
                 po.getDatePlaced() + "\", \"" +
                 po.getCompany() + "\")";
@@ -46,8 +45,8 @@ public class PurchaseOrderDataManager {
     }
 
     public void addPurchaseOrderLine(MaverickPurchaseOrderLine line, int poid){
-        String qryString = "INSERT INTO table_polines (poid, line, supplierpartnum, partdesc, deliverydate, quantity, price) " + "VALUES (\"" +
-                poid + "\", \"" +=
+        String qryString = "INSERT INTO table_polines (poid, line, supplierpartnum, partdesc, deliverydate, quantity, price) " + "VALUES (\"" + 
+                poid + "\", \"" +
                 line.getLineNumber() + "\", \"" +
                 line.getSupplierPartNumber() + "\", \"" +
                 line.getPartDescription() + "\", \"" +

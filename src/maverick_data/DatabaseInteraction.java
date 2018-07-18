@@ -23,8 +23,8 @@ public class DatabaseInteraction {
      * @param username the username to use
      * @param password the password to use
      */
-    public DatabaseInteraction(String host, int port, String username, String password) {
-        this.dbConn = this.createConnection(host, port, username, password);
+    public DatabaseInteraction(String host, int port, String username, String password, String database) {
+        this.dbConn = this.createConnection(host, port, username, password, database);
     }
 
     /**

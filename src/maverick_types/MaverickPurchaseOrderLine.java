@@ -1,8 +1,5 @@
 package maverick_types;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 /**
  * A single item
  */
@@ -11,7 +8,7 @@ public class MaverickPurchaseOrderLine {
     private int lineNumber;
     private String supplierPartNumber;
     private String partDescription;
-    private Date deliveryDate;
+    private String deliveryDate;
     private double quantity;
     private double price;
     
@@ -24,7 +21,7 @@ public class MaverickPurchaseOrderLine {
 	 * @param price
 	 */
 	public MaverickPurchaseOrderLine(int lineNumber, String supplierPartNumber, double quantity, String partDescription,
-			Date deliveryDate, double price) {
+			String deliveryDate, double price) {
 		this.lineNumber = lineNumber;
 		this.supplierPartNumber = supplierPartNumber;
 		this.quantity = quantity;
@@ -72,13 +69,13 @@ public class MaverickPurchaseOrderLine {
 	/**
 	 * @return the deliveryDate
 	 */
-	public Date getDeliveryDate() {
+	public String getDeliveryDate() {
 		return deliveryDate;
 	}
 	/**
 	 * @param deliveryDate the deliveryDate to set
 	 */
-	public void setDeliveryDate(Date deliveryDate) {
+	public void setDeliveryDate(String deliveryDate) {
 		this.deliveryDate = deliveryDate;
 	}
 	/**
