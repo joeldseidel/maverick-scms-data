@@ -23,13 +23,19 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.auth0.jwt.algorithms.*;
+import com.auth0.jwt.exceptions.*;
+import com.auth0.jwt.impl.*;
+import com.auth0.jwt.interfaces.*;
+import com.auth0.jwt.*;
+
 import maverick_types.MaverickPurchaseOrder;
 import maverick_types.MaverickPurchaseOrderLine;
 import managers.PurchaseOrderDataManager;
 
 public class AddPurchaseOrderHandler extends HandlerPrototype implements HttpHandler {
 
-    private String[] requiredKeys = {"fdaid", "name", "category", "cid", "token"};
+    private String[] requiredKeys = {"number", "dateplaced", "placingcompany", "cid", "lines", "token"};
     private String response;
     public void handle(HttpExchange httpExchange) throws IOException {
         JSONObject requestParams = GetParameterObject(httpExchange);
@@ -44,7 +50,7 @@ public class AddPurchaseOrderHandler extends HandlerPrototype implements HttpHan
         Headers headers = httpExchange.getResponseHeaders();
         headers.add("Access-Control-Allow-Origin", "*");
         httpExchange.sendResponseHeaders(responseCode, this.response.length());
-        System.out.println("Response to Add Item Request : " + this.response);
+        System.out.println("Response to Add Purchase Order Request : " + this.response);
         OutputStream os = httpExchange.getResponseBody();
         os.write(this.response.getBytes());
         os.close();
@@ -73,10 +79,11 @@ public class AddPurchaseOrderHandler extends HandlerPrototype implements HttpHan
 
         boolean isVerified;
 
-        int fdaid = requestParams.getInt("fdaid");
         String cid = requestParams.getString("cid");
-        String name = requestParams.getString("name");
-        String category = requestParams.getString("category");
+        String number = requestParams.getString("number");
+        String dateplaced = requestParams.getString("dateplaced");
+        String placingcompany = requestParams.getString("placingcompany");
+        //~~TODO~~ add function to read lines
         String token = requestParams.getString("token");
 
         try {
@@ -97,9 +104,9 @@ public class AddPurchaseOrderHandler extends HandlerPrototype implements HttpHan
 
         if(isVerified){
 
-            MaverickItem thisItem = new MaverickItem(fdaid, name, category, cid);
-            ItemDataManager itemDataManager = new ItemDataManager();
-            itemDataManager.addItem(thisItem);
+            MaverickPurchaseOrder thisOrder = new MaverickPurchaseOrder(number, dateplaced, placingcompany, cid);
+            PurchaseOrderDataManager poDataManager = new PurchaseOrderDataManager();
+            poDataManager.addPurchaseOrder(thisOrder);
             JSONObject responseObject = new JSONObject();
             responseObject.put("message","Success");
             this.response = responseObject.toString();

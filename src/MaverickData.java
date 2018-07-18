@@ -59,6 +59,7 @@ public class MaverickData {
             server.createContext("/add_item", new AddItemHandler());
             server.createContext("/users/is_username_unique", new UserDataQueryHandler());
             server.createContext("/update_fda_data", new RunFDAUpdateHandler());
+            server.createContext("/add_po", new AddPurchaseOrderHandler());
             //Create the context of the commands and the handlers in this line
             server.setExecutor(null);
             server.start();

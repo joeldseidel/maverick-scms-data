@@ -1,7 +1,5 @@
 package maverick_types;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.ArrayList;
 
 /**
@@ -10,7 +8,7 @@ import java.util.ArrayList;
 public class MaverickPurchaseOrder {
 
     private String number;
-    private Date datePlaced;
+    private String datePlaced;
     private String placingCompany;
     private String customerID;
     private ArrayList<MaverickPurchaseOrderLine> lines;
@@ -18,7 +16,7 @@ public class MaverickPurchaseOrder {
     /**
      * Constructor for a new MaverickItem
      */
-    public MaverickPurchaseOrder(String number, Date datePlaced, String placingCompany, String customerID) {
+    public MaverickPurchaseOrder(String number, String datePlaced, String placingCompany, String customerID) {
         this.number = number;
         this.datePlaced = datePlaced;
         this.placingCompany = placingCompany;
@@ -46,7 +44,7 @@ public class MaverickPurchaseOrder {
      * Setter for the date placed
      * @param datePlaced the new date placed to use
      */
-    public void setDatePlaced(Date datePlaced) {
+    public void setDatePlaced(String datePlaced) {
         this.datePlaced = datePlaced;
     }
 
@@ -54,7 +52,7 @@ public class MaverickPurchaseOrder {
      * Getter for date placed
      * @return date placed
      */
-    public Date getDatePlaced() {
+    public String getDatePlaced() {
         return this.datePlaced;
     }
 

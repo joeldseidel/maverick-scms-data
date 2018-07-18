@@ -3,12 +3,11 @@ package managers;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
 import java.util.ArrayList;
-import java.util.Date;
 
 import maverick_data.DatabaseInteraction;
-import maverick_types.MaverickItem;
+import maverick_types.MaverickPurchaseOrder;
+import maverick_types.MaverickPurchaseOrderLine;
 import maverick_data.Config;
 import maverick_types.MaverickPurchaseOrder;
 import maverick_types.MaverickPurchaseOrderLine;
@@ -34,17 +33,29 @@ public class PurchaseOrderDataManager {
      * addPurchaseOrder adds a purchase order to the database
      */
     public void addPurchaseOrder(MaverickPurchaseOrder po) {
+<<<<<<< HEAD
         String qryString = "INSERT INTO table_po (cid, number, dateplaced, placingcompany) " + "VALUES (\"" + po.getCustomer() + "\", \"" + po.getNumber() + "\", \"" + po.getDatePlaced() + "\", \"" + po.getCompany() + "\")";
+=======
+        String qryString = "INSERT INTO table_po (cid, number, dateplaced, placingcompany) " + "VALUES (\"" +
+                po.getCustomer() + "\", \"" +
+                po.getNumber() + "\", \"" +
+                po.getDatePlaced() + "\", \"" +
+                po.getCompany() + "\")";
+
+>>>>>>> 25fe3896d7458e90bde8e873042616fc744d7ddd
         PreparedStatement qryStatement = this.database.prepareStatement(qryString);
-        this.database.nonQuery(qryStatement);
+        int poid = this.database.nonQueryWithIdCallback(qryStatement);
         for(MaverickPurchaseOrderLine line : po.getLines()){
-//~~TODO~~ Grab the returned ID from the purchase order creation to pass into the PO lines
-            this.addPurchaseOrderLine(line, 1);
+            this.addPurchaseOrderLine(line, poid);
         }
     }
 
     public void addPurchaseOrderLine(MaverickPurchaseOrderLine line, int poid){
+<<<<<<< HEAD
         String qryString = "INSERT INTO table_polines (poid, line, supplierpartnum, partdesc, deliverydate, quantity, price) " + "VALUES (\"" +
+=======
+        String qryString = "INSERT INTO table_polines (poid, line, supplierpartnum, partdesc, deliverydate, quantity, price) " + "VALUES (\"" + 
+>>>>>>> 25fe3896d7458e90bde8e873042616fc744d7ddd
                 poid + "\", \"" +
                 line.getLineNumber() + "\", \"" +
                 line.getSupplierPartNumber() + "\", \"" +
