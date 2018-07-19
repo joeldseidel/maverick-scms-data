@@ -1,7 +1,9 @@
 import com.sun.net.httpserver.HttpsConfigurator;
 import com.sun.net.httpserver.HttpsParameters;
 import com.sun.net.httpserver.HttpsServer;
-import handlers.AuthenticateUserHandler;
+import handlers.*;
+import handlers.UserDataQueryHandler;
+import server_events.FDADataUpdate;
 
 import javax.net.ssl.*;
 import java.io.FileInputStream;
@@ -9,6 +11,7 @@ import java.net.InetSocketAddress;
 import java.security.KeyStore;
 
 public class MaverickData {
+
     public static void main(String args[]){
         try{
             //Create socket address
@@ -53,11 +56,19 @@ public class MaverickData {
                 }
             });
             server.createContext("/authenticate_user", new AuthenticateUserHandler());
+            server.createContext("/add_item", new AddItemHandler());
+            server.createContext("/users/is_username_unique", new UserDataQueryHandler());
+            server.createContext("/update_fda_data", new RunFDAUpdateHandler());
+            server.createContext("/add_po", new AddPurchaseOrderHandler());
             //Create the context of the commands and the handlers in this line
             server.setExecutor(null);
             server.start();
+
+            //Debug 
+            System.out.println("Server Running and Listening On " + address);
         } catch(Exception ex){
             ex.printStackTrace();
         }
     }
+    
 }
