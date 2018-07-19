@@ -154,6 +154,7 @@ public class FDADataUpdate implements Runnable {
             } else {
                 System.out.println("Bad request code to fetch file at " + thisFileUrlString);
             }
+            parseFDAFiles();
         }
     }
 
@@ -360,11 +361,50 @@ public class FDADataUpdate implements Runnable {
             this.value = value;
             this.colName = keyName;
         }
+
+        String getColumnName(){
+            return this.colName;
+        }
+
+        Object getValue(){
+            return this.value;
+        }
     }
 
     private void writeDevice(JSONObject readObject, DatabaseInteraction databaseInteraction){
-        String fdaId = readObject.getJSONObject("identifiers").getString("id");
+        String fdaId = readObject.getJSONArray("identifiers").getJSONObject(0).getString("id");
         List<FDADeviceProperty> deviceProperties = getDeviceProperties(readObject);
+        String writeDeviceColumnsSql = "INSERT INTO fda_data_devices(fda_id";
+        String writeDeviceValuesSql = ") VALUES ('" + fdaId + "'";
+        for (FDADeviceProperty thisProperty : deviceProperties) {
+            writeDeviceColumnsSql += ", " + thisProperty.getColumnName();
+            writeDeviceValuesSql += ", ";
+            Object propertyValue = thisProperty.getValue();
+            if(propertyValue.getClass() == String.class || propertyValue instanceof Date){
+                writeDeviceValuesSql += "'" + propertyValue.toString() + "'";
+            }
+            else if(propertyValue.getClass() == Boolean.class){
+                if((Boolean)propertyValue){
+                    writeDeviceValuesSql += "1";
+                } else {
+                    writeDeviceValuesSql += "0";
+                }
+            } else if (propertyValue.getClass() == int.class || propertyValue.getClass() == Integer.class) {
+                writeDeviceValuesSql += propertyValue;
+            }
+        }
+        String writeDeviceSql = writeDeviceColumnsSql + writeDeviceValuesSql + ")";
+        //Todo: run nonquery (async?)
+        if(readObject.has("customer_contacts")){
+            writeDeviceCustomerContacts(readObject, fdaId);
+        }
+    }
+
+    private void writeDeviceCustomerContacts(JSONObject readObject, String fdaId){
+        List<JSONObject> customerContactObjects = new ArrayList();
+        for (int i = 0; i < readObject.getJSONArray("customer_contacts").length(); i++){
+
+        }
     }
 
     private List<FDADeviceProperty> getDeviceProperties(JSONObject readObject){
@@ -378,7 +418,7 @@ public class FDADataUpdate implements Runnable {
         if(readObject.has("device_description")){ props.add(new FDADeviceProperty("device_description", readObject.getString("device_description"))); }
         if(readObject.has("has_donation_id_number")){ props.add(new FDADeviceProperty("has_donation_id_number", readObject.getBoolean("has_donation_id_number"))); }
         if(readObject.has("has_expiration_date")){ props.add(new FDADeviceProperty("has_expiration_date", readObject.getBoolean("has_expiration_date"))); }
-        if(readObject.has("has_lot_or_batch_number")){ props.add(new FDADeviceProperty("has_lot_or_batch_number", readObject.getBoolean("has_lot_or_batch"))); }
+        if(readObject.has("has_lot_or_batch_number")){ props.add(new FDADeviceProperty("has_lot_or_batch_number", readObject.getBoolean("has_lot_or_batch_number"))); }
         if(readObject.has("has_manufacturing_date")){ props.add(new FDADeviceProperty("has_manufacturing_date", readObject.getBoolean("has_manufacturing_date"))); }
         if(readObject.has("has_serial_number")){ props.add(new FDADeviceProperty("has_serial_number", readObject.getBoolean("has_serial_number"))); }
         if(readObject.has("is_combination_product")){ props.add(new FDADeviceProperty("is_combination_product", readObject.getBoolean("is_combination_product"))); }
@@ -393,10 +433,10 @@ public class FDADataUpdate implements Runnable {
         if(readObject.has("is_single_use")){ props.add(new FDADeviceProperty("is_single_use", readObject.getBoolean("is_single_use"))); }
         if(readObject.has("labeler_duns_number")){ props.add(new FDADeviceProperty("labeler_duns_number", readObject.getString("labeler_duns_number"))); }
         if(readObject.has("mri_safety")){ props.add(new FDADeviceProperty("mri_safety", readObject.getString("mri_safety"))); }
-        if(readObject.has("public_version_date")){ props.add(new FDADeviceProperty("public_version_date", Date.parse(readObject.getString("public_version_date")))); }
+        if(readObject.has("public_version_date")){ props.add(new FDADeviceProperty("public_version_date", readObject.getString("public_version_date"))); }
         if(readObject.has("public_version_number")){ props.add(new FDADeviceProperty("public_version_number", readObject.getString("public_version_number"))); }
         if(readObject.has("public_version_status")){ props.add(new FDADeviceProperty("public_version_status", readObject.getString("public_version_status"))); }
-        if(readObject.has("publish_date")){ props.add(new FDADeviceProperty("publish_date", Date.parse(readObject.getString("publish_date")))); }
+        if(readObject.has("publish_date")){ props.add(new FDADeviceProperty("publish_date", readObject.getString("publish_date"))); }
         if(readObject.has("record_key")){ props.add(new FDADeviceProperty("record_key", readObject.getString("record_key"))); }
         if(readObject.has("record_status")){ props.add(new FDADeviceProperty("record_status", readObject.getString("record_status"))); }
         if(readObject.has("is_sterile")){ props.add(new FDADeviceProperty("is_sterile", readObject.getBoolean("is_sterile"))); }
