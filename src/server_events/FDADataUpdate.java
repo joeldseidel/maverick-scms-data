@@ -10,6 +10,9 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -60,7 +63,7 @@ public class FDADataUpdate implements Runnable {
             System.out.println("Parsing record " + recordCounter + "/" + totalRecordCount);
             JSONObject readObject = getNextJsonObjectFromFile(parseFromFile);
             if(!isNull(readObject)){
-                //Todo @Joel Seidel: write object to database and handle different names from JSON fields
+                writeDevice(readObject, database);
             } else {
                 remainingObjectsInFile = false;
             }
@@ -98,7 +101,7 @@ public class FDADataUpdate implements Runnable {
     }
 
     //I hate to make this global but we need to return a few different values, I'm sorry programming gods
-    int lastLineIndex = 0; int resultIndex = 0;
+    private int lastLineIndex = 0; private int resultIndex = 0;
     private JSONObject getMetaData(File parseFromFile){
         String metaDataObjectString = "{ ";
         try(BufferedReader br = new BufferedReader(new FileReader(parseFromFile))){
@@ -337,5 +340,74 @@ public class FDADataUpdate implements Runnable {
         int getContentLength(){
             return this.contentLength;
         }
+    }
+
+    private class FDADeviceProperty{
+        String keyName;
+        Object value;
+        String colName;
+
+        //Constructor for when the property and the destination column name are not the same
+        FDADeviceProperty(String keyName, Object value, String colName){
+            this.keyName = keyName;
+            this.value = value;
+            this.colName = colName;
+        }
+
+        //Constructor for when the property and the destination column name are the same
+        FDADeviceProperty(String keyName, Object value){
+            this.keyName = keyName;
+            this.value = value;
+            this.colName = keyName;
+        }
+    }
+
+    private void writeDevice(JSONObject readObject, DatabaseInteraction databaseInteraction){
+        String fdaId = readObject.getJSONObject("identifiers").getString("id");
+        List<FDADeviceProperty> deviceProperties = getDeviceProperties(readObject);
+    }
+
+    private List<FDADeviceProperty> getDeviceProperties(JSONObject readObject){
+        List<FDADeviceProperty> props = new ArrayList<>();
+        if(readObject.has("brand_name")){ props.add(new FDADeviceProperty("brand_name", readObject.getString("brand_name"))); }
+        if(readObject.has("catalog_number")){ props.add(new FDADeviceProperty("catalog_number", readObject.getString("catalog_number"))); }
+        if(readObject.has("commercial_distribution_end_date")){ props.add(new FDADeviceProperty("commercial_distribution_end_date", Date.parse(readObject.getString("commercial_distribution_end_date")))); }
+        if(readObject.has("commercial_distribution_status")){ props.add(new FDADeviceProperty("commercial_distribution_status", readObject.getString("commercial_distribution_status"))); }
+        if(readObject.has("company_name")){ props.add(new FDADeviceProperty("company_name", readObject.getString("company_name"))); }
+        if(readObject.has("device_count_in_base_package")){ props.add(new FDADeviceProperty("device_count_in_base_package", readObject.getInt("device_count_in_base_package"))); }
+        if(readObject.has("device_description")){ props.add(new FDADeviceProperty("device_description", readObject.getString("device_description"))); }
+        if(readObject.has("has_donation_id_number")){ props.add(new FDADeviceProperty("has_donation_id_number", readObject.getBoolean("has_donation_id_number"))); }
+        if(readObject.has("has_expiration_date")){ props.add(new FDADeviceProperty("has_expiration_date", readObject.getBoolean("has_expiration_date"))); }
+        if(readObject.has("has_lot_or_batch_number")){ props.add(new FDADeviceProperty("has_lot_or_batch_number", readObject.getBoolean("has_lot_or_batch"))); }
+        if(readObject.has("has_manufacturing_date")){ props.add(new FDADeviceProperty("has_manufacturing_date", readObject.getBoolean("has_manufacturing_date"))); }
+        if(readObject.has("has_serial_number")){ props.add(new FDADeviceProperty("has_serial_number", readObject.getBoolean("has_serial_number"))); }
+        if(readObject.has("is_combination_product")){ props.add(new FDADeviceProperty("is_combination_product", readObject.getBoolean("is_combination_product"))); }
+        if(readObject.has("is_direct_marking_exempt")){ props.add(new FDADeviceProperty("is_direct_marking_exempt", readObject.getBoolean("is_direct_marking_exempt"))); }
+        if(readObject.has("is_hct_p")){ props.add(new FDADeviceProperty("is_hct_p", readObject.getBoolean("is_hct_p"))); }
+        if(readObject.has("is_kit")){ props.add(new FDADeviceProperty("is_kit", readObject.getBoolean("is_kit"))); }
+        if(readObject.has("is_labeled_as_no_nrl")){ props.add(new FDADeviceProperty("is_labeled_as_no_nrl", readObject.getBoolean("is_labeled_as_no_nrl"))); }
+        if(readObject.has("is_labeled_as_nrl")){ props.add(new FDADeviceProperty("is_labeled_as_nrl", readObject.getBoolean("is_labeled_as_nrl"))); }
+        if(readObject.has("is_otc")){ props.add(new FDADeviceProperty("is_otc", readObject.getBoolean("is_otc"))); }
+        if(readObject.has("is_pm_exempt")){ props.add(new FDADeviceProperty("is_pm_exempt", readObject.getBoolean("is_pm_exempt"))); }
+        if(readObject.has("is_rx")){ props.add(new FDADeviceProperty("is_rx", readObject.getBoolean("is_rx"))); }
+        if(readObject.has("is_single_use")){ props.add(new FDADeviceProperty("is_single_use", readObject.getBoolean("is_single_use"))); }
+        if(readObject.has("labeler_duns_number")){ props.add(new FDADeviceProperty("labeler_duns_number", readObject.getString("labeler_duns_number"))); }
+        if(readObject.has("mri_safety")){ props.add(new FDADeviceProperty("mri_safety", readObject.getString("mri_safety"))); }
+        if(readObject.has("public_version_date")){ props.add(new FDADeviceProperty("public_version_date", Date.parse(readObject.getString("public_version_date")))); }
+        if(readObject.has("public_version_number")){ props.add(new FDADeviceProperty("public_version_number", readObject.getString("public_version_number"))); }
+        if(readObject.has("public_version_status")){ props.add(new FDADeviceProperty("public_version_status", readObject.getString("public_version_status"))); }
+        if(readObject.has("publish_date")){ props.add(new FDADeviceProperty("publish_date", Date.parse(readObject.getString("publish_date")))); }
+        if(readObject.has("record_key")){ props.add(new FDADeviceProperty("record_key", readObject.getString("record_key"))); }
+        if(readObject.has("record_status")){ props.add(new FDADeviceProperty("record_status", readObject.getString("record_status"))); }
+        if(readObject.has("is_sterile")){ props.add(new FDADeviceProperty("is_sterile", readObject.getBoolean("is_sterile"))); }
+        if(readObject.has("is_sterilization_prior_use")){ props.add(new FDADeviceProperty("is_sterilization_prior_use", readObject.getBoolean("is_sterilization_prior_use"))); }
+        if(readObject.has("sterilization_methods")){ props.add(new FDADeviceProperty("sterilization_methods", readObject.getString("sterilization_methods"))); }
+        if(readObject.has("version_or_model_number")){ props.add(new FDADeviceProperty("version_or_model_number", readObject.getString("version_or_model_number"))); }
+        if(readObject.has("device_class")){ props.add(new FDADeviceProperty("device_class", readObject.getString("device_class"))); }
+        if(readObject.has("device_name")){ props.add(new FDADeviceProperty("device_name", readObject.getString("device_name"))); }
+        if(readObject.has("fei_number")){ props.add(new FDADeviceProperty("fei_number", readObject.getString("fei_number"))); }
+        if(readObject.has("medical_specialty_description")){ props.add(new FDADeviceProperty("medical_specialty_description", readObject.getString("medical_specialty_description"))); }
+        if(readObject.has("regulation_number")){ props.add(new FDADeviceProperty("regulation_number", readObject.getString("regulation_number"))); }
+        return props;
     }
 }
