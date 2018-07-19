@@ -7,7 +7,6 @@ import java.sql.*;
  *
  * @author Joel Seidel
  * @author Chris Vantine
- * @author Josh Famous
  */
 public class DatabaseInteraction {
 

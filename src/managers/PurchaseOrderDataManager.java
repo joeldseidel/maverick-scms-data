@@ -9,8 +9,6 @@ import maverick_data.DatabaseInteraction;
 import maverick_types.MaverickPurchaseOrder;
 import maverick_types.MaverickPurchaseOrderLine;
 import maverick_data.Config;
-import maverick_types.MaverickPurchaseOrder;
-import maverick_types.MaverickPurchaseOrderLine;
 
 /**
  * Abstracts away all of the database interaction necessary to work with items in our databases
@@ -33,16 +31,12 @@ public class PurchaseOrderDataManager {
      * addPurchaseOrder adds a purchase order to the database
      */
     public void addPurchaseOrder(MaverickPurchaseOrder po) {
-<<<<<<< HEAD
-        String qryString = "INSERT INTO table_po (cid, number, dateplaced, placingcompany) " + "VALUES (\"" + po.getCustomer() + "\", \"" + po.getNumber() + "\", \"" + po.getDatePlaced() + "\", \"" + po.getCompany() + "\")";
-=======
         String qryString = "INSERT INTO table_po (cid, number, dateplaced, placingcompany) " + "VALUES (\"" +
                 po.getCustomer() + "\", \"" +
                 po.getNumber() + "\", \"" +
                 po.getDatePlaced() + "\", \"" +
                 po.getCompany() + "\")";
 
->>>>>>> 25fe3896d7458e90bde8e873042616fc744d7ddd
         PreparedStatement qryStatement = this.database.prepareStatement(qryString);
         int poid = this.database.nonQueryWithIdCallback(qryStatement);
         for(MaverickPurchaseOrderLine line : po.getLines()){
@@ -51,11 +45,7 @@ public class PurchaseOrderDataManager {
     }
 
     public void addPurchaseOrderLine(MaverickPurchaseOrderLine line, int poid){
-<<<<<<< HEAD
-        String qryString = "INSERT INTO table_polines (poid, line, supplierpartnum, partdesc, deliverydate, quantity, price) " + "VALUES (\"" +
-=======
         String qryString = "INSERT INTO table_polines (poid, line, supplierpartnum, partdesc, deliverydate, quantity, price) " + "VALUES (\"" + 
->>>>>>> 25fe3896d7458e90bde8e873042616fc744d7ddd
                 poid + "\", \"" +
                 line.getLineNumber() + "\", \"" +
                 line.getSupplierPartNumber() + "\", \"" +
