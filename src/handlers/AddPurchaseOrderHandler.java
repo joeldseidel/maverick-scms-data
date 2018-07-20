@@ -77,7 +77,6 @@ public class AddPurchaseOrderHandler extends HandlerPrototype implements HttpHan
         String number = requestParams.getString("number");
         String dateplaced = requestParams.getString("dateplaced");
         String placingcompany = requestParams.getString("placingcompany");
-        //~~TODO~~ add function to read lines
         String token = requestParams.getString("token");
 
         try {
@@ -98,8 +97,25 @@ public class AddPurchaseOrderHandler extends HandlerPrototype implements HttpHan
 
         if(isVerified){
 
+            //CREATE PURCHASE ORDER
             MaverickPurchaseOrder thisOrder = new MaverickPurchaseOrder(number, dateplaced, placingcompany, cid);
             PurchaseOrderDataManager poDataManager = new PurchaseOrderDataManager();
+
+            //ADD PURCHASE ORDER LINES
+            JSONArray lines = requestParams.getJSONArray("lines");
+            for (int i = 0; i < lines.length(); i++) {
+              JSONObject line = lines.getJSONObject(i);
+              thisOrder.addLine(new MaverickPurchaseOrderLine(
+                line.getInt("line"),
+                line.getString("supplierpartnum"),
+                line.getString("partdesc"),
+                line.getString("deliverydate"),
+                line.getFloat("quantity"),
+                line.getFloat("price")
+                ));
+            }
+
+            //PERFORM PURCHASE ORDER ADDING
             poDataManager.addPurchaseOrder(thisOrder);
             JSONObject responseObject = new JSONObject();
             responseObject.put("message","Success");
