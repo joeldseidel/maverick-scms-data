@@ -10,6 +10,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -38,7 +39,8 @@ public class FDADataUpdate implements Runnable {
     public void run(){
         System.out.println("Starting to update FDA data on thread " + fdaUpdateThread.getName());
         while(!Thread.interrupted()){
-            fetchFDAFiles();
+            //fetchFDAFiles();
+            parseFDAFiles();
         }
     }
 
@@ -60,13 +62,14 @@ public class FDADataUpdate implements Runnable {
         boolean remainingObjectsInFile = true;
         DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass, Config.databaseName);
         do {
-            System.out.println("Parsing record " + recordCounter + "/" + totalRecordCount);
+            System.out.println("Writing record " + recordCounter + "/" + totalRecordCount);
             JSONObject readObject = getNextJsonObjectFromFile(parseFromFile);
             if(!isNull(readObject)){
                 writeDevice(readObject, database);
             } else {
                 remainingObjectsInFile = false;
             }
+            recordCounter++;
         } while(remainingObjectsInFile);
     }
 
@@ -371,17 +374,156 @@ public class FDADataUpdate implements Runnable {
         }
     }
 
-    private void writeDevice(JSONObject readObject, DatabaseInteraction databaseInteraction){
+    private void writeDevice(JSONObject readObject, DatabaseInteraction database){
         String fdaId = readObject.getJSONArray("identifiers").getJSONObject(0).getString("id");
         List<FDADeviceProperty> deviceProperties = getDeviceProperties(readObject);
-        String writeDeviceColumnsSql = "INSERT INTO fda_data_devices(fda_id";
+        String deviceInsertSql = fdaDevicePropertyQueryBuilder("fda_data_devices", fdaId ,deviceProperties);
+        PreparedStatement deviceInsertQuery = database.prepareStatement(deviceInsertSql);
+        database.nonQuery(deviceInsertQuery);
+        if(readObject.has("customer_contacts")){
+            writeDeviceCustomerContacts(readObject, fdaId, database);
+        }
+        if(readObject.has("device_sizes")){
+            writeDeviceSizes(readObject, fdaId, database);
+        }
+        if(readObject.has("gmdn_terms")){
+            writeDeviceGmdnTerms(readObject, fdaId, database);
+        }
+        if(readObject.has("identifiers")){
+            writeDeviceIdentifiers(readObject, fdaId, database);
+        }
+        if(readObject.has("premarket_submissions")){
+            writeDevicePremarketSubmissions(readObject, fdaId, database);
+        }
+        if(readObject.has("product_codes")){
+            writeDeviceProductCodes(readObject, fdaId, database);
+        }
+        if(readObject.has("storage")){
+            writeDeviceStorage(readObject, fdaId, database);
+        }
+    }
+
+    private void writeDeviceCustomerContacts(JSONObject readObject, String fdaId, DatabaseInteraction database){
+        JSONArray customerContactsArray = readObject.getJSONArray("customer_contacts");
+        for (int i = 0; i < customerContactsArray.length(); i++){
+            JSONObject thisCustomerContact = customerContactsArray.getJSONObject(i);
+            List<FDADeviceProperty> props = new ArrayList<>();
+            if(thisCustomerContact.has("phone")){ props.add(new FDADeviceProperty("phone", thisCustomerContact.getString("phone"))); }
+            if(thisCustomerContact.has("email")){ props.add(new FDADeviceProperty("email", thisCustomerContact.getString("email"))); }
+            String thisCustomerContactInsertSql = fdaDevicePropertyQueryBuilder("fda_data_device_customer_contacts", fdaId, props);
+            PreparedStatement customerContactInsertQuery = database.prepareStatement(thisCustomerContactInsertSql);
+            database.nonQuery(customerContactInsertQuery);
+        }
+    }
+
+    private void writeDeviceSizes(JSONObject readObject, String fdaId, DatabaseInteraction database){
+        JSONArray deviceSizesArray = readObject.getJSONArray("device_sizes");
+        for(int i = 0; i < deviceSizesArray.length(); i++){
+            JSONObject thisDeviceSize = deviceSizesArray.getJSONObject(i);
+            List<FDADeviceProperty> props = new ArrayList<>();
+            if(thisDeviceSize.has("text")){ props.add(new FDADeviceProperty("text", thisDeviceSize.getString("text"), "size_text")); }
+            if(thisDeviceSize.has("type")){ props.add(new FDADeviceProperty("type", thisDeviceSize.getString("type"), "size_type")); }
+            if(thisDeviceSize.has("value")){ props.add(new FDADeviceProperty("value", thisDeviceSize.getString("value"), "size_value")); }
+            if(thisDeviceSize.has("unit")) { props.add(new FDADeviceProperty("unit", thisDeviceSize.getString("unit"))); }
+            String thisDeviceSizeInsertSql = fdaDevicePropertyQueryBuilder("fda_data_device_device_sizes", fdaId, props);
+            PreparedStatement deviceSizeInsertQuery = database.prepareStatement(thisDeviceSizeInsertSql);
+            database.nonQuery(deviceSizeInsertQuery);
+        }
+    }
+
+    private void writeDeviceGmdnTerms(JSONObject readObject, String fdaId, DatabaseInteraction database){
+        JSONArray deviceGmdnTermsArray = readObject.getJSONArray("gmdn_terms");
+        for(int i = 0; i < deviceGmdnTermsArray.length(); i++){
+            JSONObject thisGmdnTerm = deviceGmdnTermsArray.getJSONObject(i);
+            List<FDADeviceProperty> props = new ArrayList<>();
+            if(thisGmdnTerm.has("name")){ props.add(new FDADeviceProperty("name", thisGmdnTerm.getString("name"))); }
+            if(thisGmdnTerm.has("definition")){ props.add(new FDADeviceProperty("definition", thisGmdnTerm.getString("definition"))); }
+            String thisGmdnTermsInsertSql = fdaDevicePropertyQueryBuilder("fda_data_device_gmdn_terms", fdaId, props);
+            PreparedStatement gmdnTermsInsertQuery = database.prepareStatement(thisGmdnTermsInsertSql);
+            database.nonQuery(gmdnTermsInsertQuery);
+        }
+    }
+
+    private void writeDeviceIdentifiers(JSONObject readObject, String fdaId, DatabaseInteraction database){
+        JSONArray deviceIdentifiers = readObject.getJSONArray("identifiers");
+        for(int i = 0; i <deviceIdentifiers.length(); i++){
+            JSONObject thisDeviceIdentifier = deviceIdentifiers.getJSONObject(i);
+            List<FDADeviceProperty> props = new ArrayList<>();
+            if(thisDeviceIdentifier.has("id")){ props.add(new FDADeviceProperty("id", thisDeviceIdentifier.getString("id"), "identifier_id")); }
+            if(thisDeviceIdentifier.has("issuing_agency")){ props.add(new FDADeviceProperty("issuing_agency", thisDeviceIdentifier.getString("issuing_agency"))); }
+            if(thisDeviceIdentifier.has("package_discontinue_date")){ props.add(new FDADeviceProperty("package_discontinue_date", thisDeviceIdentifier.getString("package_discontinue_date"))); }
+            if(thisDeviceIdentifier.has("package_status")){ props.add(new FDADeviceProperty("package_status", thisDeviceIdentifier.getString("package_status"))); }
+            if(thisDeviceIdentifier.has("package_type")){ props.add(new FDADeviceProperty("package_type", thisDeviceIdentifier.getString("package_type"))); }
+            if(thisDeviceIdentifier.has("quantity_per_package")){ props.add(new FDADeviceProperty("quantity_per_package", thisDeviceIdentifier.getInt("quantity_per_package"))); }
+            if(thisDeviceIdentifier.has("type")){ props.add(new FDADeviceProperty("type", thisDeviceIdentifier.getString("type"), "identifier_type")); }
+            if(thisDeviceIdentifier.has("unit_of_use_id")){ props.add(new FDADeviceProperty("unit_of_use_id", thisDeviceIdentifier.getString("unit_of_use_id"))); }
+            String thisDeviceIdentifierInsertSql = fdaDevicePropertyQueryBuilder("fda_data_device_identifiers", fdaId, props);
+            PreparedStatement deviceIdentifierQuery = database.prepareStatement(thisDeviceIdentifierInsertSql);
+            database.nonQuery(deviceIdentifierQuery);
+        }
+    }
+
+    private void writeDevicePremarketSubmissions(JSONObject readObject, String fdaId, DatabaseInteraction database){
+        JSONArray devicePremarketSubmissions = readObject.getJSONArray("premarket_submissions");
+        for(int i = 0; i < devicePremarketSubmissions.length(); i++){
+            JSONObject thisPremarketSubmission = devicePremarketSubmissions.getJSONObject(i);
+            List<FDADeviceProperty> props = new ArrayList<>();
+            if(thisPremarketSubmission.has("submission_number")){ props.add(new FDADeviceProperty("submission_number", thisPremarketSubmission.getString("submission_number"))); }
+            if(thisPremarketSubmission.has("supplement_number")){ props.add(new FDADeviceProperty("supplement_number", thisPremarketSubmission.getString("supplement_number"))); }
+            if(thisPremarketSubmission.has("submission_type")){ props.add(new FDADeviceProperty("submission_type", thisPremarketSubmission.getString("submission_type"))); }
+            String thisPremarketSubmissionSql = fdaDevicePropertyQueryBuilder("fda_data_device_premarket_submissions", fdaId, props);
+            PreparedStatement premarketSubmissionQuery = database.prepareStatement(thisPremarketSubmissionSql);
+            database.nonQuery(premarketSubmissionQuery);
+        }
+    }
+
+    private void writeDeviceProductCodes(JSONObject readObject, String fdaId, DatabaseInteraction database){
+        JSONArray deviceProductCodes = readObject.getJSONArray("product_codes");
+        for(int i = 0; i < deviceProductCodes.length(); i++){
+            JSONObject thisProductCode = deviceProductCodes.getJSONObject(i);
+            List<FDADeviceProperty> props = new ArrayList<>();
+            if(thisProductCode.has("code")){ props.add(new FDADeviceProperty("code", thisProductCode.getString("code"))); }
+            if(thisProductCode.has("name")){ props.add(new FDADeviceProperty("name", thisProductCode.getString("name"))); }
+            String thisProductCodeInsertSql = fdaDevicePropertyQueryBuilder("fda_data_device_product_codes", fdaId, props);
+            PreparedStatement productCodeQuery = database.prepareStatement(thisProductCodeInsertSql);
+            database.nonQuery(productCodeQuery);
+        }
+    }
+
+    private void writeDeviceStorage(JSONObject readObject, String fdaId, DatabaseInteraction database){
+        JSONArray deviceStorage = readObject.getJSONArray("storage");
+        for(int i = 0; i < deviceStorage.length(); i++){
+            JSONObject thisStorage = deviceStorage.getJSONObject(i);
+            List<FDADeviceProperty> props = new ArrayList<>();
+            if(thisStorage.has("high")){
+                JSONObject storageHigh = thisStorage.getJSONObject("high");
+                if(storageHigh.has("value")){ props.add(new FDADeviceProperty("value", storageHigh.getString("value"), "high_value")); }
+                if(storageHigh.has("unit")){ props.add(new FDADeviceProperty("unit", storageHigh.getString("unit"), "high_unit")); }
+            }
+            if(thisStorage.has("low")){
+                JSONObject storageLow = thisStorage.getJSONObject("low");
+                if(storageLow.has("value")){ props.add(new FDADeviceProperty("value", storageLow.getString("value"), "low_value")); }
+                if(storageLow.has("unit")){ props.add(new FDADeviceProperty("unit", storageLow.getString("unit"), "low_unit")); }
+            }
+            if(thisStorage.has("special_conditions")){ props.add(new FDADeviceProperty("special_conditions", thisStorage.getString("special_conditions"))); }
+            if(thisStorage.has("type")){ props.add(new FDADeviceProperty("type", thisStorage.getString("type"), "storage_type")); }
+            String thisStorageInsertSql = fdaDevicePropertyQueryBuilder("fda_data_device_storage", fdaId, props);
+            PreparedStatement storageQuery = database.prepareStatement(thisStorageInsertSql);
+            database.nonQuery(storageQuery);
+        }
+    }
+
+    private String fdaDevicePropertyQueryBuilder(String tableName, String fdaId, List<FDADeviceProperty> props){
+        String writeDeviceColumnsSql = "INSERT INTO " + tableName + "(fda_id";
         String writeDeviceValuesSql = ") VALUES ('" + fdaId + "'";
-        for (FDADeviceProperty thisProperty : deviceProperties) {
+        for (FDADeviceProperty thisProperty : props) {
             writeDeviceColumnsSql += ", " + thisProperty.getColumnName();
             writeDeviceValuesSql += ", ";
             Object propertyValue = thisProperty.getValue();
             if(propertyValue.getClass() == String.class || propertyValue instanceof Date){
-                writeDeviceValuesSql += "'" + propertyValue.toString() + "'";
+                String propValString = propertyValue.toString();
+                propValString = propValString.replace("'", "''");
+                writeDeviceValuesSql += "'" + propValString + "'";
             }
             else if(propertyValue.getClass() == Boolean.class){
                 if((Boolean)propertyValue){
@@ -393,25 +535,14 @@ public class FDADataUpdate implements Runnable {
                 writeDeviceValuesSql += propertyValue;
             }
         }
-        String writeDeviceSql = writeDeviceColumnsSql + writeDeviceValuesSql + ")";
-        //Todo: run nonquery (async?)
-        if(readObject.has("customer_contacts")){
-            writeDeviceCustomerContacts(readObject, fdaId);
-        }
-    }
-
-    private void writeDeviceCustomerContacts(JSONObject readObject, String fdaId){
-        List<JSONObject> customerContactObjects = new ArrayList();
-        for (int i = 0; i < readObject.getJSONArray("customer_contacts").length(); i++){
-
-        }
+        return writeDeviceColumnsSql + writeDeviceValuesSql + ")";
     }
 
     private List<FDADeviceProperty> getDeviceProperties(JSONObject readObject){
         List<FDADeviceProperty> props = new ArrayList<>();
         if(readObject.has("brand_name")){ props.add(new FDADeviceProperty("brand_name", readObject.getString("brand_name"))); }
         if(readObject.has("catalog_number")){ props.add(new FDADeviceProperty("catalog_number", readObject.getString("catalog_number"))); }
-        if(readObject.has("commercial_distribution_end_date")){ props.add(new FDADeviceProperty("commercial_distribution_end_date", Date.parse(readObject.getString("commercial_distribution_end_date")))); }
+        if(readObject.has("commercial_distribution_end_date")){ props.add(new FDADeviceProperty("commercial_distribution_end_date", readObject.getString("commercial_distribution_end_date"))); }
         if(readObject.has("commercial_distribution_status")){ props.add(new FDADeviceProperty("commercial_distribution_status", readObject.getString("commercial_distribution_status"))); }
         if(readObject.has("company_name")){ props.add(new FDADeviceProperty("company_name", readObject.getString("company_name"))); }
         if(readObject.has("device_count_in_base_package")){ props.add(new FDADeviceProperty("device_count_in_base_package", readObject.getInt("device_count_in_base_package"))); }
@@ -443,7 +574,29 @@ public class FDADataUpdate implements Runnable {
         if(readObject.has("is_sterilization_prior_use")){ props.add(new FDADeviceProperty("is_sterilization_prior_use", readObject.getBoolean("is_sterilization_prior_use"))); }
         if(readObject.has("sterilization_methods")){ props.add(new FDADeviceProperty("sterilization_methods", readObject.getString("sterilization_methods"))); }
         if(readObject.has("version_or_model_number")){ props.add(new FDADeviceProperty("version_or_model_number", readObject.getString("version_or_model_number"))); }
-        if(readObject.has("device_class")){ props.add(new FDADeviceProperty("device_class", readObject.getString("device_class"))); }
+        if(readObject.has("product_codes")){
+            JSONArray productCodes = readObject.getJSONArray("product_codes");
+            if(productCodes.length() != 0) {
+                if (productCodes.getJSONObject(0).has("openfda")) {
+                    JSONObject openFda = productCodes.getJSONObject(0).getJSONObject("openfda");
+                    if (openFda.has("device_class")) {
+                        props.add(new FDADeviceProperty("device_class", openFda.getString("device_class")));
+                    }
+                    if (openFda.has("device_name")) {
+                        props.add(new FDADeviceProperty("device_name", openFda.getString("device_name")));
+                    }
+                    if (openFda.has("fei_number")) {
+                        props.add(new FDADeviceProperty("fei_number", openFda.getString("fei_number")));
+                    }
+                    if (openFda.has("medical_specialty_description")) {
+                        props.add(new FDADeviceProperty("medical_specialty_description", openFda.getString("medical_specialty_description")));
+                    }
+                    if (openFda.has("regulation_number")) {
+                        props.add(new FDADeviceProperty("regulation_number", openFda.getString("regulation_number")));
+                    }
+                }
+            }
+        }
         if(readObject.has("device_name")){ props.add(new FDADeviceProperty("device_name", readObject.getString("device_name"))); }
         if(readObject.has("fei_number")){ props.add(new FDADeviceProperty("fei_number", readObject.getString("fei_number"))); }
         if(readObject.has("medical_specialty_description")){ props.add(new FDADeviceProperty("medical_specialty_description", readObject.getString("medical_specialty_description"))); }
