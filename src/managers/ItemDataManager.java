@@ -38,4 +38,7 @@ public class ItemDataManager {
         this.database.nonQuery(qryStatement);
     }
 
+    public void generateItemLotNumber(){
+
+    }
 }
