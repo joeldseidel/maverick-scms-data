@@ -108,7 +108,7 @@ public class EditUserHandler extends HandlerPrototype implements HttpHandler {
             if(isVerified){
 
                 //Perform requested operation
-                switch('field'){
+                switch(field){
                     case "username":
                         if(newvalue.length() > 30 || newvalue.length() < 1){
                             responseObject.put("message","UsernameLengthError");

@@ -90,12 +90,12 @@ public class UserDataManager {
     }
 
     public static String getUserCID(int uid){
-        String cid;
+        String cid = "notfound";
         DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass, Config.databaseName);
         String getUserCIDSql = "SELECT cid FROM table_users WHERE uid = ?";
         PreparedStatement getUserCIDStatement = database.prepareStatement(getUserCIDSql);
         try{
-            getUserCIDStatement.setString(1, uid);
+            getUserCIDStatement.setString(1, ""+uid);
             ResultSet CIDResults = database.query(getUserCIDStatement);
             CIDResults.next();
             cid = CIDResults.getString("cid");
@@ -155,7 +155,7 @@ public class UserDataManager {
         String qryString = "DELETE FROM table_users WHERE uid = ?";
         PreparedStatement qryStatement = database.prepareStatement(qryString);
         try{
-            qryStatement.setString(1, uid);
+            qryStatement.setString(1, ""+uid);
             database.nonQuery(qryStatement);
         }catch(SQLException sqlEx){
             sqlEx.printStackTrace();
@@ -173,7 +173,7 @@ public class UserDataManager {
         PreparedStatement qryStatement = database.prepareStatement(qryString);
         try{
             qryStatement.setString(1, username);
-            qryStatement.setString(2, uid);
+            qryStatement.setString(2, ""+uid);
             database.nonQuery(qryStatement);
         }catch(SQLException sqlEx){
             sqlEx.printStackTrace();
@@ -198,7 +198,7 @@ public class UserDataManager {
         PreparedStatement qryStatement = database.prepareStatement(qryString);
         try{
             qryStatement.setString(1, hashedPassword);
-            qryStatement.setString(2, uid);
+            qryStatement.setString(2, ""+uid);
             database.nonQuery(qryStatement);
         }catch(SQLException sqlEx){
             sqlEx.printStackTrace();
@@ -216,7 +216,7 @@ public class UserDataManager {
         PreparedStatement qryStatement = database.prepareStatement(qryString);
         try{
             qryStatement.setString(1, rank);
-            qryStatement.setString(2, uid);
+            qryStatement.setString(2, ""+uid);
             database.nonQuery(qryStatement);
         }catch(SQLException sqlEx){
             sqlEx.printStackTrace();
