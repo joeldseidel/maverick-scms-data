@@ -89,6 +89,25 @@ public class UserDataManager {
         return userUUID;
     }
 
+    public static String getUserCID(int uid){
+        String cid;
+        DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass, Config.databaseName);
+        String getUserCIDSql = "SELECT cid FROM table_users WHERE uid = ?";
+        PreparedStatement getUserCIDStatement = database.prepareStatement(getUserCIDSql);
+        try{
+            getUserCIDStatement.setString(1, uid);
+            ResultSet CIDResults = database.query(getUserCIDStatement);
+            CIDResults.next();
+            cid = CIDResults.getString("cid");
+        } catch(SQLException sqlEx){
+            sqlEx.printStackTrace();
+        } finally {
+            database.closeConnection();
+        }
+        System.out.println("Got User CID : " + cid);
+        return cid;
+    }
+
     //Method to take byte array returned from hashing, and turn it into one string to compare with one from database
     private static String byteArrayToString(byte[] hash){
         StringBuffer outString = new StringBuffer();
@@ -120,6 +139,84 @@ public class UserDataManager {
             qryStatement.setString(1, cid);
             qryStatement.setString(2, username);
             qryStatement.setString(3, hashedPassword);
+            database.nonQuery(qryStatement);
+        }catch(SQLException sqlEx){
+            sqlEx.printStackTrace();
+        } finally {
+            database.closeConnection();
+        }
+    }
+
+    /**
+     * removeUser removes a user from the database
+     */
+    public static void removeUser(int uid) {
+        DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass, Config.databaseName);
+        String qryString = "DELETE FROM table_users WHERE uid = ?";
+        PreparedStatement qryStatement = database.prepareStatement(qryString);
+        try{
+            qryStatement.setString(1, uid);
+            database.nonQuery(qryStatement);
+        }catch(SQLException sqlEx){
+            sqlEx.printStackTrace();
+        } finally {
+            database.closeConnection();
+        }
+    }
+
+    /**
+     * editUsername changes a user's username
+     */
+    public static void editUsername(int uid, String username) {
+        DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass, Config.databaseName);
+        String qryString = "UPDATE table_users SET username = ? WHERE uid = ?";
+        PreparedStatement qryStatement = database.prepareStatement(qryString);
+        try{
+            qryStatement.setString(1, username);
+            qryStatement.setString(2, uid);
+            database.nonQuery(qryStatement);
+        }catch(SQLException sqlEx){
+            sqlEx.printStackTrace();
+        } finally {
+            database.closeConnection();
+        }
+    }
+
+    /**
+     * editPassword changes a user's password
+     */
+    public static void editPassword(int uid, String password) {
+        try{
+            messageDigestSHA = MessageDigest.getInstance("SHA-256");
+        }
+        catch(Exception e){
+            System.out.println("Message Digest failed for : " + e);
+        }
+        String hashedPassword = byteArrayToString(messageDigestSHA.digest(password.getBytes(StandardCharsets.UTF_8))).toLowerCase();
+        DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass, Config.databaseName);
+        String qryString = "UPDATE table_users SET password = ? WHERE uid = ?";
+        PreparedStatement qryStatement = database.prepareStatement(qryString);
+        try{
+            qryStatement.setString(1, hashedPassword);
+            qryStatement.setString(2, uid);
+            database.nonQuery(qryStatement);
+        }catch(SQLException sqlEx){
+            sqlEx.printStackTrace();
+        } finally {
+            database.closeConnection();
+        }
+    }
+
+    /**
+     * editRank changes a user's rank
+     */
+    public static void editRank(int uid, String rank) {
+        DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass, Config.databaseName);
+        String qryString = "UPDATE table_users SET rank = ? WHERE uid = ?";
+        PreparedStatement qryStatement = database.prepareStatement(qryString);
+        try{
+            qryStatement.setString(1, rank);
+            qryStatement.setString(2, uid);
             database.nonQuery(qryStatement);
         }catch(SQLException sqlEx){
             sqlEx.printStackTrace();
