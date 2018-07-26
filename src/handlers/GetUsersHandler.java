@@ -71,6 +71,7 @@ public class GetUsersHandler extends HandlerPrototype implements HttpHandler {
 
         String cid = requestParams.getString("cid");
         String token = requestParams.getString("token");
+        boolean isVerified = false;
 
         //VERIFY TOKEN
         try {
