@@ -46,12 +46,13 @@ public class LotNumberManager {
 
     private boolean isUniqueLot(LotType lotType, long generatedLot){
         String checkTable = lotType == LotType.Item ? "table_items" : "table_pallets";
-        String getMatchingLotNumberSql = "SELECT COUNT(1) FROM " + checkTable + " WHERE mid = '" + generatedLot + "'";
+        String getMatchingLotNumberSql = "SELECT COUNT(1) FROM " + checkTable + " WHERE mid = ?";
         DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass, Config.databaseName);
-        PreparedStatement matchingLotQuery = database.prepareStatement(getMatchingLotNumberSql);
-        ResultSet matchingLotResult = database.query(matchingLotQuery);
         int matchingLotCount = 0;
         try{
+            PreparedStatement matchingLotQuery = database.prepareStatement(getMatchingLotNumberSql);
+            matchingLotQuery.setString(1, Long.toString(generatedLot));
+            ResultSet matchingLotResult = database.query(matchingLotQuery);
             if(matchingLotResult.next()){
                 matchingLotCount = matchingLotResult.getInt(0);
             }
