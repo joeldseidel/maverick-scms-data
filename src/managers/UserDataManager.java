@@ -102,4 +102,30 @@ public class UserDataManager {
         return outString.toString();
     }
 
+    /**
+     * addUser adds a user to the database
+     */
+    public static void addUser(String cid, String username, String password) {
+        try{
+            messageDigestSHA = MessageDigest.getInstance("SHA-256");
+        }
+        catch(Exception e){
+            System.out.println("Message Digest failed for : " + e);
+        }
+        String hashedPassword = byteArrayToString(messageDigestSHA.digest(password.getBytes(StandardCharsets.UTF_8))).toLowerCase();
+        DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass, Config.databaseName);
+        String qryString = "INSERT INTO table_users (cid, username, password) VALUES (?, ?, ?)";
+        PreparedStatement qryStatement = database.prepareStatement(qryString);
+        try{
+            qryStatement.setString(1, cid);
+            qryStatement.setString(2, username);
+            qryStatement.setString(3, hashedPassword);
+            database.nonQuery(qryStatement);
+        }catch(SQLException sqlEx){
+            sqlEx.printStackTrace();
+        } finally {
+            database.closeConnection();
+        }
+    }
+
 }

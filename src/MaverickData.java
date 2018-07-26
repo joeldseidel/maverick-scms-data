@@ -2,7 +2,6 @@ import com.sun.net.httpserver.HttpsConfigurator;
 import com.sun.net.httpserver.HttpsParameters;
 import com.sun.net.httpserver.HttpsServer;
 import handlers.*;
-import handlers.UserDataQueryHandler;
 
 import javax.net.ssl.*;
 import java.io.FileInputStream;
@@ -56,7 +55,7 @@ public class MaverickData {
             });
             server.createContext("/authenticate_user", new AuthenticateUserHandler());
             server.createContext("/add_item", new AddItemHandler());
-            server.createContext("/users/is_username_unique", new UserDataQueryHandler());
+            server.createContext("/add_user", new UserRegistrationHandler());
             server.createContext("/is_device_in_fda_data", new DeviceDataInFdaDataHandler());
             server.createContext("/add_po", new AddPurchaseOrderHandler());
             server.createContext("/generate_item_lot_number", new GenerateLotNumberHandler());
