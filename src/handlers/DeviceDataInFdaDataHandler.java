@@ -56,19 +56,26 @@ public class DeviceDataInFdaDataHandler extends HandlerPrototype implements Http
 
     @Override
     protected void fulfillRequest(JSONObject requestParams){
+        //
         String fdaId = requestParams.getString("fdaId");
         DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass, Config.databaseName);
-        String isDeviceInFdaDataSql = "SELECT fdaId FROM fda_data_devices WHERE fdaId = '" + fdaId + "'";
-        PreparedStatement isDeviceInFdaDataQuery = database.prepareStatement(isDeviceInFdaDataSql);
-        ResultSet isDeviceInFdaDataResult = database.query(isDeviceInFdaDataQuery);
-        int matchingDeviceCount = 0;
         try {
-            while (isDeviceInFdaDataResult.next()) {
-                matchingDeviceCount++;
-            }
+            boolean deviceDataExists = isDeviceDataInFdaData(fdaId, database);
+            //Todo: fetch the device data if it exists
         } catch(SQLException sqlEx){
-            this.response = "bad request attempt";
+            sqlEx.printStackTrace();
         }
-        this.response = matchingDeviceCount == 1 ? "true" : "false";
+    }
+
+    private boolean isDeviceDataInFdaData(String fdaId, DatabaseInteraction database) throws SQLException{
+        int matchingDeviceCount = 0;
+        String isDeviceInFdaDataSql = "SELECT COUNT(1) FROM fda_data_devices WHERE fdaId = ?";
+        PreparedStatement isDeviceInFdaDataQuery = database.prepareStatement(isDeviceInFdaDataSql);
+        isDeviceInFdaDataQuery.setString(1, fdaId);
+        ResultSet isDeviceInFdaDataResult = database.query(isDeviceInFdaDataQuery);
+        if(isDeviceInFdaDataResult.next()){
+            matchingDeviceCount = isDeviceInFdaDataResult.getInt(0);
+        }
+        return matchingDeviceCount == 1;
     }
 }
