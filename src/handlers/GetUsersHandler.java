@@ -138,15 +138,15 @@ public class GetUsersHandler extends HandlerPrototype implements HttpHandler {
     public static JSONArray getUserDataFormattedResponse(ResultSet userDataResults) throws Exception {
         JSONArray jsonArray = new JSONArray();
         while (userDataResults.next()) {
+            JSONObject obj = new JSONObject();
             int total_rows = userDataResults.getMetaData().getColumnCount();
             for (int i = 0; i < total_rows; i++) {
-                JSONObject obj = new JSONObject();
                 System.out.println("Got " + userDataResults.getObject(i + 1) + " for " + userDataResults.getMetaData().getColumnLabel(i + 1)
                         .toLowerCase());
                 obj.put(userDataResults.getMetaData().getColumnLabel(i + 1)
                         .toLowerCase(), userDataResults.getObject(i + 1));
-                jsonArray.put(obj);
             }
+            jsonArray.put(obj);
         }
         return jsonArray;
     }
