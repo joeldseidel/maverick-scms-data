@@ -36,7 +36,6 @@ public class PurchaseOrderDataManager {
                 po.getNumber() + "\", \"" +
                 po.getDatePlaced() + "\", \"" +
                 po.getCompany() + "\")";
-
         PreparedStatement qryStatement = this.database.prepareStatement(qryString);
         int poid = this.database.nonQueryWithIdCallback(qryStatement);
         for(MaverickPurchaseOrderLine line : po.getLines()){
