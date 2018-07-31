@@ -20,8 +20,8 @@ public class MaverickPurchaseOrderLine {
 	 * @param deliveryDate
 	 * @param price
 	 */
-	public MaverickPurchaseOrderLine(int lineNumber, String supplierPartNumber, double quantity, String partDescription,
-			String deliveryDate, double price) {
+	public MaverickPurchaseOrderLine(int lineNumber, String supplierPartNumber, String partDescription, 
+		String deliveryDate, double quantity, double price) {
 		this.lineNumber = lineNumber;
 		this.supplierPartNumber = supplierPartNumber;
 		this.quantity = quantity;

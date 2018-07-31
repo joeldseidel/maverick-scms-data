@@ -23,13 +23,20 @@ import com.auth0.jwt.impl.*;
 import com.auth0.jwt.interfaces.*;
 import com.auth0.jwt.*;
 
-import maverick_types.MaverickPurchaseOrder;
-import maverick_types.MaverickPurchaseOrderLine;
-import managers.PurchaseOrderDataManager;
+import maverick_types.MaverickItem;
+import maverick_types.MaverickPallet;
+import managers.PalletDataManager;
 
-public class AddPurchaseOrderHandler extends HandlerPrototype implements HttpHandler {
+/**
+ * /*
+ * @author Joshua Famous
+ *
+ * Handler class to create new pallets and potentially assign items to them if sent with pallet creation
+ */
 
-    private String[] requiredKeys = {"number", "dateplaced", "placingcompany", "cid", "lines", "token"};
+public class AddPalletHandler extends HandlerPrototype implements HttpHandler {
+
+    private String[] requiredKeys = {"cid", "items", "token"};
     private String response;
     public void handle(HttpExchange httpExchange) throws IOException {
         JSONObject requestParams = GetParameterObject(httpExchange);
@@ -44,7 +51,7 @@ public class AddPurchaseOrderHandler extends HandlerPrototype implements HttpHan
         Headers headers = httpExchange.getResponseHeaders();
         headers.add("Access-Control-Allow-Origin", "*");
         httpExchange.sendResponseHeaders(responseCode, this.response.length());
-        System.out.println("Response to Add Purchase Order Request : " + this.response);
+        System.out.println("Response to Add Pallet Request : " + this.response);
         OutputStream os = httpExchange.getResponseBody();
         os.write(this.response.getBytes());
         os.close();
@@ -74,9 +81,6 @@ public class AddPurchaseOrderHandler extends HandlerPrototype implements HttpHan
         boolean isVerified;
 
         String cid = requestParams.getString("cid");
-        String number = requestParams.getString("number");
-        String dateplaced = requestParams.getString("dateplaced");
-        String placingcompany = requestParams.getString("placingcompany");
         String token = requestParams.getString("token");
 
         try {
@@ -97,26 +101,22 @@ public class AddPurchaseOrderHandler extends HandlerPrototype implements HttpHan
 
         if(isVerified){
 
-            //CREATE PURCHASE ORDER
-            MaverickPurchaseOrder thisOrder = new MaverickPurchaseOrder(number, dateplaced, placingcompany, cid);
-            PurchaseOrderDataManager poDataManager = new PurchaseOrderDataManager();
+            //CREATE PALLET
+            MaverickPallet thisPallet = new MaverickPallet(cid);
+            PalletDataManager palletDataManager = new PalletDataManager();
 
-            //ADD PURCHASE ORDER LINES
-            JSONArray lines = requestParams.getJSONArray("lines");
-            for (int i = 0; i < lines.length(); i++) {
-              JSONObject line = lines.getJSONObject(i);
-              thisOrder.addLine(new MaverickPurchaseOrderLine(
-                line.getInt("line"),
-                line.getString("supplierpartnum"),
-                line.getString("partdesc"),
-                line.getString("deliverydate"),
-                line.getFloat("quantity"),
-                line.getFloat("price")
-                ));
-            }
+            /**ADD PALLET ITEMS
+            JSONArray items = requestParams.getJSONArray("items");
+            for (int i = 0; i < items.length(); i++) {
+                JSONObject item = items.getJSONObject(i);
+                if(item.has("mid")){
+                    System.out.println("Attempting item add");
+                  thisPallet.addItem(new MaverickItem(item.getString("mid")));
+                }
+            }*/
 
-            //PERFORM PURCHASE ORDER ADDING
-            poDataManager.addPurchaseOrder(thisOrder);
+            //PERFORM PALLET ADDING
+            palletDataManager.addPallet(thisPallet);
             JSONObject responseObject = new JSONObject();
             responseObject.put("message","Success");
             this.response = responseObject.toString();

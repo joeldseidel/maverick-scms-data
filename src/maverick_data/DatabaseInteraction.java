@@ -116,10 +116,13 @@ public class DatabaseInteraction {
     public int nonQueryWithIdCallback(PreparedStatement nonQueryIdCallbackStatement){
         try{
             nonQueryIdCallbackStatement.executeUpdate();
-            ResultSet idCallback = nonQueryIdCallbackStatement.getGeneratedKeys();
-            idCallback.next();
-            return idCallback.getInt(1);
+            String getLastIDSql = "SELECT LAST_INSERT_ID() AS thisid";
+            PreparedStatement getLastIDStatement = this.prepareStatement(getLastIDSql);
+            ResultSet getLastIdResult = this.query(getLastIDStatement);
+            getLastIdResult.next();
+            return getLastIdResult.getInt("thisid");
         } catch(SQLException sqlException){
+            System.out.println(sqlException.getMessage());
             return -1;
         }
     }

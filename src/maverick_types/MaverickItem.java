@@ -14,13 +14,18 @@ public class MaverickItem {
      * Constructor for a new MaverickItem
      */
     public MaverickItem(int fdaID, String itemName, String itemCategory, String customerID) {
-        // TODO: generate a Maverick ID from a utility function, or something else
-        // ~Josh~ Using this for now so I can add more than one item to the database for testing
         this.maverickID = "M-" + (int)((Math.random() * 10000) - 1);
         this.fdaID = fdaID;
         this.itemName = itemName;
         this.itemCategory = itemCategory;
         this.customerID = customerID;
+    }
+
+    /**
+     * Overload Constructor for Pallet Creation
+     */
+    public MaverickItem(String mid) {
+        this.maverickID = mid;
     }
 
     /**

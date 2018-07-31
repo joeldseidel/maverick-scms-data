@@ -3,6 +3,7 @@ package managers;
 import java.sql.PreparedStatement;
 
 import maverick_data.DatabaseInteraction;
+import maverick_types.LotType;
 import maverick_types.MaverickItem;
 import maverick_data.Config;
 
@@ -38,4 +39,8 @@ public class ItemDataManager {
         this.database.nonQuery(qryStatement);
     }
 
+    public long generateItemLotNumber(){
+        LotNumberManager lotNumber = new LotNumberManager();
+        return lotNumber.generateLotNumber(LotType.Item);
+    }
 }

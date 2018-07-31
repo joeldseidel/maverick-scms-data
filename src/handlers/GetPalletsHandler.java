@@ -3,6 +3,7 @@ package handlers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.Headers;
+import managers.ItemDataManager;
 import maverick_data.DatabaseInteraction;
 import maverick_data.Config;
 import org.json.JSONObject;
@@ -23,15 +24,19 @@ import com.auth0.jwt.impl.*;
 import com.auth0.jwt.interfaces.*;
 import com.auth0.jwt.*;
 
-import maverick_types.MaverickPurchaseOrder;
-import maverick_types.MaverickPurchaseOrderLine;
-import managers.PurchaseOrderDataManager;
+/**
+ * /*
+ * @author Joshua Famous
+ *
+ * Handler class to return a listing of all pallets in their company to the client
+ */
 
-public class AddPurchaseOrderHandler extends HandlerPrototype implements HttpHandler {
+public class GetPalletsHandler extends HandlerPrototype implements HttpHandler {
 
-    private String[] requiredKeys = {"number", "dateplaced", "placingcompany", "cid", "lines", "token"};
+    private String[] requiredKeys = {"cid", "token"};
     private String response;
     public void handle(HttpExchange httpExchange) throws IOException {
+        System.out.println("Entered Get Pallets Handler");
         JSONObject requestParams = GetParameterObject(httpExchange);
         boolean isValidRequest = isRequestValid(requestParams);
         displayRequestValidity(isValidRequest);
@@ -44,7 +49,7 @@ public class AddPurchaseOrderHandler extends HandlerPrototype implements HttpHan
         Headers headers = httpExchange.getResponseHeaders();
         headers.add("Access-Control-Allow-Origin", "*");
         httpExchange.sendResponseHeaders(responseCode, this.response.length());
-        System.out.println("Response to Add Purchase Order Request : " + this.response);
+        System.out.println("Response to Get Pallets Request : " + this.response);
         OutputStream os = httpExchange.getResponseBody();
         os.write(this.response.getBytes());
         os.close();
@@ -71,14 +76,11 @@ public class AddPurchaseOrderHandler extends HandlerPrototype implements HttpHan
     @Override
     protected void fulfillRequest(JSONObject requestParams){
 
-        boolean isVerified;
-
         String cid = requestParams.getString("cid");
-        String number = requestParams.getString("number");
-        String dateplaced = requestParams.getString("dateplaced");
-        String placingcompany = requestParams.getString("placingcompany");
         String token = requestParams.getString("token");
+        boolean isVerified = false;
 
+        //VERIFY TOKEN
         try {
 
             Algorithm algorithm = Algorithm.HMAC256("secret");
@@ -97,29 +99,10 @@ public class AddPurchaseOrderHandler extends HandlerPrototype implements HttpHan
 
         if(isVerified){
 
-            //CREATE PURCHASE ORDER
-            MaverickPurchaseOrder thisOrder = new MaverickPurchaseOrder(number, dateplaced, placingcompany, cid);
-            PurchaseOrderDataManager poDataManager = new PurchaseOrderDataManager();
-
-            //ADD PURCHASE ORDER LINES
-            JSONArray lines = requestParams.getJSONArray("lines");
-            for (int i = 0; i < lines.length(); i++) {
-              JSONObject line = lines.getJSONObject(i);
-              thisOrder.addLine(new MaverickPurchaseOrderLine(
-                line.getInt("line"),
-                line.getString("supplierpartnum"),
-                line.getString("partdesc"),
-                line.getString("deliverydate"),
-                line.getFloat("quantity"),
-                line.getFloat("price")
-                ));
-            }
-
-            //PERFORM PURCHASE ORDER ADDING
-            poDataManager.addPurchaseOrder(thisOrder);
-            JSONObject responseObject = new JSONObject();
-            responseObject.put("message","Success");
-            this.response = responseObject.toString();
+            //Format item data into an object to return
+            JSONObject itemDataObject = getItemDataByCompany(cid);
+            //If item data fetched, return data, otherwise say no
+            this.response = itemDataObject.toString();
 
         }
         else{
@@ -127,7 +110,54 @@ public class AddPurchaseOrderHandler extends HandlerPrototype implements HttpHan
             this.response = Boolean.toString(false);
 
         }
+    }
 
+    private JSONObject getItemDataByCompany(String cid){
+        System.out.println("Attempting to get item data for company : " + cid);
+        DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass, Config.databaseName);
+        String getItemDataSql = "SELECT id FROM table_pallets WHERE cid = ?";
+        PreparedStatement getItemDataStatement = database.prepareStatement(getItemDataSql);
+        JSONObject itemDataObject = new JSONObject();
+        try{
+            getItemDataStatement.setString(1, cid);
+            ResultSet getItemDataResults = database.query(getItemDataStatement);
+            try{
+            itemDataObject.put("arrayResult",getItemDataFormattedResponse(getItemDataResults));
+            }
+            catch(Exception e){
+                System.out.println("Failed to get Formatted Response");
+                itemDataObject = null;
+            }
+        } catch(SQLException sqlEx){
+            sqlEx.printStackTrace();
+            itemDataObject = null;
+        } finally {
+            database.closeConnection();
+        }
+        System.out.println("Got Pallet Data Object : " + itemDataObject);
+        return itemDataObject;
+    }
+
+    /**
+     * Convert a result set into a JSON Array
+     * @param resultSet
+     * @return a JSONArray
+     * @throws Exception
+     */
+    public static JSONArray getItemDataFormattedResponse(ResultSet itemDataResults) throws Exception {
+        JSONArray jsonArray = new JSONArray();
+        while (itemDataResults.next()) {
+            JSONObject obj = new JSONObject();
+            int total_rows = itemDataResults.getMetaData().getColumnCount();
+            for (int i = 0; i < total_rows; i++) {
+                System.out.println("Got " + itemDataResults.getObject(i + 1) + " for " + itemDataResults.getMetaData().getColumnLabel(i + 1)
+                        .toLowerCase());
+                obj.put(itemDataResults.getMetaData().getColumnLabel(i + 1)
+                        .toLowerCase(), itemDataResults.getObject(i + 1));
+            }
+            jsonArray.put(obj);
+        }
+        return jsonArray;
     }
 
 }
