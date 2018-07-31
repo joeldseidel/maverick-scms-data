@@ -16,6 +16,7 @@ public class MaverickPallet {
 	 */
 	public MaverickPallet(String customerID) {
 		this.customerID = customerID;
+		items = new ArrayList<MaverickItem>();
 	}
 
 	/**

@@ -51,7 +51,7 @@ public class AddPalletHandler extends HandlerPrototype implements HttpHandler {
         Headers headers = httpExchange.getResponseHeaders();
         headers.add("Access-Control-Allow-Origin", "*");
         httpExchange.sendResponseHeaders(responseCode, this.response.length());
-        System.out.println("Response to Add Purchase Order Request : " + this.response);
+        System.out.println("Response to Add Pallet Request : " + this.response);
         OutputStream os = httpExchange.getResponseBody();
         os.write(this.response.getBytes());
         os.close();
@@ -105,14 +105,15 @@ public class AddPalletHandler extends HandlerPrototype implements HttpHandler {
             MaverickPallet thisPallet = new MaverickPallet(cid);
             PalletDataManager palletDataManager = new PalletDataManager();
 
-            //ADD PALLET ITEMS
+            /**ADD PALLET ITEMS
             JSONArray items = requestParams.getJSONArray("items");
             for (int i = 0; i < items.length(); i++) {
-              JSONObject item = items.getJSONObject(i);
-              thisPallet.addItem(new MaverickItem(
-                item.getString("mid")
-                ));
-            }
+                JSONObject item = items.getJSONObject(i);
+                if(item.has("mid")){
+                    System.out.println("Attempting item add");
+                  thisPallet.addItem(new MaverickItem(item.getString("mid")));
+                }
+            }*/
 
             //PERFORM PALLET ADDING
             palletDataManager.addPallet(thisPallet);
