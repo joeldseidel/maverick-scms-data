@@ -49,7 +49,7 @@ public class GetItemsHandler extends HandlerPrototype implements HttpHandler {
         Headers headers = httpExchange.getResponseHeaders();
         headers.add("Access-Control-Allow-Origin", "*");
         httpExchange.sendResponseHeaders(responseCode, this.response.length());
-        System.out.println("Response to User Logon Request : " + this.response);
+        System.out.println("Response to Get Item Request : " + this.response);
         OutputStream os = httpExchange.getResponseBody();
         os.write(this.response.getBytes());
         os.close();
@@ -115,22 +115,25 @@ public class GetItemsHandler extends HandlerPrototype implements HttpHandler {
     private JSONObject getItemDataByCompany(String cid){
         System.out.println("Attempting to get item data for company : " + cid);
         DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass, Config.databaseName);
-        String getItemDataSql = "SELECT mid, name, category FROM table_items WHERE cid = ?";
+        String getItemDataSql = "SELECT table_items.mid, table_items.name, table_items.category, table_itempalletmapping.pallet FROM table_items LEFT JOIN table_itempalletmapping ON table_items.mid = table_itempalletmapping.mid AND table_items.cid = ?";
         PreparedStatement getItemDataStatement = database.prepareStatement(getItemDataSql);
         JSONObject itemDataObject = new JSONObject();
         try{
             getItemDataStatement.setString(1, cid);
             ResultSet getItemDataResults = database.query(getItemDataStatement);
             try{
-            itemDataObject.put("arrayResult",getItemDataFormattedResponse(getItemDataResults));
+                itemDataObject.put("arrayResult",getItemDataFormattedResponse(getItemDataResults));
             }
             catch(Exception e){
-                System.out.println("Failed to get Formatted Response");
+                System.out.println("Failed to get Formatted Response for " + e);
                 itemDataObject = null;
             }
         } catch(SQLException sqlEx){
             sqlEx.printStackTrace();
             itemDataObject = null;
+        }
+        finally{
+            database.closeConnection();
         }
         System.out.println("Got Item Data Object : " + itemDataObject);
         return itemDataObject;

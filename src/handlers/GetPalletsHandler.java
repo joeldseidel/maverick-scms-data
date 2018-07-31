@@ -49,7 +49,7 @@ public class GetPalletsHandler extends HandlerPrototype implements HttpHandler {
         Headers headers = httpExchange.getResponseHeaders();
         headers.add("Access-Control-Allow-Origin", "*");
         httpExchange.sendResponseHeaders(responseCode, this.response.length());
-        System.out.println("Response to User Logon Request : " + this.response);
+        System.out.println("Response to Get Pallets Request : " + this.response);
         OutputStream os = httpExchange.getResponseBody();
         os.write(this.response.getBytes());
         os.close();
@@ -131,6 +131,8 @@ public class GetPalletsHandler extends HandlerPrototype implements HttpHandler {
         } catch(SQLException sqlEx){
             sqlEx.printStackTrace();
             itemDataObject = null;
+        } finally {
+            database.closeConnection();
         }
         System.out.println("Got Pallet Data Object : " + itemDataObject);
         return itemDataObject;
