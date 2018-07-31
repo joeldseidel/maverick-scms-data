@@ -9,16 +9,13 @@ public class MaverickPallet {
 
 	private ArrayList<MaverickItem> items;
     private String customerID;
-    private int palletid;
 	
 	/**
 	 * @param customerID
 	 * @param palletid
 	 */
-	public MaverickPallet(String customerID, int palletid) {
-		super();
+	public MaverickPallet(String customerID) {
 		this.customerID = customerID;
-		this.palletid = palletid;
 	}
 
 	/**
@@ -47,20 +44,6 @@ public class MaverickPallet {
 	 */
 	public void setCustomerID(String customerID) {
 		this.customerID = customerID;
-	}
-	
-	/**
-	 * @return the palletid
-	 */
-	public int getPalletid() {
-		return palletid;
-	}
-
-	/**
-	 * @param palletid the palletid to set
-	 */
-	public void setPalletid(int palletid) {
-		this.palletid = palletid;
 	}
 
 	/**
