@@ -3,7 +3,7 @@ package handlers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.Headers;
-import managers.UserDataManager;
+import managers.ItemDataManager;
 import maverick_data.DatabaseInteraction;
 import maverick_data.Config;
 import org.json.JSONObject;
@@ -28,15 +28,15 @@ import com.auth0.jwt.*;
  * /*
  * @author Joshua Famous
  *
- * Handler class to return a listing of all users in their company to the client
+ * Handler class to return a listing of all items in their company to the client
  */
 
-public class GetUsersHandler extends HandlerPrototype implements HttpHandler {
+public class GetItemsHandler extends HandlerPrototype implements HttpHandler {
 
     private String[] requiredKeys = {"cid", "token"};
     private String response;
     public void handle(HttpExchange httpExchange) throws IOException {
-        System.out.println("Entered Get Users Handler");
+        System.out.println("Entered Get Items Handler");
         JSONObject requestParams = GetParameterObject(httpExchange);
         boolean isValidRequest = isRequestValid(requestParams);
         displayRequestValidity(isValidRequest);
@@ -99,10 +99,10 @@ public class GetUsersHandler extends HandlerPrototype implements HttpHandler {
 
         if(isVerified){
 
-            //Request wants the user data row in return
-            JSONObject userDataObject = getUserDataByCompany(cid);
-            //If user data fetched, return data, otherwise say no
-            this.response = userDataObject.toString();
+            //Format item data into an object to return
+            JSONObject itemDataObject = getItemDataByCompany(cid);
+            //If item data fetched, return data, otherwise say no
+            this.response = itemDataObject.toString();
 
         }
         else{
@@ -112,28 +112,28 @@ public class GetUsersHandler extends HandlerPrototype implements HttpHandler {
         }
     }
 
-    private JSONObject getUserDataByCompany(String cid){
-        System.out.println("Attempting to get user data for company : " + cid);
+    private JSONObject getItemDataByCompany(String cid){
+        System.out.println("Attempting to get item data for company : " + cid);
         DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass, Config.databaseName);
-        String getUserDataSql = "SELECT * FROM table_users WHERE cid = ?";
-        PreparedStatement getUserDataStatement = database.prepareStatement(getUserDataSql);
-        JSONObject userDataObject = new JSONObject();
+        String getItemDataSql = "SELECT mid, name, category FROM table_items WHERE cid = ?";
+        PreparedStatement getItemDataStatement = database.prepareStatement(getItemDataSql);
+        JSONObject itemDataObject = new JSONObject();
         try{
-            getUserDataStatement.setString(1, cid);
-            ResultSet getUserDataResults = database.query(getUserDataStatement);
+            getItemDataStatement.setString(1, cid);
+            ResultSet getItemDataResults = database.query(getItemDataStatement);
             try{
-            userDataObject.put("arrayResult",getUserDataFormattedResponse(getUserDataResults));
+            itemDataObject.put("arrayResult",getItemDataFormattedResponse(getItemDataResults));
             }
             catch(Exception e){
                 System.out.println("Failed to get Formatted Response");
-                userDataObject = null;
+                itemDataObject = null;
             }
         } catch(SQLException sqlEx){
             sqlEx.printStackTrace();
-            userDataObject = null;
+            itemDataObject = null;
         }
-        System.out.println("Got User Data Object : " + userDataObject);
-        return userDataObject;
+        System.out.println("Got Item Data Object : " + itemDataObject);
+        return itemDataObject;
     }
 
     /**
@@ -142,16 +142,16 @@ public class GetUsersHandler extends HandlerPrototype implements HttpHandler {
      * @return a JSONArray
      * @throws Exception
      */
-    public static JSONArray getUserDataFormattedResponse(ResultSet userDataResults) throws Exception {
+    public static JSONArray getItemDataFormattedResponse(ResultSet itemDataResults) throws Exception {
         JSONArray jsonArray = new JSONArray();
-        while (userDataResults.next()) {
+        while (itemDataResults.next()) {
             JSONObject obj = new JSONObject();
-            int total_rows = userDataResults.getMetaData().getColumnCount();
+            int total_rows = itemDataResults.getMetaData().getColumnCount();
             for (int i = 0; i < total_rows; i++) {
-                System.out.println("Got " + userDataResults.getObject(i + 1) + " for " + userDataResults.getMetaData().getColumnLabel(i + 1)
+                System.out.println("Got " + itemDataResults.getObject(i + 1) + " for " + itemDataResults.getMetaData().getColumnLabel(i + 1)
                         .toLowerCase());
-                obj.put(userDataResults.getMetaData().getColumnLabel(i + 1)
-                        .toLowerCase(), userDataResults.getObject(i + 1));
+                obj.put(itemDataResults.getMetaData().getColumnLabel(i + 1)
+                        .toLowerCase(), itemDataResults.getObject(i + 1));
             }
             jsonArray.put(obj);
         }

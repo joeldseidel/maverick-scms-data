@@ -27,6 +27,13 @@ import maverick_types.MaverickItem;
 import maverick_types.MaverickPallet;
 import managers.PalletDataManager;
 
+/**
+ * /*
+ * @author Joshua Famous
+ *
+ * Handler class to create new pallets and potentially assign items to them if sent with pallet creation
+ */
+
 public class AddPalletHandler extends HandlerPrototype implements HttpHandler {
 
     private String[] requiredKeys = {"cid", "items", "token"};
