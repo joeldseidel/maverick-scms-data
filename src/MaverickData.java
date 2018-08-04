@@ -57,6 +57,7 @@ public class MaverickData {
             server.createContext("/add_item", new AddItemHandler());
             server.createContext("/add_user", new UserRegistrationHandler());
             server.createContext("/edit_user", new EditUserHandler());
+            server.createContext("/edit_pallet", new EditPalletHandler());
             server.createContext("/get_users", new GetUsersHandler());
             server.createContext("/get_items", new GetItemsHandler());
             server.createContext("/get_pallets", new GetPalletsHandler());
