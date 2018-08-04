@@ -73,4 +73,43 @@ public class PalletDataManager {
         }
     }
 
+    public static boolean palletExists(int pallet){
+        System.out.println("Attempting to get pallet validity for pallet with id : " + pallet);
+        DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass, Config.databaseName);
+        String palletCountSql = "SELECT * FROM table_pallets WHERE id = ?";
+        PreparedStatement palletCountStatement = database.prepareStatement(palletCountSql);
+        try{
+            palletCountStatement.setString(1, ""+pallet);
+            ResultSet getPalletResults = database.query(palletCountStatement);
+            while(getPalletResults.next()){
+                return true;
+            }
+        } catch(SQLException sqlEx){
+            sqlEx.printStackTrace();
+            return false;
+        } finally {
+            database.closeConnection();
+        }
+        return false;
+    }
+
+    public static String getPalletCID(int pallet){
+        String cid = "notfound";
+        DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass, Config.databaseName);
+        String getPalletCIDSql = "SELECT cid FROM table_pallets WHERE id = ?";
+        PreparedStatement getPalletCIDStatement = database.prepareStatement(getPalletCIDSql);
+        try{
+            getPalletCIDStatement.setString(1, ""+pallet);
+            ResultSet CIDResults = database.query(getPalletCIDStatement);
+            CIDResults.next();
+            cid = CIDResults.getString("cid");
+        } catch(SQLException sqlEx){
+            sqlEx.printStackTrace();
+        } finally {
+            database.closeConnection();
+        }
+        System.out.println("Got Pallet CID : " + cid);
+        return cid;
+    }
+
 }
