@@ -116,7 +116,7 @@ public class EditPalletHandler extends HandlerPrototype implements HttpHandler {
                 if(ItemDataManager.itemExists(mid)){
 
                     //ENSURE ITEM IS IN COMPANY
-                    if(!PalletDataManager.getPalletCID(pallet).equals(cid)){
+                    if(!ItemDataManager.getItemCID(mid).equals(cid)){
 
                         responseObject.put("message","ItemOutsideCompanyError");
                         this.response = responseObject.toString();
