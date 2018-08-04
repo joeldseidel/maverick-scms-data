@@ -106,7 +106,7 @@ public class EditPalletHandler extends HandlerPrototype implements HttpHandler {
         if(isVerified){
 
             //ENSURE PALLET IS IN COMPANY
-            if(!PalletDataManager.getPalletCID(pallet).equals(cid)){
+            if(!PalletDataManager.getPalletCID(pallet).equals(cid) && pallet > 0){
                 responseObject.put("message","PalletOutsideCompanyError");
                 this.response = responseObject.toString();
             }
@@ -124,8 +124,8 @@ public class EditPalletHandler extends HandlerPrototype implements HttpHandler {
                     }
                     else{
 
-                        //CHECK VALIDITY OF MAVERICK ITEM
-                        if(ItemDataManager.itemExists(mid)){
+                        //CHECK VALIDITY OF PALLET
+                        if(PalletDataManager.palletExists(pallet) || pallet == 0){
 
                             if(pallet == 0){
                                 ItemDataManager.removeFromPallet(mid);
