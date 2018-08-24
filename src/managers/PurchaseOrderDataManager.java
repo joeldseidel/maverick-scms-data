@@ -3,6 +3,7 @@ package managers;
 import java.sql.PreparedStatement;
 
 import maverick_data.DatabaseInteraction;
+import maverick_types.DatabaseType;
 import maverick_types.MaverickPurchaseOrder;
 import maverick_types.MaverickPurchaseOrderLine;
 import maverick_data.Config;
@@ -21,7 +22,7 @@ public class PurchaseOrderDataManager {
      * Constructor for the PurchaseOrderDataManager class
      */
     public PurchaseOrderDataManager() {
-        this.database = new DatabaseInteraction(Config.port, Config.user, Config.pass, Config.databaseName);
+        this.database = new DatabaseInteraction(DatabaseType.AppData);
     }
 
     /**

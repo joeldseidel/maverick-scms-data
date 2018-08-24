@@ -5,6 +5,7 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.Headers;
 import maverick_data.DatabaseInteraction;
 import maverick_data.Config;
+import maverick_types.DatabaseType;
 import org.json.JSONObject;
 import org.json.JSONArray;
 
@@ -108,7 +109,7 @@ public class GetUsersHandler extends HandlerPrototype implements HttpHandler {
 
     private JSONObject getUserDataByCompany(String cid){
         System.out.println("Attempting to get user data for company : " + cid);
-        DatabaseInteraction database = new DatabaseInteraction(Config.port, Config.user, Config.pass, Config.databaseName);
+        DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
         String getUserDataSql = "SELECT * FROM table_users WHERE cid = ?";
         PreparedStatement getUserDataStatement = database.prepareStatement(getUserDataSql);
         JSONObject userDataObject = new JSONObject();

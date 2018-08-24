@@ -2,6 +2,7 @@ package managers;
 
 import maverick_data.Config;
 import maverick_data.DatabaseInteraction;
+import maverick_types.DatabaseType;
 import maverick_types.LotType;
 
 import java.sql.PreparedStatement;
@@ -47,7 +48,7 @@ public class LotNumberManager {
     private boolean isUniqueLot(LotType lotType, long generatedLot){
         String checkTable = lotType == LotType.Item ? "table_items" : "table_pallets";
         String getMatchingLotNumberSql = "SELECT COUNT(1) FROM " + checkTable + " WHERE mid = ?";
-        DatabaseInteraction database = new DatabaseInteraction(Config.port, Config.user, Config.pass, Config.databaseName);
+        DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
         int matchingLotCount = 0;
         try{
             PreparedStatement matchingLotQuery = database.prepareStatement(getMatchingLotNumberSql);

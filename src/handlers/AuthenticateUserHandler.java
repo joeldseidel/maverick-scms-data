@@ -6,6 +6,7 @@ import com.sun.net.httpserver.Headers;
 import managers.UserDataManager;
 import maverick_data.DatabaseInteraction;
 import maverick_data.Config;
+import maverick_types.DatabaseType;
 import org.json.JSONObject;
 import org.json.JSONArray;
 
@@ -94,7 +95,7 @@ public class AuthenticateUserHandler extends HandlerPrototype implements HttpHan
 
     private JSONObject getUserData(String username){
         System.out.println("Attempting to get user data for username : " + username);
-        DatabaseInteraction database = new DatabaseInteraction(Config.port, Config.user, Config.pass, Config.databaseName);
+        DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
         String getUserDataSql = "SELECT * FROM table_users WHERE username = ?";
         PreparedStatement getUserDataStatement = database.prepareStatement(getUserDataSql);
         JSONObject userDataObject = new JSONObject();

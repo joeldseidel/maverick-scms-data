@@ -61,7 +61,6 @@ public class MaverickData {
             server.createContext("/get_users", new GetUsersHandler());
             server.createContext("/get_items", new GetItemsHandler());
             server.createContext("/get_pallets", new GetPalletsHandler());
-            server.createContext("/is_device_in_fda_data", new DeviceDataInFdaDataHandler());
             server.createContext("/add_po", new AddPurchaseOrderHandler());
             server.createContext("/add_pallet", new AddPalletHandler());
             server.createContext("/generate_item_lot_number", new GenerateLotNumberHandler());
