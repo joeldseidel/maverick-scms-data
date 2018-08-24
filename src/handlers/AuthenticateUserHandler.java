@@ -13,15 +13,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 import com.auth0.jwt.algorithms.*;
-import com.auth0.jwt.exceptions.*;
-import com.auth0.jwt.impl.*;
-import com.auth0.jwt.interfaces.*;
 import com.auth0.jwt.*;
 
 public class AuthenticateUserHandler extends HandlerPrototype implements HttpHandler {
@@ -100,7 +94,7 @@ public class AuthenticateUserHandler extends HandlerPrototype implements HttpHan
 
     private JSONObject getUserData(String username){
         System.out.println("Attempting to get user data for username : " + username);
-        DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass, Config.databaseName);
+        DatabaseInteraction database = new DatabaseInteraction(Config.port, Config.user, Config.pass, Config.databaseName);
         String getUserDataSql = "SELECT * FROM table_users WHERE username = ?";
         PreparedStatement getUserDataStatement = database.prepareStatement(getUserDataSql);
         JSONObject userDataObject = new JSONObject();

@@ -3,7 +3,6 @@ package handlers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.Headers;
-import managers.UserDataManager;
 import maverick_data.DatabaseInteraction;
 import maverick_data.Config;
 import org.json.JSONObject;
@@ -13,14 +12,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 import com.auth0.jwt.algorithms.*;
-import com.auth0.jwt.exceptions.*;
-import com.auth0.jwt.impl.*;
 import com.auth0.jwt.interfaces.*;
 import com.auth0.jwt.*;
 
@@ -114,7 +108,7 @@ public class GetUsersHandler extends HandlerPrototype implements HttpHandler {
 
     private JSONObject getUserDataByCompany(String cid){
         System.out.println("Attempting to get user data for company : " + cid);
-        DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass, Config.databaseName);
+        DatabaseInteraction database = new DatabaseInteraction(Config.port, Config.user, Config.pass, Config.databaseName);
         String getUserDataSql = "SELECT * FROM table_users WHERE cid = ?";
         PreparedStatement getUserDataStatement = database.prepareStatement(getUserDataSql);
         JSONObject userDataObject = new JSONObject();

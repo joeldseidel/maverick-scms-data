@@ -23,7 +23,7 @@ public class ItemDataManager {
      * Constructor for the ItemDataManager class
      */
     public ItemDataManager() {
-        this.database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass, Config.databaseName);
+        this.database = new DatabaseInteraction(Config.port, Config.user, Config.pass, Config.databaseName);
     }
 
     /**
@@ -48,7 +48,7 @@ public class ItemDataManager {
 
     public static boolean itemExists(String mid){
         System.out.println("Attempting to get item count for item with mid : " + mid);
-        DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass, Config.databaseName);
+        DatabaseInteraction database = new DatabaseInteraction(Config.port, Config.user, Config.pass, Config.databaseName);
         String itemCountSQL = "SELECT rowid FROM table_items WHERE mid = ?";
         PreparedStatement itemCountStatement = database.prepareStatement(itemCountSQL);
         try{
@@ -68,7 +68,7 @@ public class ItemDataManager {
 
     public static String getItemCID(String mid){
         String cid = "notfound";
-        DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass, Config.databaseName);
+        DatabaseInteraction database = new DatabaseInteraction(Config.port, Config.user, Config.pass, Config.databaseName);
         String getItemCIDSql = "SELECT cid FROM table_items WHERE mid = ?";
         PreparedStatement getItemCIDStatement = database.prepareStatement(getItemCIDSql);
         try{
@@ -89,7 +89,7 @@ public class ItemDataManager {
      * removeFromPallet removes an item from a pallet
      */
     public static void removeFromPallet(String mid) {
-        DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass, Config.databaseName);
+        DatabaseInteraction database = new DatabaseInteraction(Config.port, Config.user, Config.pass, Config.databaseName);
         String qryString = "DELETE FROM table_itempalletmapping WHERE mid = ?";
         PreparedStatement qryStatement = database.prepareStatement(qryString);
         try{
@@ -106,7 +106,7 @@ public class ItemDataManager {
      * updatePallet changes an item's pallet
      */
     public static void updatePallet(String mid, int pallet) {
-        DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass, Config.databaseName);
+        DatabaseInteraction database = new DatabaseInteraction(Config.port, Config.user, Config.pass, Config.databaseName);
         String qryString = "INSERT INTO table_itempalletmapping (mid, pallet) VALUES (?, ?) ON DUPLICATE KEY UPDATE pallet=?";
         PreparedStatement qryStatement = database.prepareStatement(qryString);
         try{

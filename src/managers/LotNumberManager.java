@@ -47,7 +47,7 @@ public class LotNumberManager {
     private boolean isUniqueLot(LotType lotType, long generatedLot){
         String checkTable = lotType == LotType.Item ? "table_items" : "table_pallets";
         String getMatchingLotNumberSql = "SELECT COUNT(1) FROM " + checkTable + " WHERE mid = ?";
-        DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass, Config.databaseName);
+        DatabaseInteraction database = new DatabaseInteraction(Config.port, Config.user, Config.pass, Config.databaseName);
         int matchingLotCount = 0;
         try{
             PreparedStatement matchingLotQuery = database.prepareStatement(getMatchingLotNumberSql);

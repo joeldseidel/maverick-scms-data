@@ -1,6 +1,12 @@
 package maverick_data;
 
+import maverick_types.DatabaseType;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.*;
+import java.util.Properties;
 
 /**
  * A class for interacting with a MySQL database
@@ -16,17 +22,31 @@ public class DatabaseInteraction {
     private Connection dbConn;
 
     /**
-     * Create a new DatabaseInteraction object
+     * Create a new DatabaseInteraction object by fetching the database connection properties and creating a connection
      *
-     * @param host the host to connect to
-     * @param port the port to connect on
-     * @param username the username to use
-     * @param password the password to use
+     * @param databaseType the database type which needs to have its specific name fetched from the properties
      */
 
-    //Todo: implement get properties from properties file
-    public DatabaseInteraction(String host, int port, String username, String password, String database) {
-        this.dbConn = this.createConnection(host, port, username, password, database);
+    public DatabaseInteraction(DatabaseType databaseType) {
+        Properties properties = new Properties();
+        InputStream input = null;
+        try{
+            input = new FileInputStream("database.properties");
+            properties.load(input);
+            String host = properties.getProperty("host");
+            int port = Integer.parseInt(properties.getProperty("port"));
+            String username = properties.getProperty("username");
+            String password = properties.getProperty("password");
+            String database;
+            if(databaseType == DatabaseType.AppData){
+                database = properties.getProperty("maverick.dbName");
+            } else {
+                database = properties.getProperty("devices.dbName");
+            }
+            this.dbConn = this.createConnection(host, port, username, password, database);
+        } catch(IOException ioEx){
+            //Just loading the properties file no big deal
+        }
     }
 
     /**
