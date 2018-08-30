@@ -3,9 +3,9 @@ package handlers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.Headers;
-import managers.ItemDataManager;
 import maverick_data.DatabaseInteraction;
 import maverick_data.Config;
+import maverick_types.DatabaseType;
 import org.json.JSONObject;
 import org.json.JSONArray;
 
@@ -13,14 +13,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 import com.auth0.jwt.algorithms.*;
-import com.auth0.jwt.exceptions.*;
-import com.auth0.jwt.impl.*;
 import com.auth0.jwt.interfaces.*;
 import com.auth0.jwt.*;
 
@@ -114,7 +109,7 @@ public class GetPalletsHandler extends HandlerPrototype implements HttpHandler {
 
     private JSONObject getItemDataByCompany(String cid){
         System.out.println("Attempting to get item data for company : " + cid);
-        DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass, Config.databaseName);
+        DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
         String getItemDataSql = "SELECT id FROM table_pallets WHERE cid = ?";
         PreparedStatement getItemDataStatement = database.prepareStatement(getItemDataSql);
         JSONObject itemDataObject = new JSONObject();

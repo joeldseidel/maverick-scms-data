@@ -3,18 +3,22 @@ package handlers;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import managers.DeviceDataManager;
 import maverick_data.Config;
 import maverick_data.DatabaseInteraction;
+import maverick_types.FDADevice;
 import org.json.JSONObject;
+import org.json.JSONArray;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
-public class DeviceDataInFdaDataHandler extends HandlerPrototype implements HttpHandler {
-    private String[] requiredKeys = {"fdaId"};
+public class GetDeviceDataHandler extends HandlerPrototype implements HttpHandler {
     private String response;
     public void handle(HttpExchange httpExchange) throws IOException {
         System.out.println("Entered create device manifest handler");
@@ -43,28 +47,52 @@ public class DeviceDataInFdaDataHandler extends HandlerPrototype implements Http
             System.out.println("Request Params Null");
             return false;
         }
-        for(String requiredKey : requiredKeys){
-            if(!requestParams.has(requiredKey)){
-                //Missing a required key, request is invalid
-                System.out.println("Request Params Missing Key " + requiredKey);
-                return false;
-            }
+        if(!requestParams.has("devices") || requestParams.optJSONArray("devices") == null){
+            //Request params does not contains the devices array
+            return false;
         }
-        //Request contains all required keys
+        //Request contains required key and proper formatting
         return true;
     }
 
     @Override
     protected void fulfillRequest(JSONObject requestParams){
-        //
-        String fdaId = requestParams.getString("fdaId");
-        DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass, Config.databaseName);
-        try {
-            boolean deviceDataExists = isDeviceDataInFdaData(fdaId, database);
-            //Todo: fetch the device data if it exists
-        } catch(SQLException sqlEx){
-            sqlEx.printStackTrace();
+        List<String> deviceIds = getParameterDeviceIds(requestParams.getJSONArray("devices"));
+        List<FDADevice> devices = getDeviceDataObjects(deviceIds);
+        JSONArray deviceDataArray = getDeviceJsonArray(devices);
+        this.response = new JSONObject().put("device_data", deviceDataArray).toString();
+    }
+
+    private JSONArray getDeviceJsonArray(List<FDADevice> devices){
+        JSONArray deviceArray = new JSONArray();
+        for(FDADevice device : devices){
+            JSONObject deviceObj = device.serializeToJson(device);
+            deviceArray.put(deviceObj);
         }
+        return deviceArray;
+    }
+
+    private List<FDADevice> getDeviceDataObjects(List<String> deviceIds){
+        DeviceDataManager deviceDataManager = new DeviceDataManager();
+        List<FDADevice> devices = new ArrayList<>();
+        for(String fdaId : deviceIds){
+            try {
+                FDADevice thisDevice = deviceDataManager.getDeviceByFdaId(fdaId);
+                devices.add(thisDevice);
+            } catch (SQLException sqlEx) {
+                sqlEx.printStackTrace();
+            }
+        }
+        return devices;
+    }
+
+    private List<String> getParameterDeviceIds(JSONArray devicesArray){
+        List<String> fdaIds = new ArrayList<>();
+        for(int i = 0; i < devicesArray.length(); i++){
+            JSONObject thisFdaIdObj = devicesArray.getJSONObject(i);
+            fdaIds.add(thisFdaIdObj.getString("fdaid"));
+        }
+        return fdaIds;
     }
 
     private boolean isDeviceDataInFdaData(String fdaId, DatabaseInteraction database) throws SQLException{

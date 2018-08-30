@@ -3,9 +3,9 @@ package managers;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 import maverick_data.DatabaseInteraction;
+import maverick_types.DatabaseType;
 import maverick_types.MaverickItem;
 import maverick_types.MaverickPallet;
 import maverick_data.Config;
@@ -28,7 +28,7 @@ public class PalletDataManager {
      * Constructor for the PalletDataManager class
      */
     public PalletDataManager() {
-        this.database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass, Config.databaseName);
+        this.database = new DatabaseInteraction(DatabaseType.AppData);
     }
 
     /**
@@ -75,7 +75,7 @@ public class PalletDataManager {
 
     public static boolean palletExists(int pallet){
         System.out.println("Attempting to get pallet validity for pallet with id : " + pallet);
-        DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass, Config.databaseName);
+        DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
         String palletCountSql = "SELECT * FROM table_pallets WHERE id = ?";
         PreparedStatement palletCountStatement = database.prepareStatement(palletCountSql);
         try{
@@ -95,7 +95,7 @@ public class PalletDataManager {
 
     public static String getPalletCID(int pallet){
         String cid = "notfound";
-        DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass, Config.databaseName);
+        DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
         String getPalletCIDSql = "SELECT cid FROM table_pallets WHERE id = ?";
         PreparedStatement getPalletCIDStatement = database.prepareStatement(getPalletCIDSql);
         try{
