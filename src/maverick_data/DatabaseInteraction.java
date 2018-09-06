@@ -31,7 +31,7 @@ public class DatabaseInteraction {
         Properties properties = new Properties();
         InputStream input = null;
         try{
-            input = new FileInputStream("database.properties");
+            input = getClass().getResourceAsStream("database.properties");
             properties.load(input);
             String host = properties.getProperty("host");
             int port = Integer.parseInt(properties.getProperty("port"));
@@ -46,6 +46,7 @@ public class DatabaseInteraction {
             this.dbConn = this.createConnection(host, port, username, password, database);
         } catch(IOException ioEx){
             //Just loading the properties file no big deal
+            ioEx.printStackTrace();
         }
     }
 
