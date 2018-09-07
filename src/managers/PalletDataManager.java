@@ -116,9 +116,19 @@ public class PalletDataManager {
      * removePallet removes a pallet from the database
      */
     public static void removePallet(int pid) {
+        //First, remove any items from the pallet
         DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
-        String qryString = "DELETE FROM table_pallets WHERE id = ?";
+        String qryString = "DELETE FROM table_itempalletmapping WHERE pallet = ?";
         PreparedStatement qryStatement = database.prepareStatement(qryString);
+        try{
+            qryStatement.setString(1, ""+pid);
+            database.nonQuery(qryStatement);
+        }catch(SQLException sqlEx){
+            sqlEx.printStackTrace();
+        }
+        //Finally, delete the pallet itself
+        qryString = "DELETE FROM table_pallets WHERE id = ?";
+        qryStatement = database.prepareStatement(qryString);
         try{
             qryStatement.setString(1, ""+pid);
             database.nonQuery(qryStatement);
