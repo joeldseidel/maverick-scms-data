@@ -2,6 +2,7 @@ package managers;
 
 import maverick_data.DatabaseInteraction;
 import maverick_data.Config;
+import maverick_types.DatabaseType;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -16,7 +17,7 @@ public class UserDataManager {
 
     public static int getUserCount(String username){
         System.out.println("Attempting to get user count for username : " + username);
-        DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass, Config.databaseName);
+        DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
         String isUserValidSql = "SELECT uid FROM table_users WHERE username = ?";
         PreparedStatement isUserValidStatement = database.prepareStatement(isUserValidSql);
         int userCount = 0;
@@ -48,7 +49,7 @@ public class UserDataManager {
         catch(Exception e){
             System.out.println("Message Digest failed for : " + e);
         }
-        DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass, Config.databaseName);
+        DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
         String isPasswordMatchSql = "SELECT password FROM table_users WHERE uid = ?";
         PreparedStatement matchPasswordStatement = database.prepareStatement(isPasswordMatchSql);
         try{
@@ -71,7 +72,7 @@ public class UserDataManager {
     }
 
     public static long getUserUUID(String username){
-        DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass, Config.databaseName);
+        DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
         String getUserUUIDSql = "SELECT uid FROM table_users WHERE username = ?";
         PreparedStatement getUUIDStatement = database.prepareStatement(getUserUUIDSql);
         long userUUID = 0;
@@ -91,7 +92,7 @@ public class UserDataManager {
 
     public static String getUserCID(int uid){
         String cid = "notfound";
-        DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass, Config.databaseName);
+        DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
         String getUserCIDSql = "SELECT cid FROM table_users WHERE uid = ?";
         PreparedStatement getUserCIDStatement = database.prepareStatement(getUserCIDSql);
         try{
@@ -132,7 +133,7 @@ public class UserDataManager {
             System.out.println("Message Digest failed for : " + e);
         }
         String hashedPassword = byteArrayToString(messageDigestSHA.digest(password.getBytes(StandardCharsets.UTF_8))).toLowerCase();
-        DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass, Config.databaseName);
+        DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
         String qryString = "INSERT INTO table_users (cid, username, password) VALUES (?, ?, ?)";
         PreparedStatement qryStatement = database.prepareStatement(qryString);
         try{
@@ -151,7 +152,7 @@ public class UserDataManager {
      * removeUser removes a user from the database
      */
     public static void removeUser(int uid) {
-        DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass, Config.databaseName);
+        DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
         String qryString = "DELETE FROM table_users WHERE uid = ?";
         PreparedStatement qryStatement = database.prepareStatement(qryString);
         try{
@@ -168,7 +169,7 @@ public class UserDataManager {
      * editUsername changes a user's username
      */
     public static void editUsername(int uid, String username) {
-        DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass, Config.databaseName);
+        DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
         String qryString = "UPDATE table_users SET username = ? WHERE uid = ?";
         PreparedStatement qryStatement = database.prepareStatement(qryString);
         try{
@@ -193,7 +194,7 @@ public class UserDataManager {
             System.out.println("Message Digest failed for : " + e);
         }
         String hashedPassword = byteArrayToString(messageDigestSHA.digest(password.getBytes(StandardCharsets.UTF_8))).toLowerCase();
-        DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass, Config.databaseName);
+        DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
         String qryString = "UPDATE table_users SET password = ? WHERE uid = ?";
         PreparedStatement qryStatement = database.prepareStatement(qryString);
         try{
@@ -211,7 +212,7 @@ public class UserDataManager {
      * editRank changes a user's rank
      */
     public static void editRank(int uid, String rank) {
-        DatabaseInteraction database = new DatabaseInteraction(Config.host, Config.port, Config.user, Config.pass, Config.databaseName);
+        DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
         String qryString = "UPDATE table_users SET rank = ? WHERE uid = ?";
         PreparedStatement qryStatement = database.prepareStatement(qryString);
         try{

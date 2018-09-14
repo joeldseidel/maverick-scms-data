@@ -5,7 +5,6 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.Headers;
 import maverick_data.DatabaseInteraction;
 import maverick_data.Config;
-import maverick_types.DatabaseType;
 import org.json.JSONObject;
 import org.json.JSONArray;
 
@@ -13,25 +12,34 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.auth0.jwt.algorithms.*;
+import com.auth0.jwt.exceptions.*;
+import com.auth0.jwt.impl.*;
 import com.auth0.jwt.interfaces.*;
 import com.auth0.jwt.*;
+
+import maverick_types.MaverickItem;
+import maverick_types.MaverickPallet;
+import managers.PalletDataManager;
+import managers.ItemDataManager;
 
 /**
  * /*
  * @author Joshua Famous
  *
- * Handler class to return a listing of all users in their company to the client
+ * Handler class to add items to pallets or remove items from pallets
  */
 
-public class GetUsersHandler extends HandlerPrototype implements HttpHandler {
+public class EditPalletHandler extends HandlerPrototype implements HttpHandler {
 
-    private String[] requiredKeys = {"cid", "token"};
+    private String[] requiredKeys = {"cid", "mid", "pallet", "token"};
     private String response;
     public void handle(HttpExchange httpExchange) throws IOException {
-        System.out.println("Entered Get Users Handler");
         JSONObject requestParams = GetParameterObject(httpExchange);
         boolean isValidRequest = isRequestValid(requestParams);
         displayRequestValidity(isValidRequest);
@@ -44,7 +52,7 @@ public class GetUsersHandler extends HandlerPrototype implements HttpHandler {
         Headers headers = httpExchange.getResponseHeaders();
         headers.add("Access-Control-Allow-Origin", "*");
         httpExchange.sendResponseHeaders(responseCode, this.response.length());
-        System.out.println("Response to User Logon Request : " + this.response);
+        System.out.println("Response to Edit Pallet Request : " + this.response);
         OutputStream os = httpExchange.getResponseBody();
         os.write(this.response.getBytes());
         os.close();
@@ -71,11 +79,14 @@ public class GetUsersHandler extends HandlerPrototype implements HttpHandler {
     @Override
     protected void fulfillRequest(JSONObject requestParams){
 
+        boolean isVerified;
+        JSONObject responseObject = new JSONObject();
+
         String cid = requestParams.getString("cid");
         String token = requestParams.getString("token");
-        boolean isVerified = false;
+        String mid = requestParams.getString("mid");
+        int pallet = requestParams.getInt("pallet");
 
-        //VERIFY TOKEN
         try {
 
             Algorithm algorithm = Algorithm.HMAC256("secret");
@@ -94,10 +105,53 @@ public class GetUsersHandler extends HandlerPrototype implements HttpHandler {
 
         if(isVerified){
 
-            //Request wants the user data row in return
-            JSONObject userDataObject = getUserDataByCompany(cid);
-            //If user data fetched, return data, otherwise say no
-            this.response = userDataObject.toString();
+            //ENSURE PALLET IS IN COMPANY
+            if(!PalletDataManager.getPalletCID(pallet).equals(cid) && pallet > 0){
+                responseObject.put("message","PalletOutsideCompanyError");
+                this.response = responseObject.toString();
+            }
+            else{
+
+                //CHECK VALIDITY OF MAVERICK ITEM
+                if(ItemDataManager.itemExists(mid)){
+
+                    //ENSURE ITEM IS IN COMPANY
+                    if(!ItemDataManager.getItemCID(mid).equals(cid)){
+
+                        responseObject.put("message","ItemOutsideCompanyError");
+                        this.response = responseObject.toString();
+
+                    }
+                    else{
+
+                        //CHECK VALIDITY OF PALLET
+                        if(PalletDataManager.palletExists(pallet) || pallet == 0){
+
+                            if(pallet == 0){
+                                ItemDataManager.removeFromPallet(mid);
+                            }
+                            else{
+                                ItemDataManager.updatePallet(mid, pallet);
+                            }
+
+                            responseObject.put("message","Success");
+                            this.response = responseObject.toString();
+
+                        }
+                        else{
+                            responseObject.put("message","InvalidPalletError");
+                            this.response = responseObject.toString();
+                        }
+                        
+                    }
+
+                }
+                else{
+                    responseObject.put("message","InvalidItemError");
+                    this.response = responseObject.toString();
+                }
+
+            }
 
         }
         else{
@@ -105,52 +159,7 @@ public class GetUsersHandler extends HandlerPrototype implements HttpHandler {
             this.response = Boolean.toString(false);
 
         }
-    }
 
-    private JSONObject getUserDataByCompany(String cid){
-        System.out.println("Attempting to get user data for company : " + cid);
-        DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
-        String getUserDataSql = "SELECT * FROM table_users WHERE cid = ?";
-        PreparedStatement getUserDataStatement = database.prepareStatement(getUserDataSql);
-        JSONObject userDataObject = new JSONObject();
-        try{
-            getUserDataStatement.setString(1, cid);
-            ResultSet getUserDataResults = database.query(getUserDataStatement);
-            try{
-            userDataObject.put("arrayResult",getUserDataFormattedResponse(getUserDataResults));
-            }
-            catch(Exception e){
-                System.out.println("Failed to get Formatted Response");
-                userDataObject = null;
-            }
-        } catch(SQLException sqlEx){
-            sqlEx.printStackTrace();
-            userDataObject = null;
-        }
-        System.out.println("Got User Data Object : " + userDataObject);
-        return userDataObject;
-    }
-
-    /**
-     * Convert a result set into a JSON Array
-     * @param resultSet
-     * @return a JSONArray
-     * @throws Exception
-     */
-    public static JSONArray getUserDataFormattedResponse(ResultSet userDataResults) throws Exception {
-        JSONArray jsonArray = new JSONArray();
-        while (userDataResults.next()) {
-            JSONObject obj = new JSONObject();
-            int total_rows = userDataResults.getMetaData().getColumnCount();
-            for (int i = 0; i < total_rows; i++) {
-                System.out.println("Got " + userDataResults.getObject(i + 1) + " for " + userDataResults.getMetaData().getColumnLabel(i + 1)
-                        .toLowerCase());
-                obj.put(userDataResults.getMetaData().getColumnLabel(i + 1)
-                        .toLowerCase(), userDataResults.getObject(i + 1));
-            }
-            jsonArray.put(obj);
-        }
-        return jsonArray;
     }
 
 }
