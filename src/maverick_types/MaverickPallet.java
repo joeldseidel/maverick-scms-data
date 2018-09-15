@@ -1,5 +1,7 @@
 package maverick_types;
 
+import managers.LotNumberManager;
+
 import java.util.ArrayList;
 
 /**
@@ -9,6 +11,7 @@ public class MaverickPallet {
 
 	private ArrayList<MaverickItem> items;
     private String customerID;
+    private String palletID;
 	
 	/**
 	 * @param customerID
@@ -17,6 +20,14 @@ public class MaverickPallet {
 	public MaverickPallet(String customerID) {
 		this.customerID = customerID;
 		items = new ArrayList<MaverickItem>();
+		LotNumberManager lotNumberManager = new LotNumberManager();
+		this.palletID = Long.toString(lotNumberManager.generateLotNumber(LotType.Pallet));
+	}
+
+	public MaverickPallet(String customerID, String palletID){
+		this.customerID = customerID;
+		items = new ArrayList<MaverickItem>();
+		this.palletID = palletID;
 	}
 
 	/**
@@ -53,5 +64,7 @@ public class MaverickPallet {
 	public void addItem(MaverickItem item) {
 		this.items.add(item);
 	}
+
+	public String getPalletID() { return this.palletID; }
     
 }

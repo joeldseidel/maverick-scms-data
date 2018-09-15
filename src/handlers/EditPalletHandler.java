@@ -85,7 +85,7 @@ public class EditPalletHandler extends HandlerPrototype implements HttpHandler {
         String cid = requestParams.getString("cid");
         String token = requestParams.getString("token");
         String mid = requestParams.getString("mid");
-        int pallet = requestParams.getInt("pallet");
+        String pallet = requestParams.getString("pallet");
 
         try {
 
@@ -106,7 +106,7 @@ public class EditPalletHandler extends HandlerPrototype implements HttpHandler {
         if(isVerified){
 
             //ENSURE PALLET IS IN COMPANY
-            if(!PalletDataManager.getPalletCID(pallet).equals(cid) && pallet > 0){
+            if(!PalletDataManager.getPalletCID(pallet).equals(cid)){
                 responseObject.put("message","PalletOutsideCompanyError");
                 this.response = responseObject.toString();
             }
@@ -125,15 +125,8 @@ public class EditPalletHandler extends HandlerPrototype implements HttpHandler {
                     else{
 
                         //CHECK VALIDITY OF PALLET
-                        if(PalletDataManager.palletExists(pallet) || pallet == 0){
-
-                            if(pallet == 0){
-                                ItemDataManager.removeFromPallet(mid);
-                            }
-                            else{
-                                ItemDataManager.updatePallet(mid, pallet);
-                            }
-
+                        if(PalletDataManager.palletExists(pallet)){
+                            ItemDataManager.updatePallet(mid, pallet);
                             responseObject.put("message","Success");
                             this.response = responseObject.toString();
 

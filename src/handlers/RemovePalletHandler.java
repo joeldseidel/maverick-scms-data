@@ -82,7 +82,7 @@ public class RemovePalletHandler extends HandlerPrototype implements HttpHandler
 
         String cid = requestParams.getString("cid");
         String token = requestParams.getString("token");
-        int pallet = requestParams.getInt("pallet");
+        String pallet = requestParams.getString("pallet");
 
         try {
 
