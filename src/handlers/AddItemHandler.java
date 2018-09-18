@@ -72,7 +72,7 @@ public class AddItemHandler extends HandlerPrototype implements HttpHandler {
 
         boolean isVerified;
 
-        int fdaid = requestParams.getInt("fdaid");
+        String fdaid = requestParams.getString("fdaid");
         String cid = requestParams.getString("cid");
         String name = requestParams.getString("name");
         String category = requestParams.getString("category");
