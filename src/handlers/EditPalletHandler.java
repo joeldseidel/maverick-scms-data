@@ -36,9 +36,10 @@ import managers.ItemDataManager;
  */
 
 public class EditPalletHandler extends HandlerPrototype implements HttpHandler {
-
-    private String[] requiredKeys = {"cid", "mid", "pallet", "token"};
     private String response;
+    public EditPalletHandler(){
+        requiredKeys = new String[] {"cid", "mid", "pallet", "token"};
+    }
     public void handle(HttpExchange httpExchange) throws IOException {
         JSONObject requestParams = GetParameterObject(httpExchange);
         boolean isValidRequest = isRequestValid(requestParams);
@@ -59,52 +60,14 @@ public class EditPalletHandler extends HandlerPrototype implements HttpHandler {
     }
 
     @Override
-    protected boolean isRequestValid(JSONObject requestParams){
-        if(requestParams == null){
-            //Request did not come with parameters, is invalid
-            System.out.println("Request Params Null");
-            return false;
-        }
-        for(String requiredKey : requiredKeys){
-            if(!requestParams.has(requiredKey)){
-                //Missing a required key, request is invalid
-                System.out.println("Request Params Missing Key " + requiredKey);
-                return false;
-            }
-        }
-        //Request contains all required keys
-        return true;
-    }
-
-    @Override
     protected void fulfillRequest(JSONObject requestParams){
 
         boolean isVerified;
         JSONObject responseObject = new JSONObject();
 
         String cid = requestParams.getString("cid");
-        String token = requestParams.getString("token");
         String mid = requestParams.getString("mid");
         String pallet = requestParams.getString("pallet");
-
-        try {
-
-            Algorithm algorithm = Algorithm.HMAC256("secret");
-            JWTVerifier verifier = JWT.require(algorithm)
-                .withIssuer("localhost:6969")
-                .build(); //Reusable verifier instance
-            DecodedJWT jwt = verifier.verify(token);
-            isVerified = true;
-            System.out.println("Token " + token + " was verified");
-
-        } catch (Exception exception){
-            //Invalid signature/claims
-            isVerified = false;
-            System.out.println("Token " + token + " was not verified");
-        }
-
-        if(isVerified){
-
             //ENSURE PALLET IS IN COMPANY
             if(!PalletDataManager.getPalletCID(pallet).equals(cid)){
                 responseObject.put("message","PalletOutsideCompanyError");
@@ -145,14 +108,6 @@ public class EditPalletHandler extends HandlerPrototype implements HttpHandler {
                 }
 
             }
-
-        }
-        else{
-
-            this.response = Boolean.toString(false);
-
-        }
-
     }
 
 }

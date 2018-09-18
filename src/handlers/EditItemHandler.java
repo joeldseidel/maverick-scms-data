@@ -27,16 +27,16 @@ import java.io.OutputStream;
  */
 
 public class EditItemHandler extends HandlerPrototype implements HttpHandler {
-
-    private String[] requiredKeys = {"cid", "mid", "field", "newvalue", "token"};
     private String response = "";
-
-    public void handle(HttpExchange httpExchange) throws IOException{
+    public EditItemHandler(){
+        requiredKeys = new String[] {"cid", "mid", "field", "newvalue", "token"};
+    }
+    public void handle(HttpExchange httpExchange) throws IOException {
         System.out.println("Enter item editing handler");
         JSONObject requestParams = GetParameterObject(httpExchange);
         boolean isValidRequest = isRequestValid(requestParams);
         displayRequestValidity(isValidRequest);
-        if(isValidRequest){
+        if (isValidRequest) {
             fulfillRequest(requestParams);
         } else {
             this.response = "invalid request";
@@ -50,36 +50,14 @@ public class EditItemHandler extends HandlerPrototype implements HttpHandler {
         os.write(this.response.getBytes());
         os.close();
     }
-
-    @Override
-    protected boolean isRequestValid(JSONObject requestParams){
-        if(requestParams == null){
-            //Request did not come with parameters, is invalid
-            System.out.println("Request params invalid");
-            return false;
-        }
-        for(String requiredKey : requiredKeys){
-            if(!requestParams.has(requiredKey)){
-                //Missing a required key, request is invalid
-                System.out.println("Request params missing key " + requiredKey);
-                return false;
-            }
-        }
-        //Request contains all required keys
-        return true;
-    }
-
     @Override
     protected void fulfillRequest(JSONObject requestParams){
-
-        boolean isVerified;
         JSONObject responseObject = new JSONObject();
 
         String cid = requestParams.getString("cid");
         String mid = requestParams.getString("mid");
         String field = requestParams.getString("field");
         String newvalue = requestParams.getString("newvalue");
-        String token = requestParams.getString("token");
 
         //Check that CID of User matches requesting CID
         if(!ItemDataManager.getItemCID(mid).equals(cid)){
@@ -87,26 +65,6 @@ public class EditItemHandler extends HandlerPrototype implements HttpHandler {
             this.response = responseObject.toString();
         }
         else{
-
-            //VERIFY TOKEN
-            try {
-
-                Algorithm algorithm = Algorithm.HMAC256("secret");
-                JWTVerifier verifier = JWT.require(algorithm)
-                    .withIssuer("localhost:6969")
-                    .build(); //Reusable verifier instance
-                DecodedJWT jwt = verifier.verify(token);
-                isVerified = true;
-                System.out.println("Token " + token + " was verified");
-
-            } catch (Exception exception){
-                //Invalid signature/claims
-                isVerified = false;
-                System.out.println("Token " + token + " was not verified");
-            }
-
-            if(isVerified){
-
                 //Perform requested operation
                 switch(field){
                     case "name":
@@ -141,15 +99,6 @@ public class EditItemHandler extends HandlerPrototype implements HttpHandler {
                         this.response = responseObject.toString();
                         break;
                 }
-
-            }
-            else{
-
-                this.response = Boolean.toString(false);
-
-            }
-
         }
-
     }
 }

@@ -20,9 +20,10 @@ import com.auth0.jwt.algorithms.*;
 import com.auth0.jwt.*;
 
 public class AuthenticateUserHandler extends HandlerPrototype implements HttpHandler {
-
-    private String[] requiredKeys = {"username", "password", "returnUserData"};
     private String response;
+    public AuthenticateUserHandler(){
+        requiredKeys = new String[] {"username", "password", "returnUserData"};
+    }
     public void handle(HttpExchange httpExchange) throws IOException {
         System.out.println("Entered User Authentication Handler");
         JSONObject requestParams = GetParameterObject(httpExchange);
@@ -42,25 +43,6 @@ public class AuthenticateUserHandler extends HandlerPrototype implements HttpHan
         os.write(this.response.getBytes());
         os.close();
     }
-
-    @Override
-    protected boolean isRequestValid(JSONObject requestParams){
-        if(requestParams == null){
-            //Request did not come with parameters, is invalid
-            System.out.println("Request Params Null");
-            return false;
-        }
-        for(String requiredKey : requiredKeys){
-            if(!requestParams.has(requiredKey)){
-                //Missing a required key, request is invalid
-                System.out.println("Request Params Missing Key " + requiredKey);
-                return false;
-            }
-        }
-        //Request contains all required keys
-        return true;
-    }
-
     @Override
     protected void fulfillRequest(JSONObject requestParams){
         String username = requestParams.getString("username");

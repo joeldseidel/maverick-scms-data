@@ -27,14 +27,15 @@ import maverick_types.MaverickItem;
 import managers.ItemDataManager;
 
 public class AddItemHandler extends HandlerPrototype implements HttpHandler {
-
-    private String[] requiredKeys = {"fdaid", "name", "category", "cid", "token"};
     private String response;
+    public AddItemHandler(){
+        requiredKeys = new String[] {"fdaid", "name", "category", "cid", "token"};
+    }
     public void handle(HttpExchange httpExchange) throws IOException {
         JSONObject requestParams = GetParameterObject(httpExchange);
         boolean isValidRequest = isRequestValid(requestParams);
         displayRequestValidity(isValidRequest);
-        if(isValidRequest){
+        if (isValidRequest) {
             fulfillRequest(requestParams);
         } else {
             this.response = "invalid request";
@@ -50,25 +51,7 @@ public class AddItemHandler extends HandlerPrototype implements HttpHandler {
     }
 
     @Override
-    protected boolean isRequestValid(JSONObject requestParams){
-        if(requestParams == null){
-            //Request did not come with parameters, is invalid
-            System.out.println("Request Params Null");
-            return false;
-        }
-        for(String requiredKey : requiredKeys){
-            if(!requestParams.has(requiredKey)){
-                //Missing a required key, request is invalid
-                System.out.println("Request Params Missing Key " + requiredKey);
-                return false;
-            }
-        }
-        //Request contains all required keys
-        return true;
-    }
-
-    @Override
-    protected void fulfillRequest(JSONObject requestParams){
+    protected void fulfillRequest(JSONObject requestParams) {
 
         boolean isVerified;
 
@@ -77,39 +60,11 @@ public class AddItemHandler extends HandlerPrototype implements HttpHandler {
         String name = requestParams.getString("name");
         String category = requestParams.getString("category");
         String token = requestParams.getString("token");
-
-        try {
-
-            Algorithm algorithm = Algorithm.HMAC256("secret");
-            JWTVerifier verifier = JWT.require(algorithm)
-                .withIssuer("localhost:6969")
-                .build(); //Reusable verifier instance
-            DecodedJWT jwt = verifier.verify(token);
-            isVerified = true;
-            System.out.println("Token " + token + " was verified");
-
-        } catch (Exception exception){
-            //Invalid signature/claims
-            isVerified = false;
-            System.out.println("Token " + token + " was not verified");
-        }
-
-        if(isVerified){
-
-            MaverickItem thisItem = new MaverickItem(fdaid, name, category, cid);
-            ItemDataManager itemDataManager = new ItemDataManager();
-            itemDataManager.addItem(thisItem);
-            JSONObject responseObject = new JSONObject();
-            responseObject.put("message","Success");
-            this.response = responseObject.toString();
-
-        }
-        else{
-
-            this.response = Boolean.toString(false);
-
-        }
-
+        MaverickItem thisItem = new MaverickItem(fdaid, name, category, cid);
+        ItemDataManager itemDataManager = new ItemDataManager();
+        itemDataManager.addItem(thisItem);
+        JSONObject responseObject = new JSONObject();
+        responseObject.put("message", "Success");
+        this.response = responseObject.toString();
     }
-
 }

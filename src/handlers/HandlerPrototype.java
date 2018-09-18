@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import java.io.*;
 
 public abstract class HandlerPrototype {
+    protected String[] requiredKeys;
     JSONObject GetParameterObject(HttpExchange httpExchange) throws IOException {
         //Fetch the parameter text from the request
         InputStream paramInStream = httpExchange.getRequestBody();
@@ -50,7 +51,25 @@ public abstract class HandlerPrototype {
         }
     }
 
-    protected abstract boolean isRequestValid(JSONObject requestParams);
+    protected boolean isRequestValid(JSONObject requestParams){
+        if(requestParams == null){
+            //Request did not come with parameters, is invalid
+            System.out.println("Request Params Null");
+            return false;
+        }
+        for(String requiredKey : requiredKeys){
+            if(!requestParams.has(requiredKey)){
+                //Missing a required key, request is invalid
+                System.out.println("Request Params Missing Key " + requiredKey);
+                return false;
+            }
+        }
+        if(!verifyToken(requestParams.getString("token"))){
+            return false;
+        }
+        //Request contains all required keys
+        return true;
+    }
 
     protected abstract void fulfillRequest(JSONObject requestParams);
 }
