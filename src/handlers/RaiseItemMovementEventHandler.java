@@ -45,10 +45,10 @@ public class RaiseItemMovementEventHandler extends HandlerPrototype implements H
                 return false;
             }
         }
-        if(!verifyToken(requestParams.getString("token"))){
+        /*if(!verifyToken(requestParams.getString("token"))){
             //Could not verify provided token, request is invalid
             return false;
-        }
+        }*/
         //Request contains all required keys
         return true;
     }

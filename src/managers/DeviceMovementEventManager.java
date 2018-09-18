@@ -41,10 +41,9 @@ public class DeviceMovementEventManager extends MovementEventManager {
             writeMovementEventStatement.setString(2, MovementEventManager.movementTypeToString(committedEvent.getType()));
             writeMovementEventStatement.setString(3, committedEvent.getFromCid());
             writeMovementEventStatement.setString(4, committedEvent.getToCid());
+            database.nonQuery(writeMovementEventStatement);
         } catch(SQLException sqlEx){
             sqlEx.printStackTrace();
-        } finally {
-            database.closeConnection();
         }
     }
     public void relatedDeviceMovementCommit(PalletMovementEvent palletMovementEvent){
