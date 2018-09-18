@@ -108,6 +108,59 @@ public class ItemDataManager {
     }
 
     /**
+     * editName changes an item's name
+     */
+    public static void editName(String mid, String newname) {
+        DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
+        String qryString = "UPDATE table_items SET name = ? WHERE mid = ?";
+        PreparedStatement qryStatement = database.prepareStatement(qryString);
+        try{
+            qryStatement.setString(1, newname);
+            qryStatement.setString(2, mid);
+            database.nonQuery(qryStatement);
+        }catch(SQLException sqlEx){
+            sqlEx.printStackTrace();
+        } finally {
+            database.closeConnection();
+        }
+    }
+
+    /**
+     * editCategory changes an item's category
+     */
+    public static void editCategory(String mid, String newcategory) {
+        DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
+        String qryString = "UPDATE table_items SET category = ? WHERE mid = ?";
+        PreparedStatement qryStatement = database.prepareStatement(qryString);
+        try{
+            qryStatement.setString(1, newcategory);
+            qryStatement.setString(2, mid);
+            database.nonQuery(qryStatement);
+        }catch(SQLException sqlEx){
+            sqlEx.printStackTrace();
+        } finally {
+            database.closeConnection();
+        }
+    }
+
+    /**
+     * removeItem removes an item from the database
+     */
+    public static void removeItem(String mid) {
+        DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
+        String qryString = "DELETE FROM table_items WHERE mid = ?";
+        PreparedStatement qryStatement = database.prepareStatement(qryString);
+        try{
+            qryStatement.setString(1, mid);
+            database.nonQuery(qryStatement);
+        }catch(SQLException sqlEx){
+            sqlEx.printStackTrace();
+        } finally {
+            database.closeConnection();
+        }
+    }
+
+    /**
      * removeFromPallet removes an item from a pallet
      */
     public static void removeFromPallet(String mid) {
