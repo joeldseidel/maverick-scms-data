@@ -12,7 +12,6 @@ import java.util.Properties;
  * A class for interacting with a MySQL database
  *
  * @author Joel Seidel
- * @author Chris Vantine
  */
 public class DatabaseInteraction {
 
@@ -150,4 +149,16 @@ public class DatabaseInteraction {
         }
     }
 
+    public void batchNonQuery(PreparedStatement batchNonQueryStatement){
+        try{
+            batchNonQueryStatement.executeBatch();
+            dbConn.commit();
+        } catch(SQLException sqlEx){
+            sqlEx.printStackTrace();
+        }
+    }
+
+    public void setAutoCommit(boolean isAutoCommit) throws SQLException{
+        dbConn.setAutoCommit(isAutoCommit);
+    }
 }

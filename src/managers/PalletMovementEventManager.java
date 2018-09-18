@@ -1,7 +1,7 @@
 package managers;
 
 /*
-    @author Joel Seidel
+ *  @author Joel Seidel
  */
 
 import maverick_data.DatabaseInteraction;
@@ -41,8 +41,11 @@ public class PalletMovementEventManager extends MovementEventManager {
             database.nonQuery(writeMovementEventStatement);
         } catch(SQLException sqlEx){
             sqlEx.printStackTrace();
-        } finally {
-            database.closeConnection();
         }
+        updatePalletRelatedDevices(committedEvent);
+    }
+    private void updatePalletRelatedDevices(PalletMovementEvent committedEvent){
+        DeviceMovementEventManager deviceMovementEventManager = new DeviceMovementEventManager();
+        deviceMovementEventManager.relatedDeviceMovementCommit(committedEvent);
     }
 }

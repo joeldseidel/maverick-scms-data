@@ -66,7 +66,8 @@ public class MaverickData {
             server.createContext("/add_pallet", new AddPalletHandler());
             server.createContext("/remove_pallet", new RemovePalletHandler());
             server.createContext("/generate_item_lot_number", new GenerateLotNumberHandler());
-            server.createContext("/raise_movement_event", new RaisePalletMovementEventHandler());
+            server.createContext("/raise_pallet_movement_event", new RaisePalletMovementEventHandler());
+            server.createContext("/raise_item_movement_event", new RaiseItemMovementEventHandler());
             //Create the context of the commands and the handlers in this line
             server.setExecutor(null);
             server.start();
