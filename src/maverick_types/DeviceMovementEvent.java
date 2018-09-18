@@ -1,8 +1,11 @@
 package maverick_types;
 
+import managers.DeviceMovementEventManager;
+
 public class DeviceMovementEvent {
     private String mid, fromCompanyId, toCompanyId;
     private MovementType type;
+    private DeviceMovementEventManager deviceMovementEventManager = new DeviceMovementEventManager();
     public DeviceMovementEvent(String mid, String fromCompanyId, String toCompanyId, MovementType type){
         this.mid = mid;
         this.fromCompanyId = fromCompanyId;
@@ -10,8 +13,15 @@ public class DeviceMovementEvent {
         this.type = type;
     }
     public boolean isValid(){
-        return false;
+        MovementStatus currentStatus = deviceMovementEventManager.getCurrentStatus(getItem());
+        if(!deviceMovementEventManager.isLegalMovement(currentStatus, type)){
+            return false;
+        }
+        //Todo: implement checks for other things probably
+        return true;
     }
+    public void commit(){ deviceMovementEventManager.commitMovement(this); }
+
     public String getItemId(){
         return mid;
     }
@@ -23,5 +33,8 @@ public class DeviceMovementEvent {
     }
     public MovementType getType(){
         return type;
+    }
+    public MaverickItem getItem(){
+        return new MaverickItem(mid);
     }
 }

@@ -4,29 +4,29 @@ import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import managers.MovementEventManager;
-import maverick_types.PalletMovementEvent;
+import maverick_types.DeviceMovementEvent;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class RaisePalletMovementEventHandler extends HandlerPrototype implements HttpHandler {
-    private String[] requiredKeys = {"palletid", "type" , "fromcid", "tocid", "token"};
+public class RaiseItemMovementEventHandler extends HandlerPrototype implements HttpHandler {
+    private String[] requiredKeys = {"mid", "type", "fromcid", "tocid", "token"};
     private String response;
     public void handle(HttpExchange httpExchange) throws IOException {
         JSONObject requestParams = GetParameterObject(httpExchange);
-        boolean isValidRequest = isRequestValid(requestParams);
-        displayRequestValidity(isValidRequest);
-        if(isValidRequest){
+        boolean isRequestValid = isRequestValid(requestParams);
+        displayRequestValidity(isRequestValid);
+        if(isRequestValid){
             fulfillRequest(requestParams);
         } else {
-            this.response = "invalid request";
+            this.response = "invalid response";
         }
-        int responseCode = isValidRequest ? 200 : 400;
+        int responseCode = isRequestValid ? 200 : 400;
         Headers headers = httpExchange.getResponseHeaders();
         headers.add("Access-Control-Allow-Origin", "*");
         httpExchange.sendResponseHeaders(responseCode, this.response.length());
-        System.out.println("Response to raise pallet movement event : " + this.response);
+        System.out.println("Response to raise item movement event: " + this.response);
         OutputStream os = httpExchange.getResponseBody();
         os.write(this.response.getBytes());
         os.close();
@@ -54,21 +54,21 @@ public class RaisePalletMovementEventHandler extends HandlerPrototype implements
     }
     @Override
     protected void fulfillRequest(JSONObject requestParams){
-        //Get params from request params object
-        String palletid = requestParams.getString("palletid");
+        //Get params from request params objects
+        String itemid = requestParams.getString("mid");
         String type = requestParams.getString("type");
-        String fromCid = requestParams.getString("fromcid");
-        String toCid = requestParams.getString("tocid");
-        //Create a pallet movement object from parameters
-        PalletMovementEvent thisPalletMovementEvent = new PalletMovementEvent(palletid, MovementEventManager.parseMovementType(type), fromCid, toCid);
-        //Validate and commit movement event
-        if(thisPalletMovementEvent.isValid()){
-            //Pallet movement event is valid and legal, commit to database
-            thisPalletMovementEvent.commit();
+        String fromcid = requestParams.getString("fromcid");
+        String tocid = requestParams.getString("tocid");
+        //Create item movement event object from parameters
+        DeviceMovementEvent deviceMovementEvent = new DeviceMovementEvent(itemid, fromcid, tocid, MovementEventManager.parseMovementType(type));
+        //Validate movement event and commit if valid
+        if(deviceMovementEvent.isValid()){
+            //Item movement event is valid and legal, commit to database
+            deviceMovementEvent.commit();
             //Return successful message to client
             this.response = "success";
         } else {
-            //Pallet movement was invalid
+            //Pallet movement request was invalid :(
             this.response = "invalid request";
         }
     }

@@ -5,7 +5,7 @@ import managers.PalletMovementEventManager;
 public class PalletMovementEvent {
     private String palletid, fromCompanyId, toCompanyId;
     private MovementType type;
-    PalletMovementEventManager palletMovementEventManager = new PalletMovementEventManager();
+    private PalletMovementEventManager palletMovementEventManager = new PalletMovementEventManager();
     public PalletMovementEvent(String palletid, MovementType type, String fromCompanyId, String toCompanyId){
         this.palletid = palletid;
         this.type = type;

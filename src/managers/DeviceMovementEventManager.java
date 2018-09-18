@@ -10,7 +10,7 @@ import java.sql.SQLException;
 /*
  *  @author Joel Seidel
  *
- *  Data manager for device movements
+ *  Data manager for device mo
  */
 
 
