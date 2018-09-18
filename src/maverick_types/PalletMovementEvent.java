@@ -13,7 +13,8 @@ public class PalletMovementEvent {
         this.toCompanyId = toCompanyId;
     }
     public boolean isValid(){
-        if(!palletMovementEventManager.isLegalMovement(this, type)){
+        MovementStatus currentStatus = palletMovementEventManager.getCurrentStatus(getPallet());
+        if(!palletMovementEventManager.isLegalMovement(currentStatus, type)){
             return false;
         }
         //Todo: implement checks for the companies

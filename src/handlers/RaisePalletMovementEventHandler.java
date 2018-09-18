@@ -3,7 +3,7 @@ package handlers;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import maverick_types.MovementEventPrototype;
+import managers.MovementEventManager;
 import maverick_types.PalletMovementEvent;
 import org.json.JSONObject;
 
@@ -60,7 +60,7 @@ public class RaisePalletMovementEventHandler extends HandlerPrototype implements
         String fromCid = requestParams.getString("fromcid");
         String toCid = requestParams.getString("tocid");
         //Create a pallet movement object from parameters
-        PalletMovementEvent thisPalletMovementEvent = new PalletMovementEvent(palletid, MovementEventPrototype.parseMovementType(type), fromCid, toCid);
+        PalletMovementEvent thisPalletMovementEvent = new PalletMovementEvent(palletid, MovementEventManager.parseMovementType(type), fromCid, toCid);
         //Validate and commit movement event
         if(thisPalletMovementEvent.isValid()){
             //Pallet movement event is valid and legal, commit to database
