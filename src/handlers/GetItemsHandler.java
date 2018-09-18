@@ -110,7 +110,7 @@ public class GetItemsHandler extends HandlerPrototype implements HttpHandler {
     private JSONObject getItemDataByCompany(String cid){
         System.out.println("Attempting to get item data for company : " + cid);
         DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
-        String getItemDataSql = "SELECT table_items.mid, table_items.name, table_items.category, table_itempalletmapping.pallet FROM table_items LEFT JOIN table_itempalletmapping ON table_items.mid = table_itempalletmapping.mid AND table_items.cid = ?";
+        String getItemDataSql = "SELECT table_items.mid, table_items.fdaid, table_items.name, table_items.category, table_itempalletmapping.pallet FROM table_items LEFT JOIN table_itempalletmapping ON table_items.mid = table_itempalletmapping.mid AND table_items.cid = ?";
         PreparedStatement getItemDataStatement = database.prepareStatement(getItemDataSql);
         JSONObject itemDataObject = new JSONObject();
         try{
