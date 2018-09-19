@@ -91,7 +91,7 @@ public class GetItemsHandler extends HandlerPrototype implements HttpHandler {
      * @return a JSONArray
      * @throws Exception
      */
-    public static JSONArray getItemDataFormattedResponse(ResultSet itemDataResults) throws Exception {
+    private static JSONArray getItemDataFormattedResponse(ResultSet itemDataResults) throws Exception {
         JSONArray jsonArray = new JSONArray();
         while (itemDataResults.next()) {
             JSONObject obj = new JSONObject();
