@@ -11,8 +11,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class RaiseItemMovementEventHandler extends HandlerPrototype implements HttpHandler {
-    private String[] requiredKeys = {"mid", "type", "fromcid", "tocid", "token"};
     private String response;
+    public RaiseItemMovementEventHandler(){
+        requiredKeys = new String[] {"mid", "type", "fromcid", "tocid", "token"};
+    }
     public void handle(HttpExchange httpExchange) throws IOException {
         JSONObject requestParams = GetParameterObject(httpExchange);
         boolean isRequestValid = isRequestValid(requestParams);
@@ -30,27 +32,6 @@ public class RaiseItemMovementEventHandler extends HandlerPrototype implements H
         OutputStream os = httpExchange.getResponseBody();
         os.write(this.response.getBytes());
         os.close();
-    }
-    @Override
-    protected boolean isRequestValid(JSONObject requestParams){
-        if(requestParams == null){
-            //Request did not come with parameters, is invalid
-            System.out.println("Request Params Null");
-            return false;
-        }
-        for(String requiredKey : requiredKeys){
-            if(!requestParams.has(requiredKey)){
-                //Missing a required key, request is invalid
-                System.out.println("Request Params Missing Key " + requiredKey);
-                return false;
-            }
-        }
-        if(!verifyToken(requestParams.getString("token"))){
-            //Could not verify provided token, request is invalid
-            return false;
-        }
-        //Request contains all required keys
-        return true;
     }
     @Override
     protected void fulfillRequest(JSONObject requestParams){

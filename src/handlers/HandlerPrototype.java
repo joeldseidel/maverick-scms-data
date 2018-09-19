@@ -37,7 +37,7 @@ public abstract class HandlerPrototype {
         }
     }
 
-    boolean verifyToken(String token){
+    private boolean isTokenValid(String token){
         try{
             Algorithm algorithm = Algorithm.HMAC256("secret");
             JWTVerifier verifier = JWT.require(algorithm)
@@ -64,11 +64,7 @@ public abstract class HandlerPrototype {
                 return false;
             }
         }
-        if(!verifyToken(requestParams.getString("token"))){
-            return false;
-        }
-        //Request contains all required keys
-        return true;
+        return isTokenValid(requestParams.getString("token"));
     }
 
     protected abstract void fulfillRequest(JSONObject requestParams);
