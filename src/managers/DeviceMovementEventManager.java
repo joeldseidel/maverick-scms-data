@@ -6,6 +6,9 @@ import maverick_types.*;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /*
  *  @author Joel Seidel
@@ -75,5 +78,27 @@ public class DeviceMovementEventManager extends MovementEventManager {
         } catch(SQLException sqlEx){
             sqlEx.printStackTrace();
         }
+    }
+    public List<DeviceMovementEvent> getMovements(MaverickItem maverickItem){
+        String getItemMovementsSql = "SELECT * FROM device_movements WHERE mid = ? ORDER BY movementtime DESC";
+        PreparedStatement getItemMovementsStatement = database.prepareStatement(getItemMovementsSql);
+        try{
+            getItemMovementsStatement.setString(1, maverickItem.getMaverickID());
+            ResultSet getItemMovementsResults = database.query(getItemMovementsStatement);
+            List<DeviceMovementEvent> deviceMovementEvents = new ArrayList<>();
+            while(getItemMovementsResults.next()){
+                String mid = maverickItem.getMaverickID();
+                MovementType movementType = MovementEventManager.parseMovementType(getItemMovementsResults.getString("movementtype"));
+                String fromcid = getItemMovementsResults.getString("fromcid");
+                String tocid = getItemMovementsResults.getString("tocid");
+                Date movementTime = getItemMovementsResults.getDate("movementtime");
+                DeviceMovementEvent thisMovementEvent = new DeviceMovementEvent(mid, fromcid, tocid, movementType, movementTime);
+                deviceMovementEvents.add(thisMovementEvent);
+            }
+            return deviceMovementEvents;
+        } catch(SQLException sqlEx){
+            sqlEx.printStackTrace();
+        }
+        return null;
     }
 }
