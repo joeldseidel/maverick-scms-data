@@ -8,7 +8,6 @@ import managers.DeviceMovementEventManager;
 import managers.MovementEventManager;
 import maverick_types.DeviceMovementEvent;
 import maverick_types.MaverickItem;
-import maverick_types.PalletMovementEvent;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -51,7 +50,7 @@ public class GetItemHistoryHandler extends HandlerPrototype implements HttpHandl
             //Request is invalid, set response to reflect this
             this.response = "invalid response";
         }
-        //Create reponse to client
+        //Create response to client
         int responseCode = isValidRequest ? 200 : 400;
         Headers headers = httpExchange.getResponseHeaders();
         headers.add("Access-Control-Allow-Origin", "*");
