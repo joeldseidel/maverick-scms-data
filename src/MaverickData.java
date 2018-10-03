@@ -87,6 +87,7 @@ public class MaverickData {
         server.createContext("/raise_item_movement_event", new RaiseItemMovementEventHandler());
         server.createContext("/get_pallet_history", new GetPalletHistoryHandler());
         server.createContext("/get_item_history", new GetItemHistoryHandler());
+        server.createContext("/get_item_by_lot", new GetItemByLotHandler());
         return server;
     }
 }

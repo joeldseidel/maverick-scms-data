@@ -5,7 +5,6 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.Headers;
 import managers.UserDataManager;
 import maverick_data.DatabaseInteraction;
-import maverick_data.Config;
 import maverick_types.DatabaseType;
 import org.json.JSONObject;
 import org.json.JSONArray;
@@ -65,6 +64,27 @@ public class AuthenticateUserHandler extends HandlerPrototype implements HttpHan
         os.close();
     }
 
+    /**
+     * Override the super class request validity method because the token has not be assigned yet and cannot be verified
+     * @param requestParams parameters from the client to be validated
+     * @return boolean with results of validity test
+     */
+    @Override
+    protected boolean isRequestValid(JSONObject requestParams) {
+        if (requestParams == null) {
+            //Request did not come with parameters, is invalid
+            System.out.println("Request Params Null");
+            return false;
+        }
+        for(String requiredKey : requiredKeys){
+            if(!requestParams.has(requiredKey)){
+                //Missing a required key, request is invalid
+                System.out.println("Request Params Missing Key " + requiredKey);
+                return false;
+            }
+        }
+        return true;
+    }
     /**
      * Parse request parameters, query database to determine authenticity, format and structure user data, return requested data
      * @param requestParams validated parameters sent by the client

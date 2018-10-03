@@ -1,47 +1,28 @@
 package handlers;
 
+import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.Headers;
-import maverick_data.DatabaseInteraction;
+import managers.ItemDataManager;
+import maverick_types.MaverickItem;
 import org.json.JSONObject;
-import org.json.JSONArray;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
-import com.auth0.jwt.algorithms.*;
-import com.auth0.jwt.exceptions.*;
-import com.auth0.jwt.impl.*;
-import com.auth0.jwt.interfaces.*;
-import com.auth0.jwt.*;
-
-import maverick_types.MaverickItem;
-import managers.ItemDataManager;
 
 /**
- *  @author Joshua Famous, Joel Seidel
- *
- *  Handler class for adding items to the database
+ * @author Joel Seidel
+ * Handles requests to get a single item by its maverick lot number
  */
-
-
-public class AddItemHandler extends HandlerPrototype implements HttpHandler {
+public class GetItemByLotHandler extends HandlerPrototype implements HttpHandler {
     private String response;
     /**
      * Constructor to set this handler's required keys on handler context creation
      */
-    public AddItemHandler(){
-        //Set required keys in array in inherited from HandlerPrototype super class
-        requiredKeys = new String[] {"fdaid", "name", "category", "cid", "token"};
+    public GetItemByLotHandler(){
+        //Set required keys in array inherited from HandlerPrototype super class
+        requiredKeys = new String[] {"mid", "token"};
     }
-
     /**
      * Entry point for handler. Get parameters, verify request validity, fulfill request, return response to client
      * @param httpExchange inherited from super class, set from client with params
@@ -54,7 +35,7 @@ public class AddItemHandler extends HandlerPrototype implements HttpHandler {
         boolean isValidRequest = isRequestValid(requestParams);
         //Display in server console validity of the request for testing purposes
         displayRequestValidity(isValidRequest);
-        if (isValidRequest) {
+        if(isValidRequest){
             //Request was valid, fulfill the request with params
             fulfillRequest(requestParams);
         } else {
@@ -66,7 +47,7 @@ public class AddItemHandler extends HandlerPrototype implements HttpHandler {
         Headers headers = httpExchange.getResponseHeaders();
         headers.add("Access-Control-Allow-Origin", "*");
         httpExchange.sendResponseHeaders(responseCode, this.response.length());
-        System.out.println("Response to Add Item Request : " + this.response);
+        System.out.println("Response to Get Item By Lot Request : " + this.response);
         //Write response to the client
         OutputStream os = httpExchange.getResponseBody();
         os.write(this.response.getBytes());
@@ -74,25 +55,34 @@ public class AddItemHandler extends HandlerPrototype implements HttpHandler {
     }
 
     /**
-     * Fulfills valid request. Reads/parses params, performs request actions, and formats response
-     * @param requestParams validated parameters sent by the client
+     * Parse params, get item data by id, format response, return to client
+     * @param requestParams validated parameters sent from client
      */
     @Override
-    protected void fulfillRequest(JSONObject requestParams) {
-        //Parse the request parameters
-        String fdaid = requestParams.getString("fdaid");
-        String cid = requestParams.getString("cid");
-        String name = requestParams.getString("name");
-        String category = requestParams.getString("category");
-        //Instantiate an item object from data received within request parameters
-        MaverickItem thisItem = new MaverickItem(fdaid, name, category, cid);
-        //Instantiate item data manager to interact with item data
+    protected void fulfillRequest(JSONObject requestParams){
+        //Parse params from the request parameters object
+        String mlot = requestParams.getString("mid");
+        //Instantiate item manager to get item from database with lot number
         ItemDataManager itemDataManager = new ItemDataManager();
-        //Write created item to the database
-        itemDataManager.addItem(thisItem);
-        //Create response object
+        //Get maverick item from database by lot number
+        MaverickItem thisItem = itemDataManager.getItem(mlot);
+        //Format maverick object into a json object to stringify and send back as response
+        this.response = formatResponse(thisItem).toString();
+    }
+
+    /**
+     * Convert the maverick item object into a json object
+     * @param item maverick item object to be put into the response json object
+     * @return json object containing the data from the maverick item object
+     */
+    private JSONObject formatResponse(MaverickItem item){
+        //Create json object to format data
         JSONObject responseObject = new JSONObject();
-        responseObject.put("message", "Success");
-        this.response = responseObject.toString();
+        //Get data from maverick item and put into response object
+        responseObject.put("mid", item.getMaverickID());
+        responseObject.put("fdaid", item.getFdaID());
+        responseObject.put("itemName", item.getItemName());
+        responseObject.put("itemcategory", item.getItemCategory());
+        return responseObject;
     }
 }
