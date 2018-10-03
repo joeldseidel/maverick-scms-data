@@ -2,7 +2,6 @@ package maverick_data;
 
 import maverick_types.DatabaseType;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.*;

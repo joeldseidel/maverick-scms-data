@@ -6,7 +6,6 @@ import maverick_data.DatabaseInteraction;
 import maverick_types.DatabaseType;
 import maverick_types.MaverickPurchaseOrder;
 import maverick_types.MaverickPurchaseOrderLine;
-import maverick_data.Config;
 
 /**
  * Abstracts away all of the database interaction necessary to work with items in our databases

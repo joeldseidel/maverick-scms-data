@@ -3,25 +3,11 @@ package handlers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.Headers;
-import maverick_data.DatabaseInteraction;
-import maverick_data.Config;
 import org.json.JSONObject;
 import org.json.JSONArray;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
-import com.auth0.jwt.algorithms.*;
-import com.auth0.jwt.exceptions.*;
-import com.auth0.jwt.impl.*;
-import com.auth0.jwt.interfaces.*;
-import com.auth0.jwt.*;
 
 import maverick_types.MaverickPurchaseOrder;
 import maverick_types.MaverickPurchaseOrderLine;

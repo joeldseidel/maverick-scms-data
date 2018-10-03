@@ -1,7 +1,6 @@
 package maverick_types;
 
 import managers.ItemDataManager;
-import managers.LotNumberManager;
 
 /**
  * A single item

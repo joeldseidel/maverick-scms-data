@@ -4,7 +4,6 @@ import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import managers.DeviceDataManager;
-import maverick_data.Config;
 import maverick_data.DatabaseInteraction;
 import maverick_types.FDADevice;
 import org.json.JSONObject;

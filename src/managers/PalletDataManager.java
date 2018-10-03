@@ -10,7 +10,6 @@ import maverick_data.DatabaseInteraction;
 import maverick_types.DatabaseType;
 import maverick_types.MaverickItem;
 import maverick_types.MaverickPallet;
-import maverick_data.Config;
 
 /**
  * /*

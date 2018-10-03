@@ -4,15 +4,8 @@ import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import managers.UserDataManager;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import com.auth0.jwt.algorithms.*;
-import com.auth0.jwt.exceptions.*;
-import com.auth0.jwt.impl.*;
-import com.auth0.jwt.interfaces.*;
-import com.auth0.jwt.*;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.OutputStream;

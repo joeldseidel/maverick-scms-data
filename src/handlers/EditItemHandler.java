@@ -28,9 +28,18 @@ import java.io.OutputStream;
 
 public class EditItemHandler extends HandlerPrototype implements HttpHandler {
     private String response = "";
+    /**
+     * Constructor to set this handler's required keys on handler context creation
+     */
     public EditItemHandler(){
+        //Set required keys in array inherited from HandlerPrototype super class
         requiredKeys = new String[] {"cid", "mid", "field", "newvalue", "token"};
     }
+    /**
+     * Entry point for handler. Get parameters, verify request validity, fulfill request, return response to client
+     * @param httpExchange inherited from super class, set from client with params
+     * @throws IOException thrown if there is an issue with writing response data to client
+     */
     public void handle(HttpExchange httpExchange) throws IOException {
         System.out.println("Enter item editing handler");
         //Get parameters from client
@@ -57,10 +66,15 @@ public class EditItemHandler extends HandlerPrototype implements HttpHandler {
         os.write(this.response.getBytes());
         os.close();
     }
+
+    /**
+     * Parse the parameters from the client, verify the CID, determine the operation, perform the edit, and return result
+     * @param requestParams
+     */
     @Override
     protected void fulfillRequest(JSONObject requestParams){
         JSONObject responseObject = new JSONObject();
-
+        //Parse the parameters from the client
         String cid = requestParams.getString("cid");
         String mid = requestParams.getString("mid");
         String field = requestParams.getString("field");

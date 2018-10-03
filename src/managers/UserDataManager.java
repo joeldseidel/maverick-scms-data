@@ -1,7 +1,6 @@
 package managers;
 
 import maverick_data.DatabaseInteraction;
-import maverick_data.Config;
 import maverick_types.DatabaseType;
 
 import java.sql.PreparedStatement;
