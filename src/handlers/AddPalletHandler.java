@@ -6,6 +6,7 @@ import com.sun.net.httpserver.Headers;
 import org.json.JSONObject;
 import java.io.IOException;
 import java.io.OutputStream;
+import maverick_types.MaverickItem;
 import maverick_types.MaverickPallet;
 import managers.PalletDataManager;
 
