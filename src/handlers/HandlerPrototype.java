@@ -51,20 +51,20 @@ public abstract class HandlerPrototype {
         }
     }
 
-    protected boolean isRequestValid(JSONObject requestParams){
-        if(requestParams == null){
+    protected boolean isRequestValid(JSONObject requestParams) {
+        if (requestParams == null) {
             //Request did not come with parameters, is invalid
             System.out.println("Request Params Null");
             return false;
         }
-        for(String requiredKey : requiredKeys){
-            if(!requestParams.has(requiredKey)){
+        for (String requiredKey : requiredKeys) {
+            if (!requestParams.has(requiredKey)) {
                 //Missing a required key, request is invalid
                 System.out.println("Request Params Missing Key " + requiredKey);
                 return false;
             }
         }
-        return isTokenValid(requestParams.getString("token"));
+        return !requestParams.has("token") || isTokenValid(requestParams.getString("token"));
     }
 
     protected abstract void fulfillRequest(JSONObject requestParams);
