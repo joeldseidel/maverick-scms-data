@@ -1,6 +1,5 @@
 package maverick_types;
 
-import managers.DeviceDataManager;
 import org.json.JSONObject;
 
 import java.sql.ResultSet;

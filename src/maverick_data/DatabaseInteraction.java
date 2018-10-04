@@ -2,7 +2,6 @@ package maverick_data;
 
 import maverick_types.DatabaseType;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.*;
@@ -12,7 +11,6 @@ import java.util.Properties;
  * A class for interacting with a MySQL database
  *
  * @author Joel Seidel
- * @author Chris Vantine
  */
 public class DatabaseInteraction {
 
@@ -150,4 +148,16 @@ public class DatabaseInteraction {
         }
     }
 
+    public void batchNonQuery(PreparedStatement batchNonQueryStatement){
+        try{
+            batchNonQueryStatement.executeBatch();
+            dbConn.commit();
+        } catch(SQLException sqlEx){
+            sqlEx.printStackTrace();
+        }
+    }
+
+    public void setAutoCommit(boolean isAutoCommit) throws SQLException{
+        dbConn.setAutoCommit(isAutoCommit);
+    }
 }

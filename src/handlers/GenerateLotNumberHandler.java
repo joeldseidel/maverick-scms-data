@@ -11,8 +11,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class GenerateLotNumberHandler extends HandlerPrototype implements HttpHandler {
-    private String[] requiredKeys = { "lot_type" };
     private String response;
+    public GenerateLotNumberHandler(){
+        requiredKeys = new String[] {"lot_type"};
+    }
     public void handle(HttpExchange httpExchange) throws IOException {
         System.out.println("Entered generate lot number handler");
         JSONObject requestparams = GetParameterObject(httpExchange);
@@ -31,25 +33,6 @@ public class GenerateLotNumberHandler extends HandlerPrototype implements HttpHa
         OutputStream os = httpExchange.getResponseBody();
         os.write(this.response.getBytes());
         os.close();
-    }
-
-    @Override
-    protected boolean isRequestValid(JSONObject requestParams){
-        if(requestParams == null){
-            //Request did not come with parameters, is invalid
-            System.out.println("Request params null");
-            return false;
-        }
-        for(String requiredKey : requiredKeys){
-            if(!requestParams.has(requiredKey)){
-                //Missing a required key, request is invalid
-                System.out.println("Request params missing key " + requiredKey);
-                return false;
-            }
-        }
-        //TODO: verify pallet or item specified only, no other options
-        //Request contains all required keys
-        return true;
     }
 
     @Override

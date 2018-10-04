@@ -4,7 +4,6 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.Headers;
 import maverick_data.DatabaseInteraction;
-import maverick_data.Config;
 import maverick_types.DatabaseType;
 import org.json.JSONObject;
 import org.json.JSONArray;
@@ -15,10 +14,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import com.auth0.jwt.algorithms.*;
-import com.auth0.jwt.interfaces.*;
-import com.auth0.jwt.*;
-
 /**
  * /*
  * @author Joshua Famous
@@ -27,9 +22,10 @@ import com.auth0.jwt.*;
  */
 
 public class GetItemsHandler extends HandlerPrototype implements HttpHandler {
-
-    private String[] requiredKeys = {"cid", "token"};
     private String response;
+    public GetItemsHandler(){
+        requiredKeys = new String[]{"cid", "token"};
+    }
     public void handle(HttpExchange httpExchange) throws IOException {
         System.out.println("Entered Get Items Handler");
         JSONObject requestParams = GetParameterObject(httpExchange);
@@ -49,68 +45,18 @@ public class GetItemsHandler extends HandlerPrototype implements HttpHandler {
         os.write(this.response.getBytes());
         os.close();
     }
-
-    @Override
-    protected boolean isRequestValid(JSONObject requestParams){
-        if(requestParams == null){
-            //Request did not come with parameters, is invalid
-            System.out.println("Request Params Null");
-            return false;
-        }
-        for(String requiredKey : requiredKeys){
-            if(!requestParams.has(requiredKey)){
-                //Missing a required key, request is invalid
-                System.out.println("Request Params Missing Key " + requiredKey);
-                return false;
-            }
-        }
-        //Request contains all required keys
-        return true;
-    }
-
     @Override
     protected void fulfillRequest(JSONObject requestParams){
-
         String cid = requestParams.getString("cid");
-        String token = requestParams.getString("token");
-        boolean isVerified = false;
-
-        //VERIFY TOKEN
-        try {
-
-            Algorithm algorithm = Algorithm.HMAC256("secret");
-            JWTVerifier verifier = JWT.require(algorithm)
-                .withIssuer("localhost:6969")
-                .build(); //Reusable verifier instance
-            DecodedJWT jwt = verifier.verify(token);
-            isVerified = true;
-            System.out.println("Token " + token + " was verified");
-
-        } catch (Exception exception){
-            //Invalid signature/claims
-            isVerified = false;
-            System.out.println("Token " + token + " was not verified");
-        }
-
-        if(isVerified){
-
-            //Format item data into an object to return
-            JSONObject itemDataObject = getItemDataByCompany(cid);
-            //If item data fetched, return data, otherwise say no
-            this.response = itemDataObject.toString();
-
-        }
-        else{
-
-            this.response = Boolean.toString(false);
-
-        }
+        //Format item data into an object to return
+        JSONObject itemDataObject = getItemDataByCompany(cid);
+        //If item data fetched, return data, otherwise say no
+        this.response = itemDataObject.toString();
     }
-
     private JSONObject getItemDataByCompany(String cid){
         System.out.println("Attempting to get item data for company : " + cid);
         DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
-        String getItemDataSql = "SELECT table_items.mid, table_items.name, table_items.category, table_itempalletmapping.pallet FROM table_items LEFT JOIN table_itempalletmapping ON table_items.mid = table_itempalletmapping.mid AND table_items.cid = ?";
+        String getItemDataSql = "SELECT table_items.mid, table_items.fdaid, table_items.name, table_items.category, table_itempalletmapping.mlot FROM table_items LEFT JOIN table_itempalletmapping ON table_items.mid = table_itempalletmapping.mid AND table_items.cid = ?";
         PreparedStatement getItemDataStatement = database.prepareStatement(getItemDataSql);
         JSONObject itemDataObject = new JSONObject();
         try{
@@ -140,7 +86,7 @@ public class GetItemsHandler extends HandlerPrototype implements HttpHandler {
      * @return a JSONArray
      * @throws Exception
      */
-    public static JSONArray getItemDataFormattedResponse(ResultSet itemDataResults) throws Exception {
+    private static JSONArray getItemDataFormattedResponse(ResultSet itemDataResults) throws Exception {
         JSONArray jsonArray = new JSONArray();
         while (itemDataResults.next()) {
             JSONObject obj = new JSONObject();

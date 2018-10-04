@@ -1,6 +1,5 @@
 package managers;
 
-import maverick_data.Config;
 import maverick_data.DatabaseInteraction;
 import maverick_types.DatabaseType;
 import maverick_types.LotType;

@@ -1,11 +1,14 @@
 package maverick_types;
+
+import managers.ItemDataManager;
+
 /**
  * A single item
  */
 public class MaverickItem {
 
     private String maverickID;
-    private int fdaID;
+    private String fdaID;
     private String itemName;
     private String itemCategory;
     private String customerID;
@@ -13,8 +16,16 @@ public class MaverickItem {
     /**
      * Constructor for a new MaverickItem
      */
-    public MaverickItem(int fdaID, String itemName, String itemCategory, String customerID) {
-        this.maverickID = "M-" + (int)((Math.random() * 10000) - 1);
+    public MaverickItem(String fdaID, String itemName, String itemCategory, String customerID) {
+        this.fdaID = fdaID;
+        this.itemName = itemName;
+        this.itemCategory = itemCategory;
+        this.customerID = customerID;
+        this.maverickID = Long.toString(ItemDataManager.generateItemLotNumber());
+    }
+
+    public MaverickItem(String mid, String fdaID, String itemName, String itemCategory, String customerID){
+        this.maverickID = mid;
         this.fdaID = fdaID;
         this.itemName = itemName;
         this.itemCategory = itemCategory;
@@ -48,7 +59,7 @@ public class MaverickItem {
      * Getter for fdaID
      * @return fdaID
      */
-    public int getFdaID() {
+    public String getFdaID() {
         return this.fdaID;
     }
 

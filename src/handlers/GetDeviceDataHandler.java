@@ -4,7 +4,6 @@ import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import managers.DeviceDataManager;
-import maverick_data.Config;
 import maverick_data.DatabaseInteraction;
 import maverick_types.FDADevice;
 import org.json.JSONObject;
@@ -20,6 +19,9 @@ import java.util.List;
 
 public class GetDeviceDataHandler extends HandlerPrototype implements HttpHandler {
     private String response;
+    public GetDeviceDataHandler(){
+        requiredKeys = new String[] {"devices"};
+    }
     public void handle(HttpExchange httpExchange) throws IOException {
         System.out.println("Entered create device manifest handler");
         JSONObject requestParams = GetParameterObject(httpExchange);
@@ -38,21 +40,6 @@ public class GetDeviceDataHandler extends HandlerPrototype implements HttpHandle
         OutputStream os = httpExchange.getResponseBody();
         os.write(this.response.getBytes());
         os.close();
-    }
-
-    @Override
-    protected boolean isRequestValid(JSONObject requestParams){
-        if(requestParams == null){
-            //Request did not come with parameters, is invalid
-            System.out.println("Request Params Null");
-            return false;
-        }
-        if(!requestParams.has("devices") || requestParams.optJSONArray("devices") == null){
-            //Request params does not contains the devices array
-            return false;
-        }
-        //Request contains required key and proper formatting
-        return true;
     }
 
     @Override

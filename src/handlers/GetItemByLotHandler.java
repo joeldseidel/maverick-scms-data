@@ -1,33 +1,28 @@
 package handlers;
 
+import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.Headers;
+import managers.ItemDataManager;
+import maverick_types.MaverickItem;
 import org.json.JSONObject;
+
 import java.io.IOException;
 import java.io.OutputStream;
-import maverick_types.MaverickItem;
-import maverick_types.MaverickPallet;
-import managers.PalletDataManager;
 
 /**
- * /*
- * @author Joshua Famous
- *
- * Handler class to create new pallets and potentially assign items to them if sent with pallet creation
+ * @author Joel Seidel
+ * Handles requests to get a single item by its maverick lot number
  */
-
-public class AddPalletHandler extends HandlerPrototype implements HttpHandler {
+public class GetItemByLotHandler extends HandlerPrototype implements HttpHandler {
     private String response;
-
     /**
      * Constructor to set this handler's required keys on handler context creation
      */
-    public AddPalletHandler(){
+    public GetItemByLotHandler(){
         //Set required keys in array inherited from HandlerPrototype super class
-        requiredKeys = new String[] {"cid", "items", "token"};
+        requiredKeys = new String[] {"mid", "token"};
     }
-
     /**
      * Entry point for handler. Get parameters, verify request validity, fulfill request, return response to client
      * @param httpExchange inherited from super class, set from client with params
@@ -52,7 +47,7 @@ public class AddPalletHandler extends HandlerPrototype implements HttpHandler {
         Headers headers = httpExchange.getResponseHeaders();
         headers.add("Access-Control-Allow-Origin", "*");
         httpExchange.sendResponseHeaders(responseCode, this.response.length());
-        System.out.println("Response to Add Pallet Request : " + this.response);
+        System.out.println("Response to Get Item By Lot Request : " + this.response);
         //Write response to the client
         OutputStream os = httpExchange.getResponseBody();
         os.write(this.response.getBytes());
@@ -60,30 +55,34 @@ public class AddPalletHandler extends HandlerPrototype implements HttpHandler {
     }
 
     /**
-     * Fulfills valid request. Reads/parses params, performs request actions, and formats response
-     * @param requestParams validated parameters sent by the client
+     * Parse params, get item data by id, format response, return to client
+     * @param requestParams validated parameters sent from client
      */
     @Override
-    protected void fulfillRequest(JSONObject requestParams) {
-        //Parse the request parameters
-        String cid = requestParams.getString("cid");
-        //Create pallet items
-        MaverickPallet thisPallet = new MaverickPallet(cid);
-        PalletDataManager palletDataManager = new PalletDataManager();
-        /**ADD PALLET ITEMS
-         JSONArray items = requestParams.getJSONArray("items");
-         for (int i = 0; i < items.length(); i++) {
-         JSONObject item = items.getJSONObject(i);
-         if(item.has("mid")){
-         System.out.println("Attempting item add");
-         thisPallet.addItem(new MaverickItem(item.getString("mid")));
-         }
-         }*/
-        //PERFORM PALLET ADDING
-        palletDataManager.addPallet(thisPallet);
-        //Write response object
+    protected void fulfillRequest(JSONObject requestParams){
+        //Parse params from the request parameters object
+        String mlot = requestParams.getString("mid");
+        //Instantiate item manager to get item from database with lot number
+        ItemDataManager itemDataManager = new ItemDataManager();
+        //Get maverick item from database by lot number
+        MaverickItem thisItem = itemDataManager.getItem(mlot);
+        //Format maverick object into a json object to stringify and send back as response
+        this.response = formatResponse(thisItem).toString();
+    }
+
+    /**
+     * Convert the maverick item object into a json object
+     * @param item maverick item object to be put into the response json object
+     * @return json object containing the data from the maverick item object
+     */
+    private JSONObject formatResponse(MaverickItem item){
+        //Create json object to format data
         JSONObject responseObject = new JSONObject();
-        responseObject.put("message", "Success");
-        this.response = responseObject.toString();
+        //Get data from maverick item and put into response object
+        responseObject.put("mid", item.getMaverickID());
+        responseObject.put("fdaid", item.getFdaID());
+        responseObject.put("itemName", item.getItemName());
+        responseObject.put("itemcategory", item.getItemCategory());
+        return responseObject;
     }
 }

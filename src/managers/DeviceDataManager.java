@@ -6,8 +6,6 @@ package managers;
 
 import maverick_data.DatabaseInteraction;
 import maverick_types.FDADevice;
-import maverick_types.FDADeviceProperty;
-import org.json.JSONObject;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

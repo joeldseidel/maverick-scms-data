@@ -4,15 +4,8 @@ import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import managers.UserDataManager;
-import org.json.JSONArray;
 import org.json.JSONObject;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import com.auth0.jwt.algorithms.*;
-import com.auth0.jwt.exceptions.*;
-import com.auth0.jwt.impl.*;
-import com.auth0.jwt.interfaces.*;
-import com.auth0.jwt.*;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -25,10 +18,10 @@ import java.io.OutputStream;
  */
 
 public class UserRegistrationHandler extends HandlerPrototype implements HttpHandler {
-
-    private String[] requiredKeys = {"cid", "username", "password", "token"};
     private String response = "";
-
+    public void UserRegistrationHandler(){
+        requiredKeys = new String[]{"cid", "username", "password", "token"};
+    }
     public void handle(HttpExchange httpExchange) throws IOException{
         System.out.println("Enter user registration handler");
         JSONObject requestParams = GetParameterObject(httpExchange);
@@ -48,77 +41,23 @@ public class UserRegistrationHandler extends HandlerPrototype implements HttpHan
         os.write(this.response.getBytes());
         os.close();
     }
-
-    @Override
-    protected boolean isRequestValid(JSONObject requestParams){
-        if(requestParams == null){
-            //Request did not come with parameters, is invalid
-            System.out.println("Request params invalid");
-            return false;
-        }
-        for(String requiredKey : requiredKeys){
-            if(!requestParams.has(requiredKey)){
-                //Missing a required key, request is invalid
-                System.out.println("Request params missing key " + requiredKey);
-                return false;
-            }
-        }
-        //Request contains all required keys
-        return true;
-    }
-
     @Override
     protected void fulfillRequest(JSONObject requestParams){
-
-        boolean isVerified;
         JSONObject responseObject = new JSONObject();
-
         String cid = requestParams.getString("cid");
         String username = requestParams.getString("username");
         String password = requestParams.getString("password");
-        String token = requestParams.getString("token");
-
-        if(username.length() > 30 || username.length() < 1){
+        if(username.length() > 30 || username.length() < 1) {
             responseObject.put("message","UsernameLengthError");
             this.response = responseObject.toString();
-        }
-        else if(password.length() > 30 || password.length() < 1){
+        } else if(password.length() > 30 || password.length() < 1) {
             responseObject.put("message","PasswordLengthError");
             this.response = responseObject.toString();
+        } else {
+            //ADD USER THROUGH UserDataManager
+            UserDataManager.addUser(cid, username, password);
+            responseObject.put("message","Success");
+            this.response = responseObject.toString();
         }
-        else{
-
-            try {
-
-                Algorithm algorithm = Algorithm.HMAC256("secret");
-                JWTVerifier verifier = JWT.require(algorithm)
-                    .withIssuer("localhost:6969")
-                    .build(); //Reusable verifier instance
-                DecodedJWT jwt = verifier.verify(token);
-                isVerified = true;
-                System.out.println("Token " + token + " was verified");
-
-            } catch (Exception exception){
-                //Invalid signature/claims
-                isVerified = false;
-                System.out.println("Token " + token + " was not verified");
-            }
-
-            if(isVerified){
-
-                //ADD USER THROUGH UserDataManager
-                UserDataManager.addUser(cid, username, password);
-                responseObject.put("message","Success");
-                this.response = responseObject.toString();
-
-            }
-            else{
-
-                this.response = Boolean.toString(false);
-
-            }
-
-        }
-
     }
 }

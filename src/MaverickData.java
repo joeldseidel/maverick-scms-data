@@ -53,27 +53,41 @@ public class MaverickData {
                     }
                 }
             });
-            server.createContext("/authenticate_user", new AuthenticateUserHandler());
-            server.createContext("/add_item", new AddItemHandler());
-            server.createContext("/add_user", new UserRegistrationHandler());
-            server.createContext("/edit_user", new EditUserHandler());
-            server.createContext("/edit_pallet", new EditPalletHandler());
-            server.createContext("/get_users", new GetUsersHandler());
-            server.createContext("/get_items", new GetItemsHandler());
-            server.createContext("/get_pallets", new GetPalletsHandler());
-            server.createContext("/add_po", new AddPurchaseOrderHandler());
-            server.createContext("/add_pallet", new AddPalletHandler());
-            server.createContext("/remove_pallet", new RemovePalletHandler());
-            server.createContext("/generate_item_lot_number", new GenerateLotNumberHandler());
-            //Create the context of the commands and the handlers in this line
+            //Create server event handler context
+            server = createHandlerContexts(server);
+            //Start the server instance and hope for the best
             server.setExecutor(null);
             server.start();
-
-            //Debug 
+            //Debug
             System.out.println("Server Running and Listening On " + address);
         } catch(Exception ex){
             ex.printStackTrace();
         }
     }
-    
+
+    /**
+     * Create and assign the event handler contexts to their respective call urls
+     * @param server Reference to the HTTPS server object
+     */
+    private static HttpsServer createHandlerContexts(HttpsServer server){
+        server.createContext("/authenticate_user", new AuthenticateUserHandler());
+        server.createContext("/add_item", new AddItemHandler());
+        server.createContext("/add_user", new UserRegistrationHandler());
+        server.createContext("/edit_user", new EditUserHandler());
+        server.createContext("/edit_pallet", new EditPalletHandler());
+        server.createContext("/edit_item", new EditItemHandler());
+        server.createContext("/get_users", new GetUsersHandler());
+        server.createContext("/get_items", new GetItemsHandler());
+        server.createContext("/get_pallets", new GetPalletsHandler());
+        server.createContext("/add_po", new AddPurchaseOrderHandler());
+        server.createContext("/add_pallet", new AddPalletHandler());
+        server.createContext("/remove_pallet", new RemovePalletHandler());
+        server.createContext("/generate_item_lot_number", new GenerateLotNumberHandler());
+        server.createContext("/raise_pallet_movement_event", new RaisePalletMovementEventHandler());
+        server.createContext("/raise_item_movement_event", new RaiseItemMovementEventHandler());
+        server.createContext("/get_pallet_history", new GetPalletHistoryHandler());
+        server.createContext("/get_item_history", new GetItemHistoryHandler());
+        server.createContext("/get_item_by_lot", new GetItemByLotHandler());
+        return server;
+    }
 }
