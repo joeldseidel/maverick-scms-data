@@ -43,6 +43,7 @@ public class PalletDataManager {
             PreparedStatement qryStatement = this.database.prepareStatement(qryString);
             qryStatement.setString(1, pallet.getCustomerID());
             qryStatement.setString(2, pallet.getPalletID());
+            this.database.nonQuery(qryStatement);
         }catch(SQLException sqlEx){
             sqlEx.printStackTrace();
         }

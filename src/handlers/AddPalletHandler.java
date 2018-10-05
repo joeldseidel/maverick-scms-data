@@ -70,15 +70,6 @@ public class AddPalletHandler extends HandlerPrototype implements HttpHandler {
         //Create pallet items
         MaverickPallet thisPallet = new MaverickPallet(cid);
         PalletDataManager palletDataManager = new PalletDataManager();
-        /**ADD PALLET ITEMS
-         JSONArray items = requestParams.getJSONArray("items");
-         for (int i = 0; i < items.length(); i++) {
-         JSONObject item = items.getJSONObject(i);
-         if(item.has("mid")){
-         System.out.println("Attempting item add");
-         thisPallet.addItem(new MaverickItem(item.getString("mid")));
-         }
-         }*/
         //PERFORM PALLET ADDING
         palletDataManager.addPallet(thisPallet);
         //Write response object
