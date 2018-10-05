@@ -77,7 +77,7 @@ public class MaverickData {
         server.createContext("/edit_pallet", new EditPalletHandler());
         server.createContext("/edit_item", new EditItemHandler());
         server.createContext("/get_users", new GetUsersHandler());
-        server.createContext("/get_items", new GetItemsHandler());
+        server.createContext("/get_items", new GetCompanyItemsHandler());
         server.createContext("/get_pallets", new GetCompanyPalletsHandler());
         server.createContext("/add_po", new AddPurchaseOrderHandler());
         server.createContext("/add_pallet", new AddPalletHandler());
@@ -88,6 +88,8 @@ public class MaverickData {
         server.createContext("/get_pallet_history", new GetPalletHistoryHandler());
         server.createContext("/get_item_history", new GetItemHistoryHandler());
         server.createContext("/get_item_by_lot", new GetItemByLotHandler());
+        server.createContext("/get_item_by_search_term", new GetItemBySearchTermHandler());
+        server.createContext("/get_current_pallet_status", new GetCurrentPalletStatusHandler());
         return server;
     }
 }

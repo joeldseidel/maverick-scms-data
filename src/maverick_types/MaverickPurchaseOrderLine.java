@@ -5,6 +5,7 @@ package maverick_types;
  */
 public class MaverickPurchaseOrderLine {
 
+	private int poid;
     private int lineNumber;
     private String supplierPartNumber;
     private String partDescription;
@@ -27,6 +28,16 @@ public class MaverickPurchaseOrderLine {
 		this.quantity = quantity;
 		this.partDescription = partDescription;
 		this.deliveryDate = deliveryDate;
+		this.price = price;
+	}
+
+	public MaverickPurchaseOrderLine(int poid, int lineNumber, String supplierPartNumber, String partDescription, String deliveryDate, double quantity, double price){
+		this.poid = poid;
+		this.lineNumber = lineNumber;
+		this.supplierPartNumber = supplierPartNumber;
+		this.partDescription = partDescription;
+		this.deliveryDate = deliveryDate;
+		this.quantity = quantity;
 		this.price = price;
 	}
 	

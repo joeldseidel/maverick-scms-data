@@ -18,16 +18,16 @@ import java.sql.SQLException;
  * /*
  * @author Joshua Famous
  *
- * Handler class to return a listing of all pallets in their company to the client
+ * Handler class to return a listing of all items in their company to the client
  */
 
-public class GetPalletsHandler extends HandlerPrototype implements HttpHandler {
+public class GetCompanyItemsHandler extends HandlerPrototype implements HttpHandler {
     private String response;
-    public GetPalletsHandler(){
-        requiredKeys = new String[] {"cid", "token"};
+    public GetCompanyItemsHandler(){
+        requiredKeys = new String[]{"cid", "token"};
     }
     public void handle(HttpExchange httpExchange) throws IOException {
-        System.out.println("Entered Get Pallets Handler");
+        System.out.println("Entered Get Items Handler");
         JSONObject requestParams = GetParameterObject(httpExchange);
         boolean isValidRequest = isRequestValid(requestParams);
         displayRequestValidity(isValidRequest);
@@ -40,12 +40,11 @@ public class GetPalletsHandler extends HandlerPrototype implements HttpHandler {
         Headers headers = httpExchange.getResponseHeaders();
         headers.add("Access-Control-Allow-Origin", "*");
         httpExchange.sendResponseHeaders(responseCode, this.response.length());
-        System.out.println("Response to Get Pallets Request : " + this.response);
+        System.out.println("Response to Get Item Request : " + this.response);
         OutputStream os = httpExchange.getResponseBody();
         os.write(this.response.getBytes());
         os.close();
     }
-
     @Override
     protected void fulfillRequest(JSONObject requestParams){
         String cid = requestParams.getString("cid");
@@ -54,30 +53,30 @@ public class GetPalletsHandler extends HandlerPrototype implements HttpHandler {
         //If item data fetched, return data, otherwise say no
         this.response = itemDataObject.toString();
     }
-
     private JSONObject getItemDataByCompany(String cid){
         System.out.println("Attempting to get item data for company : " + cid);
         DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
-        String getItemDataSql = "SELECT id FROM table_pallets WHERE cid = ?";
+        String getItemDataSql = "SELECT table_items.mid, table_items.fdaid, table_items.name, table_items.category, table_itempalletmapping.mlot FROM table_items LEFT JOIN table_itempalletmapping ON table_items.mid = table_itempalletmapping.mid AND table_items.cid = ?";
         PreparedStatement getItemDataStatement = database.prepareStatement(getItemDataSql);
         JSONObject itemDataObject = new JSONObject();
         try{
             getItemDataStatement.setString(1, cid);
             ResultSet getItemDataResults = database.query(getItemDataStatement);
             try{
-            itemDataObject.put("arrayResult",getItemDataFormattedResponse(getItemDataResults));
+                itemDataObject.put("arrayResult",getItemDataFormattedResponse(getItemDataResults));
             }
             catch(Exception e){
-                System.out.println("Failed to get Formatted Response");
+                System.out.println("Failed to get Formatted Response for " + e);
                 itemDataObject = null;
             }
         } catch(SQLException sqlEx){
             sqlEx.printStackTrace();
             itemDataObject = null;
-        } finally {
+        }
+        finally{
             database.closeConnection();
         }
-        System.out.println("Got Pallet Data Object : " + itemDataObject);
+        System.out.println("Got Item Data Object : " + itemDataObject);
         return itemDataObject;
     }
 
@@ -87,7 +86,7 @@ public class GetPalletsHandler extends HandlerPrototype implements HttpHandler {
      * @return a JSONArray
      * @throws Exception
      */
-    public static JSONArray getItemDataFormattedResponse(ResultSet itemDataResults) throws Exception {
+    private static JSONArray getItemDataFormattedResponse(ResultSet itemDataResults) throws Exception {
         JSONArray jsonArray = new JSONArray();
         while (itemDataResults.next()) {
             JSONObject obj = new JSONObject();

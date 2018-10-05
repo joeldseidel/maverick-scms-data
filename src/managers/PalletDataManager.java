@@ -10,6 +10,8 @@ import maverick_data.DatabaseInteraction;
 import maverick_types.DatabaseType;
 import maverick_types.MaverickItem;
 import maverick_types.MaverickPallet;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  * /*
@@ -41,6 +43,7 @@ public class PalletDataManager {
             PreparedStatement qryStatement = this.database.prepareStatement(qryString);
             qryStatement.setString(1, pallet.getCustomerID());
             qryStatement.setString(2, pallet.getPalletID());
+            this.database.nonQuery(qryStatement);
         }catch(SQLException sqlEx){
             sqlEx.printStackTrace();
         }
@@ -156,5 +159,27 @@ public class PalletDataManager {
         } finally {
             database.closeConnection();
         }
+    }
+
+    /**
+     * Convert pallet data json array to a list of maverick pallet objects
+     * @param palletJsonArray the pallet json array to be converted
+     * @return a list of maverickpallet objects
+     */
+    public static List<MaverickPallet> parseFromJsonArray(JSONArray palletJsonArray){
+        List<MaverickPallet> palletList = new ArrayList<>();
+        //Loop through each of the pallet data objects within the json array and convert each to a pallet, insert into the new array
+        for(int i = 0; i < palletJsonArray.length(); i++){
+            //Get the current object from the array
+            JSONObject thisPalletObj = palletJsonArray.getJSONObject(i);
+            //Get the necessary parameters from the data objects
+            String cid = thisPalletObj.getString("cid");
+            String mlot = thisPalletObj.getString("mlot");
+            //Instantiate the pallet object with taken parameters
+            MaverickPallet thisPallet = new MaverickPallet(cid, mlot);
+            //Add the new pallet object to the list for return
+            palletList.add(thisPallet);
+        }
+        return palletList;
     }
 }

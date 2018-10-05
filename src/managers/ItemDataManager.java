@@ -3,11 +3,15 @@ package managers;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import maverick_data.DatabaseInteraction;
 import maverick_types.DatabaseType;
 import maverick_types.LotType;
 import maverick_types.MaverickItem;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  * Abstracts away all of the database interaction necessary to work with items in our databases
@@ -195,4 +199,67 @@ public class ItemDataManager {
         }
     }
 
+    /**
+     * Query the item data based on a search term. Check for columns that contain term at any position and match current company
+     * @param term the search string from client
+     * @param cid the company within which to search the data
+     * @return a list of items which match or contain search term
+     */
+    public List<MaverickItem> searchItemByTerm(String term, String cid){
+        //Create the query string and statement
+        String searchItemsSql = "SELECT * FROM table_items WHERE (cid = ?) AND (mid = ? OR fdaid = ? OR name LIKE ? OR category LIKE ?)";
+        PreparedStatement searchItemsStatement = database.prepareStatement(searchItemsSql);
+        List<MaverickItem> searchResultItems = new ArrayList<>();
+        try{
+            //Set the parameters of the query
+            searchItemsStatement.setString(1, cid);
+            searchItemsStatement.setString(2, term);
+            searchItemsStatement.setString(3, term);
+            //Concatenate in the % operator to specify the SQL like operator to look for the whole term at any position
+            searchItemsStatement.setString(4, "%"+term+"%");
+            searchItemsStatement.setString(5, "%"+term+"%");
+            //Perform the query and hope for the best
+            ResultSet searchItemsResults = database.query(searchItemsStatement);
+            //Create a maverick item object out of each result row for returning
+            while(searchItemsResults.next()){
+                //Parse the result set to get data for object instantiation
+                String mid = searchItemsResults.getString("mid");
+                String fdaId = searchItemsResults.getString("fdaid");
+                String name = searchItemsResults.getString("name");
+                String category = searchItemsResults.getString("category");
+                //Instantiate the maverick item object with data from the result row
+                MaverickItem thisMitem = new MaverickItem(mid, fdaId, name, category, cid);
+                //Add this item to the search result list for return
+                searchResultItems.add(thisMitem);
+            }
+        } catch(SQLException sqlEx) {
+            //RIP this query 2018-whenever this popped up
+            sqlEx.printStackTrace();
+        }
+        return searchResultItems;
+    }
+
+    /**
+     * Convert a list of Maverick items into a JSON array of the same maverick items but in json form
+     * @param list the list of maverick items to convert in a json array
+     * @return the json array with the converted data
+     */
+    public JSONArray convertListToJsonArray(List<MaverickItem> list){
+        //Create the json array to contain the converted data
+        JSONArray jsonArray = new JSONArray();
+        //Loop through every item within the list and convert to json object which goes into array
+        for(MaverickItem mItem : list){
+            //Create JSON object for this item
+            JSONObject mItemObj = new JSONObject();
+            //Insert the properties from the object into the JSON object
+            mItemObj.put("mid", mItem.getMaverickID());
+            mItemObj.put("fdaid", mItem.getFdaID());
+            mItemObj.put("itemname", mItem.getItemName());
+            mItemObj.put("itemcategory", mItem.getItemCategory());
+            mItemObj.put("cid", mItem.getCustomerID());
+            //Put the created json object into the array
+            jsonArray.put(mItemObj);
+        }
+        return jsonArray;
+    }
 }

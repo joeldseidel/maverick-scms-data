@@ -77,6 +77,21 @@ public abstract class MovementEventManager {
         }
     }
 
+    public static String movementStatusToString(MovementStatus movementStatus){
+        switch(movementStatus){
+            case InTransit:
+                return "InTransit";
+            case InStorage:
+                return "InStorage";
+            case OnHold:
+                return "OnHold";
+            case CycledOut:
+                return "CycledOut";
+             default:
+                 return null;
+        }
+    }
+
     public boolean isLegalMovement(MovementStatus currentStatus, MovementType intendedMovementType) {
         switch (currentStatus) {
             case InTransit:

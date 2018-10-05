@@ -1,23 +1,25 @@
 package handlers;
 
 import com.sun.net.httpserver.Headers;
-import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import managers.MovementEventManager;
-import maverick_types.PalletMovementEvent;
+import managers.PalletDataManager;
+import managers.PurchaseOrderDataManager;
+import maverick_types.MaverickPallet;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.List;
 
-public class RaisePalletMovementEventHandler extends HandlerPrototype implements HttpHandler {
+public class BindPurchaseOrderLinePalletsHandler extends HandlerPrototype implements HttpHandler {
     private String response;
     /**
-     * Constructor for defining the required keys for the request parameters
+     * Constructor to define the required keys for this handler
      */
-    public RaisePalletMovementEventHandler(){
-        //Define the required keys in the super class
-        requiredKeys = new String[] {"palletid", "type", "fromcid", "tocid", "token"};
+    public BindPurchaseOrderLinePalletsHandler(){
+        //Define the required keys in super class
+        requiredKeys = new String[] {"poid", "poline", "pallets", "token"};
     }
     /**
      * Entry point for handler. Get parameters, verify request validity, fulfill request, return response to client
@@ -49,24 +51,24 @@ public class RaisePalletMovementEventHandler extends HandlerPrototype implements
         os.write(this.response.getBytes());
         os.close();
     }
+
+    /**
+     * Parse the parameters, parse the pallet list, write each pallet binding to the database
+     * @param requestParams validated parameters from the client
+     */
     @Override
     protected void fulfillRequest(JSONObject requestParams){
-        //Get params from request params object
-        String palletid = requestParams.getString("palletid");
-        String type = requestParams.getString("type");
-        String fromCid = requestParams.getString("fromcid");
-        String toCid = requestParams.getString("tocid");
-        //Create a pallet movement object from parameters
-        PalletMovementEvent thisPalletMovementEvent = new PalletMovementEvent(palletid, MovementEventManager.parseMovementType(type), fromCid, toCid);
-        //Validate and commit movement event
-        if(thisPalletMovementEvent.isValid()){
-            //Pallet movement event is valid and legal, commit to database
-            thisPalletMovementEvent.commit();
-            //Return successful message to client
-            this.response = "success";
-        } else {
-            //Pallet movement was invalid
-            this.response = "invalid request";
+        //Parse the parameters from the request
+        int poId = requestParams.getInt("poid");
+        int poline = requestParams.getInt("poline");
+        JSONArray palletsArray = requestParams.getJSONArray("pallets");
+        //Parse the json array to get maverick pallet items from data
+        List<MaverickPallet> palletsToBind = PalletDataManager.parseFromJsonArray(palletsArray);
+        //Instantiate the data manager to interface with the pallet binding data
+        PurchaseOrderDataManager purchaseOrderDataManager = new PurchaseOrderDataManager();
+        for(MaverickPallet thisPallet : palletsToBind){
+            //For each pallet, write the pallet binding to the database
+            purchaseOrderDataManager.bindPallet(poId, poline, thisPallet);
         }
     }
 }

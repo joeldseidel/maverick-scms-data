@@ -7,6 +7,7 @@ import java.util.ArrayList;
  */
 public class MaverickPurchaseOrder {
 
+    private int id;
     private String number;
     private String datePlaced;
     private String placingCompany;
@@ -16,7 +17,15 @@ public class MaverickPurchaseOrder {
     /**
      * Constructor for a new MaverickItem
      */
-    public MaverickPurchaseOrder(String number, String datePlaced, String placingCompany, String customerID) {
+    public MaverickPurchaseOrder(int id, String number, String datePlaced, String placingCompany, String customerID) {
+        this.id = id;
+        this.number = number;
+        this.datePlaced = datePlaced;
+        this.placingCompany = placingCompany;
+        this.customerID = customerID;
+        this.lines = new ArrayList<MaverickPurchaseOrderLine>();
+    }
+    public MaverickPurchaseOrder(String number, String datePlaced, String placingCompany, String customerID){
         this.number = number;
         this.datePlaced = datePlaced;
         this.placingCompany = placingCompany;
@@ -94,6 +103,14 @@ public class MaverickPurchaseOrder {
      */
     public ArrayList<MaverickPurchaseOrderLine> getLines(){
         return this.lines;
+    }
+
+    /**
+     * Getter for id
+     * @return int id
+     */
+    public int getId(){
+        return this.id;
     }
 
 }

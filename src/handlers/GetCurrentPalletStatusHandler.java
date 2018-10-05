@@ -1,46 +1,42 @@
 package handlers;
 
+import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.Headers;
+import managers.MovementEventManager;
+import managers.PalletMovementEventManager;
+import maverick_types.MaverickPallet;
+import maverick_types.MovementStatus;
 import org.json.JSONObject;
+
 import java.io.IOException;
 import java.io.OutputStream;
-import maverick_types.MaverickItem;
-import maverick_types.MaverickPallet;
-import managers.PalletDataManager;
 
 /**
- * /*
- * @author Joshua Famous
+ * Handles requests for a pallet's current status, returns a string containing current pallet status
  *
- * Handler class to create new pallets and potentially assign items to them if sent with pallet creation
+ * @author Joel Seidel
  */
 
-public class AddPalletHandler extends HandlerPrototype implements HttpHandler {
+public class GetCurrentPalletStatusHandler extends HandlerPrototype implements HttpHandler {
     private String response;
-
-    /**
-     * Constructor to set this handler's required keys on handler context creation
-     */
-    public AddPalletHandler(){
-        //Set required keys in array inherited from HandlerPrototype super class
-        requiredKeys = new String[] {"cid", "items", "token"};
+    public GetCurrentPalletStatusHandler(){
+        requiredKeys = new String[] {"mid", "cid", "token"};
     }
-
     /**
      * Entry point for handler. Get parameters, verify request validity, fulfill request, return response to client
      * @param httpExchange inherited from super class, set from client with params
      * @throws IOException thrown if there is an issue with writing response data to client
      */
-    public void handle(HttpExchange httpExchange) throws IOException {
+    @Override
+    public void handle(HttpExchange httpExchange) throws IOException{
         //Get parameters from client
         JSONObject requestParams = GetParameterObject(httpExchange);
         //Determine validity of request parameters and validate token
         boolean isValidRequest = isRequestValid(requestParams);
         //Display in server console validity of the request for testing purposes
         displayRequestValidity(isValidRequest);
-        if(isValidRequest){
+        if (isValidRequest) {
             //Request was valid, fulfill the request with params
             fulfillRequest(requestParams);
         } else {
@@ -52,7 +48,7 @@ public class AddPalletHandler extends HandlerPrototype implements HttpHandler {
         Headers headers = httpExchange.getResponseHeaders();
         headers.add("Access-Control-Allow-Origin", "*");
         httpExchange.sendResponseHeaders(responseCode, this.response.length());
-        System.out.println("Response to Add Pallet Request : " + this.response);
+        System.out.println("Response to Get Current Item Status : " + this.response);
         //Write response to the client
         OutputStream os = httpExchange.getResponseBody();
         os.write(this.response.getBytes());
@@ -60,21 +56,21 @@ public class AddPalletHandler extends HandlerPrototype implements HttpHandler {
     }
 
     /**
-     * Fulfills valid request. Reads/parses params, performs request actions, and formats response
-     * @param requestParams validated parameters sent by the client
+     * Parse parameters, query for pallet status, convert status to response string
+     * @param requestParams validated params from the client
      */
     @Override
-    protected void fulfillRequest(JSONObject requestParams) {
-        //Parse the request parameters
+    protected void fulfillRequest(JSONObject requestParams){
+        //Parse parameters from client
+        String mid = requestParams.getString("mid");
         String cid = requestParams.getString("cid");
-        //Create pallet items
-        MaverickPallet thisPallet = new MaverickPallet(cid);
-        PalletDataManager palletDataManager = new PalletDataManager();
-        //PERFORM PALLET ADDING
-        palletDataManager.addPallet(thisPallet);
-        //Write response object
-        JSONObject responseObject = new JSONObject();
-        responseObject.put("message", "Success");
-        this.response = responseObject.toString();
+        //Instantiate referenced pallet object
+        MaverickPallet thisPallet = new MaverickPallet(cid, mid);
+        //Instantiate pallet movement manager to get the status (not moving anything just accessing that kinda data)
+        PalletMovementEventManager palletMovementEventManager = new PalletMovementEventManager();
+        //Get the current movement status from manager query
+        MovementStatus currentStatus = palletMovementEventManager.getCurrentStatus(thisPallet);
+        //Convert the movement status to string and return as response
+        this.response = MovementEventManager.movementStatusToString(currentStatus);
     }
 }
