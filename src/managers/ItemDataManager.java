@@ -207,7 +207,7 @@ public class ItemDataManager {
      */
     public List<MaverickItem> searchItemByTerm(String term, String cid){
         //Create the query string and statement
-        String searchItemsSql = "SELECT * FROM table_items WHERE (cid = ?) AND (mid = ? OR fdaid = ? OR name LIKE %?% OR category LIKE %?%)";
+        String searchItemsSql = "SELECT * FROM table_items WHERE (cid = ?) AND (mid = ? OR fdaid = ? OR name LIKE ? OR category LIKE ?)";
         PreparedStatement searchItemsStatement = database.prepareStatement(searchItemsSql);
         List<MaverickItem> searchResultItems = new ArrayList<>();
         try{
@@ -215,8 +215,9 @@ public class ItemDataManager {
             searchItemsStatement.setString(1, cid);
             searchItemsStatement.setString(2, term);
             searchItemsStatement.setString(3, term);
-            searchItemsStatement.setString(4, term);
-            searchItemsStatement.setString(5, term);
+            //Concatenate in the % operator to specify the SQL like operator to look for the whole term at any position
+            searchItemsStatement.setString(4, "%"+term+"%");
+            searchItemsStatement.setString(5, "%"+term+"%");
             //Perform the query and hope for the best
             ResultSet searchItemsResults = database.query(searchItemsStatement);
             //Create a maverick item object out of each result row for returning
