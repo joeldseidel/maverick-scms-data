@@ -4,7 +4,6 @@ import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import managers.MovementEventManager;
-import managers.PalletDataManager;
 import managers.PalletMovementEventManager;
 import maverick_types.MaverickPallet;
 import maverick_types.MovementStatus;
@@ -12,6 +11,12 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.OutputStream;
+
+/**
+ * Handles requests for a pallet's current status, returns a string containing current pallet status
+ *
+ * @author Joel Seidel
+ */
 
 public class GetCurrentPalletStatus extends HandlerPrototype implements HttpHandler {
     private String response;
