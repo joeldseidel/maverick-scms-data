@@ -21,9 +21,9 @@ import java.sql.SQLException;
  * Handler class to return a listing of all pallets in their company to the client
  */
 
-public class GetPalletsHandler extends HandlerPrototype implements HttpHandler {
+public class GetCompanyPalletsHandler extends HandlerPrototype implements HttpHandler {
     private String response;
-    public GetPalletsHandler(){
+    public GetCompanyPalletsHandler(){
         requiredKeys = new String[] {"cid", "token"};
     }
     public void handle(HttpExchange httpExchange) throws IOException {
