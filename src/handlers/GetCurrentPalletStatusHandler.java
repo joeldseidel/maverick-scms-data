@@ -18,9 +18,9 @@ import java.io.OutputStream;
  * @author Joel Seidel
  */
 
-public class GetCurrentPalletStatus extends HandlerPrototype implements HttpHandler {
+public class GetCurrentPalletStatusHandler extends HandlerPrototype implements HttpHandler {
     private String response;
-    public GetCurrentPalletStatus(){
+    public GetCurrentPalletStatusHandler(){
         requiredKeys = new String[] {"mid", "cid", "token"};
     }
     /**
