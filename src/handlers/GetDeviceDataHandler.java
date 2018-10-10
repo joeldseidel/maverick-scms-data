@@ -18,28 +18,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GetDeviceDataHandler extends HandlerPrototype implements HttpHandler {
-    private String response;
+
+
     public GetDeviceDataHandler(){
         requiredKeys = new String[] {"devices"};
-    }
-    public void handle(HttpExchange httpExchange) throws IOException {
-        System.out.println("Entered create device manifest handler");
-        JSONObject requestParams = GetParameterObject(httpExchange);
-        boolean isValidRequest = isRequestValid(requestParams);
-        displayRequestValidity(isValidRequest);
-        if(isValidRequest){
-            fulfillRequest(requestParams);
-        } else {
-            this.response = "invalid response";
-        }
-        int responseCode = isValidRequest ? 200 : 400;
-        Headers headers = httpExchange.getResponseHeaders();
-        headers.add("Access-Control-Allow-Origin", "*");
-        httpExchange.sendResponseHeaders(responseCode, this.response.length());
-        System.out.println("Response to create new manifest request : " + this.response);
-        OutputStream os = httpExchange.getResponseBody();
-        os.write(this.response.getBytes());
-        os.close();
+        handlerName = "GetDeviceDataHandler";
     }
 
     @Override

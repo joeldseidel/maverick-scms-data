@@ -18,29 +18,12 @@ import java.io.OutputStream;
  */
 
 public class UserRegistrationHandler extends HandlerPrototype implements HttpHandler {
-    private String response = "";
+
     public void UserRegistrationHandler(){
         requiredKeys = new String[]{"cid", "username", "password", "token"};
+        handlerName = "UserRegistrationHandler";
     }
-    public void handle(HttpExchange httpExchange) throws IOException{
-        System.out.println("Enter user registration handler");
-        JSONObject requestParams = GetParameterObject(httpExchange);
-        boolean isValidRequest = isRequestValid(requestParams);
-        displayRequestValidity(isValidRequest);
-        if(isValidRequest){
-            fulfillRequest(requestParams);
-        } else {
-            this.response = "invalid request";
-        }
-        int responseCode = isValidRequest ? 200 : 400;
-        Headers headers = httpExchange.getResponseHeaders();
-        headers.add("Access-Control-Allow-Origin", "*");
-        httpExchange.sendResponseHeaders(responseCode, this.response.length());
-        System.out.println("Response to user data query : " + this.response);
-        OutputStream os = httpExchange.getResponseBody();
-        os.write(this.response.getBytes());
-        os.close();
-    }
+
     @Override
     protected void fulfillRequest(JSONObject requestParams){
         JSONObject responseObject = new JSONObject();

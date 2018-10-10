@@ -22,28 +22,11 @@ import java.sql.SQLException;
  */
 
 public class GetCompanyPalletsHandler extends HandlerPrototype implements HttpHandler {
-    private String response;
+
+
     public GetCompanyPalletsHandler(){
         requiredKeys = new String[] {"cid", "token"};
-    }
-    public void handle(HttpExchange httpExchange) throws IOException {
-        System.out.println("Entered Get Pallets Handler");
-        JSONObject requestParams = GetParameterObject(httpExchange);
-        boolean isValidRequest = isRequestValid(requestParams);
-        displayRequestValidity(isValidRequest);
-        if(isValidRequest){
-            fulfillRequest(requestParams);
-        } else {
-            this.response = "invalid request";
-        }
-        int responseCode = isValidRequest ? 200 : 400;
-        Headers headers = httpExchange.getResponseHeaders();
-        headers.add("Access-Control-Allow-Origin", "*");
-        httpExchange.sendResponseHeaders(responseCode, this.response.length());
-        System.out.println("Response to Get Pallets Request : " + this.response);
-        OutputStream os = httpExchange.getResponseBody();
-        os.write(this.response.getBytes());
-        os.close();
+        handlerName = "GetCompanyPalletsHandler";
     }
 
     @Override

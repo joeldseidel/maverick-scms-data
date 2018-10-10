@@ -20,28 +20,10 @@ import java.io.OutputStream;
  */
 
 public class EditUserHandler extends HandlerPrototype implements HttpHandler {
-    private String response = "";
+
     public EditUserHandler(){
         requiredKeys = new String[] {"cid", "uid", "field", "newvalue", "token"};
-    }
-    public void handle(HttpExchange httpExchange) throws IOException{
-        System.out.println("Enter user editing handler");
-        JSONObject requestParams = GetParameterObject(httpExchange);
-        boolean isValidRequest = isRequestValid(requestParams);
-        displayRequestValidity(isValidRequest);
-        if(isValidRequest){
-            fulfillRequest(requestParams);
-        } else {
-            this.response = "invalid request";
-        }
-        int responseCode = isValidRequest ? 200 : 400;
-        Headers headers = httpExchange.getResponseHeaders();
-        headers.add("Access-Control-Allow-Origin", "*");
-        httpExchange.sendResponseHeaders(responseCode, this.response.length());
-        System.out.println("Response to user data query : " + this.response);
-        OutputStream os = httpExchange.getResponseBody();
-        os.write(this.response.getBytes());
-        os.close();
+        handlerName = "EditUserHandler";
     }
 
     @Override
