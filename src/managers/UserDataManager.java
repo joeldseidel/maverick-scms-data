@@ -31,8 +31,6 @@ public class UserDataManager {
         } catch(SQLException sqlEx){
             sqlEx.printStackTrace();
             userCount = -1;
-        } finally {
-            database.closeConnection();
         }
         System.out.println("Got User Count : " + userCount);
         return userCount;
@@ -65,8 +63,6 @@ public class UserDataManager {
         } catch(SQLException sqlEx){
             sqlEx.printStackTrace();
             isMatch = false;
-        } finally {
-            database.closeConnection();
         }
         return isMatch;
     }
@@ -82,8 +78,6 @@ public class UserDataManager {
             userUUID = UUIDResults.getLong("uid");
         } catch(SQLException sqlEx){
             sqlEx.printStackTrace();
-        } finally {
-            database.closeConnection();
         }
         System.out.println("Got User UUID : " + userUUID);
         return userUUID;
@@ -101,8 +95,6 @@ public class UserDataManager {
             cid = CIDResults.getString("cid");
         } catch(SQLException sqlEx){
             sqlEx.printStackTrace();
-        } finally {
-            database.closeConnection();
         }
         System.out.println("Got User CID : " + cid);
         return cid;
@@ -141,8 +133,6 @@ public class UserDataManager {
             database.nonQuery(qryStatement);
         }catch(SQLException sqlEx){
             sqlEx.printStackTrace();
-        } finally {
-            database.closeConnection();
         }
     }
 
@@ -157,8 +147,6 @@ public class UserDataManager {
             database.nonQuery(qryStatement);
         }catch(SQLException sqlEx){
             sqlEx.printStackTrace();
-        } finally {
-            database.closeConnection();
         }
     }
 
@@ -174,8 +162,6 @@ public class UserDataManager {
             database.nonQuery(qryStatement);
         }catch(SQLException sqlEx){
             sqlEx.printStackTrace();
-        } finally {
-            database.closeConnection();
         }
     }
 
@@ -198,8 +184,6 @@ public class UserDataManager {
             database.nonQuery(qryStatement);
         }catch(SQLException sqlEx){
             sqlEx.printStackTrace();
-        } finally {
-            database.closeConnection();
         }
     }
 
@@ -215,8 +199,6 @@ public class UserDataManager {
             database.nonQuery(qryStatement);
         }catch(SQLException sqlEx){
             sqlEx.printStackTrace();
-        } finally {
-            database.closeConnection();
         }
     }
 

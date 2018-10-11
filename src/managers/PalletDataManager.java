@@ -111,8 +111,6 @@ public class PalletDataManager {
         } catch(SQLException sqlEx){
             sqlEx.printStackTrace();
             return false;
-        } finally {
-            database.closeConnection();
         }
         return false;
     }
@@ -128,8 +126,6 @@ public class PalletDataManager {
             cid = CIDResults.getString("cid");
         } catch(SQLException sqlEx){
             sqlEx.printStackTrace();
-        } finally {
-            database.closeConnection();
         }
         System.out.println("Got Pallet CID : " + cid);
         return cid;
@@ -156,8 +152,6 @@ public class PalletDataManager {
             database.nonQuery(qryStatement);
         }catch(SQLException sqlEx){
             sqlEx.printStackTrace();
-        } finally {
-            database.closeConnection();
         }
     }
 
