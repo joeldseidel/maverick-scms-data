@@ -101,4 +101,26 @@ public class DeviceMovementEventManager extends MovementEventManager {
         }
         return null;
     }
+
+    /**
+     * Create the data record for the initial movement of an item which will active it and allow it to be moved
+     * @param item the item that is being initialized
+     */
+    public void initializeItemMovement(MaverickItem item){
+        //Create the SQL statement for inserting the initial movement record
+        String createInitialMovementSql = "INSERT INTO device_movements(movementtype, fromcid, tocid, movementtime, mid) VALUES(?, ?, ?, NOW(), ?)";
+        PreparedStatement createInitialMovementStatement = database.prepareStatement(createInitialMovementSql);
+        try{
+            //Set the parameters of the nonquery
+            createInitialMovementStatement.setString(1, MovementEventManager.movementTypeToString(MovementType.CycleIn));
+            createInitialMovementStatement.setString(2, item.getCustomerID());
+            createInitialMovementStatement.setString(3, item.getCustomerID());
+            createInitialMovementStatement.setString(4, item.getMaverickID());
+            //Perform the nonquery and insert the movement record
+            database.nonQuery(createInitialMovementStatement);
+        } catch(SQLException sqlEx){
+            //u failed nerd
+            sqlEx.printStackTrace();
+        }
+    }
 }

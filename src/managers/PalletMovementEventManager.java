@@ -72,4 +72,26 @@ public class PalletMovementEventManager extends MovementEventManager {
         }
         return null;
     }
+
+    /**
+     * Create the initial pallet movement record which will active the pallet and allow it to be moved
+     * @param pallet the pallet to be initialized
+     */
+    public void initializePalletMovement(MaverickPallet pallet){
+        //Create the SQL statement for the nonquery to insert the movement record
+        String createInitialPalletMovementSql = "INSERT INTO pallet_movements(movementtype, fromcid, tocid, movementtime, palletid) VALUES (?, ?, ?, NOW(), ?)";
+        PreparedStatement createInitialPalletMovementStatement = database.prepareStatement(createInitialPalletMovementSql);
+        try{
+            //Set the insert nonquery parameters
+            createInitialPalletMovementStatement.setString(1, movementTypeToString(MovementType.CycleIn));
+            createInitialPalletMovementStatement.setString(2, pallet.getCustomerID());
+            createInitialPalletMovementStatement.setString(3, pallet.getCustomerID());
+            createInitialPalletMovementStatement.setString(4, pallet.getPalletID());
+            //Perform the nonquery and insert the movement record
+            database.nonQuery(createInitialPalletMovementStatement);
+        } catch(SQLException sqlEx){
+            //I'll take things that ain't it for 500 Alex
+            sqlEx.printStackTrace();
+        }
+    }
 }

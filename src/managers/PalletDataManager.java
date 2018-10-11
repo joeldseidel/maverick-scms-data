@@ -4,12 +4,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import maverick_data.DatabaseInteraction;
-import maverick_types.DatabaseType;
-import maverick_types.MaverickItem;
-import maverick_types.MaverickPallet;
+import maverick_types.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -47,8 +46,12 @@ public class PalletDataManager {
         }catch(SQLException sqlEx){
             sqlEx.printStackTrace();
         }
+        PalletMovementEventManager palletMovementEventManager = new PalletMovementEventManager();
+        palletMovementEventManager.initializePalletMovement(pallet);
+        DeviceMovementEventManager deviceMovementEventManager = new DeviceMovementEventManager();
         for(MaverickItem item : pallet.getItems()){
             this.addItemToPallet(item, pallet.getPalletID());
+            deviceMovementEventManager.initializeItemMovement(item);
         }
     }
 
