@@ -19,25 +19,10 @@ import managers.PalletDataManager;
 
 public class RemovePalletHandler extends HandlerPrototype implements HttpHandler {
 
-    private String[] requiredKeys = {"cid", "pallet", "token"};
-    private String response;
-    public void handle(HttpExchange httpExchange) throws IOException {
-        JSONObject requestParams = GetParameterObject(httpExchange);
-        boolean isValidRequest = isRequestValid(requestParams);
-        displayRequestValidity(isValidRequest);
-        if(isValidRequest){
-            fulfillRequest(requestParams);
-        } else {
-            this.response = "invalid request";
-        }
-        int responseCode = isValidRequest ? 200 : 400;
-        Headers headers = httpExchange.getResponseHeaders();
-        headers.add("Access-Control-Allow-Origin", "*");
-        httpExchange.sendResponseHeaders(responseCode, this.response.length());
-        System.out.println("Response to Edit Pallet Request : " + this.response);
-        OutputStream os = httpExchange.getResponseBody();
-        os.write(this.response.getBytes());
-        os.close();
+    public RemovePalletHandler(){
+    //Define the required keys in the super class
+    requiredKeys = new String[] {"cid", "pallet", "token"};
+    handlerName = "RemovePalletHandler";
     }
 
     @Override
@@ -63,14 +48,15 @@ public class RemovePalletHandler extends HandlerPrototype implements HttpHandler
         JSONObject responseObject = new JSONObject();
         String cid = requestParams.getString("cid");
         String pallet = requestParams.getString("pallet");
+        PalletDataManager palletDataManager = new PalletDataManager();
         //ENSURE PALLET IS IN COMPANY
-        if(!PalletDataManager.getPalletCID(pallet).equals(cid)){
+        if(!palletDataManager.getPalletCID(pallet).equals(cid)){
             responseObject.put("message","PalletOutsideCompanyError");
             this.response = responseObject.toString();
         } else {
             //CHECK VALIDITY OF PALLET
-            if(PalletDataManager.palletExists(pallet)){
-                PalletDataManager.removePallet(pallet);
+            if(palletDataManager.palletExists(pallet)){
+                palletDataManager.removePallet(pallet);
                 responseObject.put("message","Success");
                 this.response = responseObject.toString();
             } else {

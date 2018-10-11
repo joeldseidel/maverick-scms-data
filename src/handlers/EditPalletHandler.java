@@ -17,27 +17,10 @@ import managers.ItemDataManager;
  */
 
 public class EditPalletHandler extends HandlerPrototype implements HttpHandler {
-    private String response;
+
     public EditPalletHandler(){
         requiredKeys = new String[] {"cid", "mid", "pallet", "token"};
-    }
-    public void handle(HttpExchange httpExchange) throws IOException {
-        JSONObject requestParams = GetParameterObject(httpExchange);
-        boolean isValidRequest = isRequestValid(requestParams);
-        displayRequestValidity(isValidRequest);
-        if(isValidRequest){
-            fulfillRequest(requestParams);
-        } else {
-            this.response = "invalid request";
-        }
-        int responseCode = isValidRequest ? 200 : 400;
-        Headers headers = httpExchange.getResponseHeaders();
-        headers.add("Access-Control-Allow-Origin", "*");
-        httpExchange.sendResponseHeaders(responseCode, this.response.length());
-        System.out.println("Response to Edit Pallet Request : " + this.response);
-        OutputStream os = httpExchange.getResponseBody();
-        os.write(this.response.getBytes());
-        os.close();
+        handlerName = "EditPalletHandler";
     }
 
     @Override
@@ -49,18 +32,19 @@ public class EditPalletHandler extends HandlerPrototype implements HttpHandler {
         String cid = requestParams.getString("cid");
         String mid = requestParams.getString("mid");
         String pallet = requestParams.getString("pallet");
+        PalletDataManager palletDataManager = new PalletDataManager();
             //ENSURE PALLET IS IN COMPANY
-            if(!PalletDataManager.getPalletCID(pallet).equals(cid)){
+            if(!palletDataManager.getPalletCID(pallet).equals(cid)){
                 responseObject.put("message","PalletOutsideCompanyError");
                 this.response = responseObject.toString();
             }
             else{
-
+                ItemDataManager itemDataManager = new ItemDataManager();
                 //CHECK VALIDITY OF MAVERICK ITEM
-                if(ItemDataManager.itemExists(mid)){
+                if(itemDataManager.itemExists(mid)){
 
                     //ENSURE ITEM IS IN COMPANY
-                    if(!ItemDataManager.getItemCID(mid).equals(cid)){
+                    if(!itemDataManager.getItemCID(mid).equals(cid)){
 
                         responseObject.put("message","ItemOutsideCompanyError");
                         this.response = responseObject.toString();
@@ -69,8 +53,8 @@ public class EditPalletHandler extends HandlerPrototype implements HttpHandler {
                     else{
 
                         //CHECK VALIDITY OF PALLET
-                        if(PalletDataManager.palletExists(pallet)){
-                            ItemDataManager.updatePallet(mid, pallet);
+                        if(palletDataManager.palletExists(pallet)){
+                            itemDataManager.updatePallet(mid, pallet);
                             responseObject.put("message","Success");
                             this.response = responseObject.toString();
 

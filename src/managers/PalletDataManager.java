@@ -95,9 +95,8 @@ public class PalletDataManager {
         return palletItems;
     }
 
-    public static boolean palletExists(String palletId){
+    public boolean palletExists(String palletId){
         System.out.println("Attempting to get pallet validity for pallet with id : " + palletId);
-        DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
         String palletCountSql = "SELECT * FROM table_pallets WHERE mlot = ?";
         PreparedStatement palletCountStatement = database.prepareStatement(palletCountSql);
         try{
@@ -115,9 +114,8 @@ public class PalletDataManager {
         return false;
     }
 
-    public static String getPalletCID(String palletId){
+    public String getPalletCID(String palletId){
         String cid = "notfound";
-        DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
         String getPalletCIDSql = "SELECT cid FROM table_pallets WHERE mlot = ?";
         PreparedStatement getPalletCIDStatement = database.prepareStatement(getPalletCIDSql);
         try{
@@ -137,9 +135,8 @@ public class PalletDataManager {
     /**
      * removePallet removes a pallet from the database
      */
-    public static void removePallet(String palletId) {
+    public void removePallet(String palletId) {
         //First, remove any items from the pallet
-        DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
         String qryString = "DELETE FROM table_itempalletmapping WHERE mlot = ?";
         PreparedStatement qryStatement = database.prepareStatement(qryString);
         try{

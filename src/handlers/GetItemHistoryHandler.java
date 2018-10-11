@@ -20,7 +20,6 @@ import java.util.List;
  */
 
 public class GetItemHistoryHandler extends HandlerPrototype implements HttpHandler{
-    private String response;
 
     /**
      * Constructor to set the required keys property inherited from the super class upon creation of the handler context
@@ -28,38 +27,7 @@ public class GetItemHistoryHandler extends HandlerPrototype implements HttpHandl
     public GetItemHistoryHandler(){
         //Set inherited required keys property to unique handler required keys
         requiredKeys = new String[]{"mid", "token"};
-    }
-
-    /**
-     * Entry point for the handler. Get parameters from request, verify params and token, fulfill request, write reponse
-     * @param httpExchange inherited from super class, comes from request with request params
-     * @throws IOException thrown if there is an issue with writing the response
-     */
-    @Override
-    public void handle(HttpExchange httpExchange) throws IOException {
-        //Get parameters from the request http exchange
-        JSONObject requestParams = GetParameterObject(httpExchange);
-        //Determine validity of the request, validate params and token
-        boolean isValidRequest = isRequestValid(requestParams);
-        //Display validity of the request to the server console for testing purposes
-        displayRequestValidity(isValidRequest);
-        if(isValidRequest){
-            //Request is valid, fulfill request with the parameters from the request object
-            fulfillRequest(requestParams);
-        } else {
-            //Request is invalid, set response to reflect this
-            this.response = "invalid response";
-        }
-        //Create response to client
-        int responseCode = isValidRequest ? 200 : 400;
-        Headers headers = httpExchange.getResponseHeaders();
-        headers.add("Access-Control-Allow-Origin", "*");
-        httpExchange.sendResponseHeaders(responseCode, this.response.length());
-        System.out.println("Response to get pallet history request: " + this.response);
-        //Write response to the client
-        OutputStream os = httpExchange.getResponseBody();
-        os.write(this.response.getBytes());
-        os.close();
+        handlerName = "GetItemHistoryHandler";
     }
 
     /**

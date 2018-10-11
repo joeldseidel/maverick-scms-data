@@ -11,28 +11,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class RaiseItemMovementEventHandler extends HandlerPrototype implements HttpHandler {
-    private String response;
+
     public RaiseItemMovementEventHandler(){
         requiredKeys = new String[] {"mid", "type", "fromcid", "tocid", "token"};
+        handlerName = "RaiseItemMovementEventHandler";
     }
-    public void handle(HttpExchange httpExchange) throws IOException {
-        JSONObject requestParams = GetParameterObject(httpExchange);
-        boolean isRequestValid = isRequestValid(requestParams);
-        displayRequestValidity(isRequestValid);
-        if(isRequestValid){
-            fulfillRequest(requestParams);
-        } else {
-            this.response = "invalid response";
-        }
-        int responseCode = isRequestValid ? 200 : 400;
-        Headers headers = httpExchange.getResponseHeaders();
-        headers.add("Access-Control-Allow-Origin", "*");
-        httpExchange.sendResponseHeaders(responseCode, this.response.length());
-        System.out.println("Response to raise item movement event: " + this.response);
-        OutputStream os = httpExchange.getResponseBody();
-        os.write(this.response.getBytes());
-        os.close();
-    }
+
     @Override
     protected void fulfillRequest(JSONObject requestParams){
         //Get params from request params objects
