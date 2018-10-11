@@ -48,14 +48,15 @@ public class RemovePalletHandler extends HandlerPrototype implements HttpHandler
         JSONObject responseObject = new JSONObject();
         String cid = requestParams.getString("cid");
         String pallet = requestParams.getString("pallet");
+        PalletDataManager palletDataManager = new PalletDataManager();
         //ENSURE PALLET IS IN COMPANY
-        if(!PalletDataManager.getPalletCID(pallet).equals(cid)){
+        if(!palletDataManager.getPalletCID(pallet).equals(cid)){
             responseObject.put("message","PalletOutsideCompanyError");
             this.response = responseObject.toString();
         } else {
             //CHECK VALIDITY OF PALLET
-            if(PalletDataManager.palletExists(pallet)){
-                PalletDataManager.removePallet(pallet);
+            if(palletDataManager.palletExists(pallet)){
+                palletDataManager.removePallet(pallet);
                 responseObject.put("message","Success");
                 this.response = responseObject.toString();
             } else {

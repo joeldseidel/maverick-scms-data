@@ -38,7 +38,8 @@ public class UserRegistrationHandler extends HandlerPrototype implements HttpHan
             this.response = responseObject.toString();
         } else {
             //ADD USER THROUGH UserDataManager
-            UserDataManager.addUser(cid, username, password);
+            UserDataManager userDataManager = new UserDataManager();
+            userDataManager.addUser(cid, username, password);
             responseObject.put("message","Success");
             this.response = responseObject.toString();
         }

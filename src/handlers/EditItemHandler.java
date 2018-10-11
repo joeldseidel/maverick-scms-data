@@ -50,8 +50,9 @@ public class EditItemHandler extends HandlerPrototype implements HttpHandler {
         String field = requestParams.getString("field");
         String newvalue = requestParams.getString("newvalue");
 
+        ItemDataManager itemDataManager = new ItemDataManager();
         //Check that CID of User matches requesting CID
-        if(!ItemDataManager.getItemCID(mid).equals(cid)){
+        if(!itemDataManager.getItemCID(mid).equals(cid)){
             responseObject.put("message","OutsideCompanyError");
             this.response = responseObject.toString();
         }
@@ -63,7 +64,7 @@ public class EditItemHandler extends HandlerPrototype implements HttpHandler {
                         responseObject.put("message","NameLengthError");
                         this.response = responseObject.toString();
                     } else{
-                        ItemDataManager.editName(mid, newvalue);
+                        itemDataManager.editName(mid, newvalue);
                         responseObject.put("message","Success");
                         this.response = responseObject.toString();
                     }
@@ -73,13 +74,13 @@ public class EditItemHandler extends HandlerPrototype implements HttpHandler {
                         responseObject.put("message","CategoryLengthError");
                         this.response = responseObject.toString();
                     } else {
-                        ItemDataManager.editCategory(mid, newvalue);
+                        itemDataManager.editCategory(mid, newvalue);
                         responseObject.put("message","Success");
                         this.response = responseObject.toString();
                     }
                     break;
                 case "delete":
-                    ItemDataManager.removeItem(mid);
+                    itemDataManager.removeItem(mid);
                     responseObject.put("message","Success");
                     this.response = responseObject.toString();
                     break;

@@ -44,6 +44,7 @@ public class EditUserHandler extends HandlerPrototype implements HttpHandler {
             this.response = responseObject.toString();
         }
         else {
+            UserDataManager userDataManager = new UserDataManager();
             //Perform requested operation
             switch (field) {
                 case "username":
@@ -51,7 +52,7 @@ public class EditUserHandler extends HandlerPrototype implements HttpHandler {
                         responseObject.put("message", "UsernameLengthError");
                         this.response = responseObject.toString();
                     } else {
-                        UserDataManager.editUsername(uid, newvalue);
+                        userDataManager.editUsername(uid, newvalue);
                         responseObject.put("message", "Success");
                         this.response = responseObject.toString();
                     }
@@ -61,18 +62,18 @@ public class EditUserHandler extends HandlerPrototype implements HttpHandler {
                         responseObject.put("message", "PasswordLengthError");
                         this.response = responseObject.toString();
                     } else {
-                        UserDataManager.editPassword(uid, newvalue);
+                        userDataManager.editPassword(uid, newvalue);
                         responseObject.put("message", "Success");
                         this.response = responseObject.toString();
                     }
                     break;
                 case "rank":
-                    UserDataManager.editRank(uid, newvalue);
+                    userDataManager.editRank(uid, newvalue);
                     responseObject.put("message", "Success");
                     this.response = responseObject.toString();
                     break;
                 case "delete":
-                    UserDataManager.removeUser(uid);
+                    userDataManager.removeUser(uid);
                     responseObject.put("message", "Success");
                     this.response = responseObject.toString();
                     break;

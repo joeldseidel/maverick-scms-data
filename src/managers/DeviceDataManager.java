@@ -5,6 +5,7 @@ package managers;
  */
 
 import maverick_data.DatabaseInteraction;
+import maverick_types.DatabaseType;
 import maverick_types.FDADevice;
 
 import java.sql.PreparedStatement;
@@ -14,8 +15,7 @@ import java.sql.SQLException;
 public class DeviceDataManager {
     private DatabaseInteraction database;
     public DeviceDataManager(){
-        //Todo: implement the device database connection once the properties are set up properly in database interaction class
-        //this.database = new DatabaseInteraction()
+        this.database = new DatabaseInteraction(DatabaseType.Devices);
     }
 
     /**

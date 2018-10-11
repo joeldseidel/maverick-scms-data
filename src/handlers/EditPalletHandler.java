@@ -32,18 +32,19 @@ public class EditPalletHandler extends HandlerPrototype implements HttpHandler {
         String cid = requestParams.getString("cid");
         String mid = requestParams.getString("mid");
         String pallet = requestParams.getString("pallet");
+        PalletDataManager palletDataManager = new PalletDataManager();
             //ENSURE PALLET IS IN COMPANY
-            if(!PalletDataManager.getPalletCID(pallet).equals(cid)){
+            if(!palletDataManager.getPalletCID(pallet).equals(cid)){
                 responseObject.put("message","PalletOutsideCompanyError");
                 this.response = responseObject.toString();
             }
             else{
-
+                ItemDataManager itemDataManager = new ItemDataManager();
                 //CHECK VALIDITY OF MAVERICK ITEM
-                if(ItemDataManager.itemExists(mid)){
+                if(itemDataManager.itemExists(mid)){
 
                     //ENSURE ITEM IS IN COMPANY
-                    if(!ItemDataManager.getItemCID(mid).equals(cid)){
+                    if(!itemDataManager.getItemCID(mid).equals(cid)){
 
                         responseObject.put("message","ItemOutsideCompanyError");
                         this.response = responseObject.toString();
@@ -52,8 +53,8 @@ public class EditPalletHandler extends HandlerPrototype implements HttpHandler {
                     else{
 
                         //CHECK VALIDITY OF PALLET
-                        if(PalletDataManager.palletExists(pallet)){
-                            ItemDataManager.updatePallet(mid, pallet);
+                        if(palletDataManager.palletExists(pallet)){
+                            itemDataManager.updatePallet(mid, pallet);
                             responseObject.put("message","Success");
                             this.response = responseObject.toString();
 

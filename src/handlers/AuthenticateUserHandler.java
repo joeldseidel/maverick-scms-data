@@ -85,12 +85,13 @@ public class AuthenticateUserHandler extends HandlerPrototype implements HttpHan
      */
     private boolean isUserValid(String username, String password){
         boolean userIsValid;
-        boolean userExists = (UserDataManager.getUserCount(username) == 1);
+        UserDataManager userDataManager = new UserDataManager();
+        boolean userExists = (userDataManager.getUserCount(username) == 1);
         if(userExists){
             //Get UUID for password checking
-            long userUUID = UserDataManager.getUserUUID(username);
+            long userUUID = userDataManager.getUserUUID(username);
             //Query the password from the users table and see if it matches
-            userIsValid = UserDataManager.checkPasswordMatch(userUUID, password);
+            userIsValid = userDataManager.checkPasswordMatch(userUUID, password);
         } else {
             userIsValid = false;
         }

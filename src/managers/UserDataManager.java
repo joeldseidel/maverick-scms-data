@@ -13,10 +13,12 @@ import java.nio.charset.StandardCharsets;
 public class UserDataManager {
 
     private static MessageDigest messageDigestSHA;
+    private DatabaseInteraction database;
 
-    public static int getUserCount(String username){
+    public UserDataManager() { database = new DatabaseInteraction(DatabaseType.AppData); }
+
+    public int getUserCount(String username){
         System.out.println("Attempting to get user count for username : " + username);
-        DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
         String isUserValidSql = "SELECT uid FROM table_users WHERE username = ?";
         PreparedStatement isUserValidStatement = database.prepareStatement(isUserValidSql);
         int userCount = 0;
@@ -36,11 +38,11 @@ public class UserDataManager {
         return userCount;
     }
 
-    public static boolean isUniqueUsername(String username){
+    public boolean isUniqueUsername(String username){
         return getUserCount(username) == 1;
     }
 
-    public static boolean checkPasswordMatch(long uid, String password){
+    public boolean checkPasswordMatch(long uid, String password){
         boolean isMatch;
         try{
             messageDigestSHA = MessageDigest.getInstance("SHA-256");
@@ -48,7 +50,6 @@ public class UserDataManager {
         catch(Exception e){
             System.out.println("Message Digest failed for : " + e);
         }
-        DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
         String isPasswordMatchSql = "SELECT password FROM table_users WHERE uid = ?";
         PreparedStatement matchPasswordStatement = database.prepareStatement(isPasswordMatchSql);
         try{
@@ -70,8 +71,7 @@ public class UserDataManager {
         return isMatch;
     }
 
-    public static long getUserUUID(String username){
-        DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
+    public long getUserUUID(String username){
         String getUserUUIDSql = "SELECT uid FROM table_users WHERE username = ?";
         PreparedStatement getUUIDStatement = database.prepareStatement(getUserUUIDSql);
         long userUUID = 0;
@@ -124,7 +124,7 @@ public class UserDataManager {
     /**
      * addUser adds a user to the database
      */
-    public static void addUser(String cid, String username, String password) {
+    public void addUser(String cid, String username, String password) {
         try{
             messageDigestSHA = MessageDigest.getInstance("SHA-256");
         }
@@ -132,7 +132,6 @@ public class UserDataManager {
             System.out.println("Message Digest failed for : " + e);
         }
         String hashedPassword = byteArrayToString(messageDigestSHA.digest(password.getBytes(StandardCharsets.UTF_8))).toLowerCase();
-        DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
         String qryString = "INSERT INTO table_users (cid, username, password) VALUES (?, ?, ?)";
         PreparedStatement qryStatement = database.prepareStatement(qryString);
         try{
@@ -150,8 +149,7 @@ public class UserDataManager {
     /**
      * removeUser removes a user from the database
      */
-    public static void removeUser(int uid) {
-        DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
+    public void removeUser(int uid) {
         String qryString = "DELETE FROM table_users WHERE uid = ?";
         PreparedStatement qryStatement = database.prepareStatement(qryString);
         try{
@@ -167,8 +165,7 @@ public class UserDataManager {
     /**
      * editUsername changes a user's username
      */
-    public static void editUsername(int uid, String username) {
-        DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
+    public void editUsername(int uid, String username) {
         String qryString = "UPDATE table_users SET username = ? WHERE uid = ?";
         PreparedStatement qryStatement = database.prepareStatement(qryString);
         try{
@@ -185,7 +182,7 @@ public class UserDataManager {
     /**
      * editPassword changes a user's password
      */
-    public static void editPassword(int uid, String password) {
+    public void editPassword(int uid, String password) {
         try{
             messageDigestSHA = MessageDigest.getInstance("SHA-256");
         }
@@ -193,7 +190,6 @@ public class UserDataManager {
             System.out.println("Message Digest failed for : " + e);
         }
         String hashedPassword = byteArrayToString(messageDigestSHA.digest(password.getBytes(StandardCharsets.UTF_8))).toLowerCase();
-        DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
         String qryString = "UPDATE table_users SET password = ? WHERE uid = ?";
         PreparedStatement qryStatement = database.prepareStatement(qryString);
         try{
@@ -210,8 +206,7 @@ public class UserDataManager {
     /**
      * editRank changes a user's rank
      */
-    public static void editRank(int uid, String rank) {
-        DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
+    public void editRank(int uid, String rank) {
         String qryString = "UPDATE table_users SET rank = ? WHERE uid = ?";
         PreparedStatement qryStatement = database.prepareStatement(qryString);
         try{
