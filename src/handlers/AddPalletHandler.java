@@ -36,9 +36,11 @@ public class AddPalletHandler extends HandlerPrototype implements HttpHandler {
     protected void fulfillRequest(JSONObject requestParams) {
         //Parse the request parameters
         String cid = requestParams.getString("cid");
+        System.out.println("Entered add pallet handler with cid " + requestParams.getString("cid"));
         //Create pallet items
         MaverickPallet thisPallet = new MaverickPallet(cid);
         PalletDataManager palletDataManager = new PalletDataManager();
+        System.out.println("Created pallet and manager successfully");
         //PERFORM PALLET ADDING
         palletDataManager.addPallet(thisPallet);
         //Write response object

@@ -37,22 +37,24 @@ public class PalletDataManager {
      * addPallet adds a pallet to the database
      */
     public void addPallet(MaverickPallet pallet) {
+        System.out.println("Trying to create pallet");
         String qryString = "INSERT INTO table_pallets (cid, mlot) VALUES (?, ?)";
         try{
             PreparedStatement qryStatement = this.database.prepareStatement(qryString);
             qryStatement.setString(1, pallet.getCustomerID());
             qryStatement.setString(2, pallet.getPalletID());
+            System.out.println("Trying to query with CID " + pallet.getCustomerID() + " and PID " + pallet.getPalletID());
             this.database.nonQuery(qryStatement);
         }catch(SQLException sqlEx){
             sqlEx.printStackTrace();
         }
-        PalletMovementEventManager palletMovementEventManager = new PalletMovementEventManager();
+        /**PalletMovementEventManager palletMovementEventManager = new PalletMovementEventManager();
         palletMovementEventManager.initializePalletMovement(pallet);
         DeviceMovementEventManager deviceMovementEventManager = new DeviceMovementEventManager();
         for(MaverickItem item : pallet.getItems()){
             this.addItemToPallet(item, pallet.getPalletID());
             deviceMovementEventManager.initializeItemMovement(item);
-        }
+        }**/
     }
 
     public void addItemToPallet(MaverickItem item, String palletId){
