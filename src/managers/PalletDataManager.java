@@ -48,13 +48,13 @@ public class PalletDataManager {
         }catch(SQLException sqlEx){
             sqlEx.printStackTrace();
         }
-        /**PalletMovementEventManager palletMovementEventManager = new PalletMovementEventManager();
+        PalletMovementEventManager palletMovementEventManager = new PalletMovementEventManager();
         palletMovementEventManager.initializePalletMovement(pallet);
         DeviceMovementEventManager deviceMovementEventManager = new DeviceMovementEventManager();
         for(MaverickItem item : pallet.getItems()){
             this.addItemToPallet(item, pallet.getPalletID());
             deviceMovementEventManager.initializeItemMovement(item);
-        }**/
+        }
     }
 
     public void addItemToPallet(MaverickItem item, String palletId){

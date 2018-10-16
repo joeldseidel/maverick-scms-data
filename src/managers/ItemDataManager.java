@@ -84,8 +84,6 @@ public class ItemDataManager {
         } catch(SQLException sqlEx){
             sqlEx.printStackTrace();
             return false;
-        } finally {
-            database.closeConnection();
         }
         return false;
     }
@@ -101,8 +99,6 @@ public class ItemDataManager {
             cid = CIDResults.getString("cid");
         } catch(SQLException sqlEx){
             sqlEx.printStackTrace();
-        } finally {
-            database.closeConnection();
         }
         System.out.println("Got Item CID : " + cid);
         return cid;
@@ -178,7 +174,7 @@ public class ItemDataManager {
      * updatePallet changes an item's pallet
      */
     public void updatePallet(String mid, String pallet) {
-        String qryString = "INSERT INTO table_itempalletmapping (mid, pallet) VALUES (?, ?) ON DUPLICATE KEY UPDATE pallet=?";
+        String qryString = "INSERT INTO table_itempalletmapping (mid, mlot) VALUES (?, ?) ON DUPLICATE KEY UPDATE mlot=?";
         PreparedStatement qryStatement = database.prepareStatement(qryString);
         try{
             qryStatement.setString(1, mid);

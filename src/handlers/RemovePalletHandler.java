@@ -20,27 +20,9 @@ import managers.PalletDataManager;
 public class RemovePalletHandler extends HandlerPrototype implements HttpHandler {
 
     public RemovePalletHandler(){
-    //Define the required keys in the super class
-    requiredKeys = new String[] {"cid", "pallet", "token"};
-    handlerName = "RemovePalletHandler";
-    }
-
-    @Override
-    protected boolean isRequestValid(JSONObject requestParams){
-        if(requestParams == null){
-            //Request did not come with parameters, is invalid
-            System.out.println("Request Params Null");
-            return false;
-        }
-        for(String requiredKey : requiredKeys){
-            if(!requestParams.has(requiredKey)){
-                //Missing a required key, request is invalid
-                System.out.println("Request Params Missing Key " + requiredKey);
-                return false;
-            }
-        }
-        //Request contains all required keys
-        return true;
+        //Define the required keys in the super class
+        requiredKeys = new String[] {"cid", "pallet", "token"};
+        handlerName = "RemovePalletHandler";
     }
 
     @Override

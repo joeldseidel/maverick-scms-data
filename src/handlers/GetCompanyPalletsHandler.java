@@ -41,7 +41,7 @@ public class GetCompanyPalletsHandler extends HandlerPrototype implements HttpHa
     private JSONObject getItemDataByCompany(String cid){
         System.out.println("Attempting to get item data for company : " + cid);
         DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
-        String getItemDataSql = "SELECT id FROM table_pallets WHERE cid = ?";
+        String getItemDataSql = "SELECT mlot FROM table_pallets WHERE cid = ?";
         PreparedStatement getItemDataStatement = database.prepareStatement(getItemDataSql);
         JSONObject itemDataObject = new JSONObject();
         try{
