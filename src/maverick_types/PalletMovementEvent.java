@@ -5,21 +5,19 @@ import managers.PalletMovementEventManager;
 import java.util.Date;
 
 public class PalletMovementEvent {
-    private String palletid, fromCompanyId, toCompanyId;
+    private String palletid, companyID;
     private MovementType type;
     private Date movementTime;
     private PalletMovementEventManager palletMovementEventManager = new PalletMovementEventManager();
-    public PalletMovementEvent(String palletid, MovementType type, String fromCompanyId, String toCompanyId){
+    public PalletMovementEvent(String palletid, MovementType type, String companyID){
         this.palletid = palletid;
         this.type = type;
-        this.fromCompanyId = fromCompanyId;
-        this.toCompanyId = toCompanyId;
+        this.companyID = companyID;
     }
-    public PalletMovementEvent(String palletid, MovementType type, String fromCompanyId, String toCompanyId, Date movementTime){
+    public PalletMovementEvent(String palletid, MovementType type, String companyID, Date movementTime){
         this.palletid = palletid;
         this.type = type;
-        this.fromCompanyId = fromCompanyId;
-        this.toCompanyId = toCompanyId;
+        this.companyID = companyID;
         this.movementTime = movementTime;
     }
     public boolean isValid(){
@@ -36,11 +34,8 @@ public class PalletMovementEvent {
     public MaverickPallet getPallet(){
         return new MaverickPallet(palletid);
     }
-    public String getFromCompanyId(){
-        return fromCompanyId;
-    }
-    public String getToCompanyId(){
-        return toCompanyId;
+    public String getCompanyID(){
+        return companyID;
     }
     public MovementType getType() {
         return type;
