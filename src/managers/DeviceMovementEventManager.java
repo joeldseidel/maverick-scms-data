@@ -42,7 +42,7 @@ public class DeviceMovementEventManager extends MovementEventManager {
         try{
             writeMovementEventStatement.setString(1, committedEvent.getItemId());
             writeMovementEventStatement.setString(2, MovementEventManager.movementTypeToString(committedEvent.getType()));
-            writeMovementEventStatement.setString(3, committedEvent.getCompanyId());
+            writeMovementEventStatement.setString(3, committedEvent.getCompanyID());
             database.nonQuery(writeMovementEventStatement);
         } catch(SQLException sqlEx){
             sqlEx.printStackTrace();
@@ -65,7 +65,7 @@ public class DeviceMovementEventManager extends MovementEventManager {
                 //Create an individual device statement to be added to write batch
                 writeThisDeviceStatement.setString(1, thisItemId);
                 writeThisDeviceStatement.setString(2, MovementEventManager.movementTypeToString(palletMovementEvent.getType()));
-                writeThisDeviceStatement.setString(3, palletMovementEvent.getCompanyId());
+                writeThisDeviceStatement.setString(3, palletMovementEvent.getCompanyID());
                 //Add this device statement to the batch
                 writeThisDeviceStatement.addBatch();
             }

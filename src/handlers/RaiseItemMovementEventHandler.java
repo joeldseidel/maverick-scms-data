@@ -13,7 +13,7 @@ import java.io.OutputStream;
 public class RaiseItemMovementEventHandler extends HandlerPrototype implements HttpHandler {
 
     public RaiseItemMovementEventHandler(){
-        requiredKeys = new String[] {"mid", "type", "cid" "token"};
+        requiredKeys = new String[] {"mid", "type", "cid", "token"};
         handlerName = "RaiseItemMovementEventHandler";
     }
 

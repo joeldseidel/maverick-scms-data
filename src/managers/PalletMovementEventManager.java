@@ -39,7 +39,7 @@ public class PalletMovementEventManager extends MovementEventManager {
         try{
             writeMovementEventStatement.setString(1, committedEvent.getPallet().getPalletID());
             writeMovementEventStatement.setString(2, MovementEventManager.movementTypeToString(committedEvent.getType()));
-            writeMovementEventStatement.setString(3, committedEvent.getCompanyId());
+            writeMovementEventStatement.setString(3, committedEvent.getCompanyID());
             database.nonQuery(writeMovementEventStatement);
         } catch(SQLException sqlEx){
             sqlEx.printStackTrace();
