@@ -43,7 +43,7 @@ public class RaisePalletMovementEventHandler extends HandlerPrototype implements
         } else {
             System.out.println("Pallet mvmt invalid");
             //Pallet movement was invalid
-            responseObject.put("message", "Invalid Request");
+            responseObject.put("message", "InvalidType");
         }
         this.response = responseObject.toString();
     }
