@@ -37,13 +37,12 @@ public class DeviceMovementEventManager extends MovementEventManager {
         return null;
     }
     public void commitMovement(DeviceMovementEvent committedEvent){
-        String writeMovementEventSql = "INSERT INTO device_movements(mid, movementtype, fromcid, tocid, movementtime) VALUES (?, ?, ?, ?, NOW())";
+        String writeMovementEventSql = "INSERT INTO device_movements(mid, movementtype, cid movementtime) VALUES (?, ?, ?, NOW())";
         PreparedStatement writeMovementEventStatement = database.prepareStatement(writeMovementEventSql);
         try{
             writeMovementEventStatement.setString(1, committedEvent.getItemId());
             writeMovementEventStatement.setString(2, MovementEventManager.movementTypeToString(committedEvent.getType()));
-            writeMovementEventStatement.setString(3, committedEvent.getFromCid());
-            writeMovementEventStatement.setString(4, committedEvent.getToCid());
+            writeMovementEventStatement.setString(3, committedEvent.getCompanyId());
             database.nonQuery(writeMovementEventStatement);
         } catch(SQLException sqlEx){
             sqlEx.printStackTrace();
@@ -56,7 +55,7 @@ public class DeviceMovementEventManager extends MovementEventManager {
             getPalletRelatedDevicesStatement.setString(1, palletMovementEvent.getPallet().getPalletID());
             ResultSet palletRelatedDevicesResults = database.query(getPalletRelatedDevicesStatement);
             //Create the master statement for batch item movement write and prepare
-            String writeThisDeviceSql = "INSERT INTO device_movements(mid, movementtype, fromcid, tocid, movementtime) VALUES (?, ?, ?, ?, NOW())";
+            String writeThisDeviceSql = "INSERT INTO device_movements(mid, movementtype, cid, movementtime) VALUES (?, ?, ?, NOW())";
             PreparedStatement writeThisDeviceStatement = database.prepareStatement(writeThisDeviceSql);
             //About to prepare a batch of prepared statements so auto commit needs to be off
             database.setAutoCommit(false);
@@ -66,8 +65,7 @@ public class DeviceMovementEventManager extends MovementEventManager {
                 //Create an individual device statement to be added to write batch
                 writeThisDeviceStatement.setString(1, thisItemId);
                 writeThisDeviceStatement.setString(2, MovementEventManager.movementTypeToString(palletMovementEvent.getType()));
-                writeThisDeviceStatement.setString(3, palletMovementEvent.getFromCompanyId());
-                writeThisDeviceStatement.setString(4, palletMovementEvent.getToCompanyId());
+                writeThisDeviceStatement.setString(3, palletMovementEvent.getCompanyId());
                 //Add this device statement to the batch
                 writeThisDeviceStatement.addBatch();
             }
@@ -89,10 +87,9 @@ public class DeviceMovementEventManager extends MovementEventManager {
             while(getItemMovementsResults.next()){
                 String mid = maverickItem.getMaverickID();
                 MovementType movementType = MovementEventManager.parseMovementType(getItemMovementsResults.getString("movementtype"));
-                String fromcid = getItemMovementsResults.getString("fromcid");
-                String tocid = getItemMovementsResults.getString("tocid");
+                String cid = getItemMovementsResults.getString("cid");
                 Date movementTime = getItemMovementsResults.getDate("movementtime");
-                DeviceMovementEvent thisMovementEvent = new DeviceMovementEvent(mid, fromcid, tocid, movementType, movementTime);
+                DeviceMovementEvent thisMovementEvent = new DeviceMovementEvent(mid, cid, movementType, movementTime);
                 deviceMovementEvents.add(thisMovementEvent);
             }
             return deviceMovementEvents;
@@ -108,14 +105,13 @@ public class DeviceMovementEventManager extends MovementEventManager {
      */
     public void initializeItemMovement(MaverickItem item){
         //Create the SQL statement for inserting the initial movement record
-        String createInitialMovementSql = "INSERT INTO device_movements(movementtype, fromcid, tocid, movementtime, mid) VALUES(?, ?, ?, NOW(), ?)";
+        String createInitialMovementSql = "INSERT INTO device_movements(movementtype, cid, movementtime, mid) VALUES(?, ?, NOW(), ?)";
         PreparedStatement createInitialMovementStatement = database.prepareStatement(createInitialMovementSql);
         try{
             //Set the parameters of the nonquery
             createInitialMovementStatement.setString(1, MovementEventManager.movementTypeToString(MovementType.CycleIn));
             createInitialMovementStatement.setString(2, item.getCustomerID());
-            createInitialMovementStatement.setString(3, item.getCustomerID());
-            createInitialMovementStatement.setString(4, item.getMaverickID());
+            createInitialMovementStatement.setString(3, item.getMaverickID());
             //Perform the nonquery and insert the movement record
             database.nonQuery(createInitialMovementStatement);
         } catch(SQLException sqlEx){
