@@ -4,7 +4,6 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.Headers;
 import org.json.JSONObject;
-
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -30,6 +29,7 @@ public class RemovePalletHandler extends HandlerPrototype implements HttpHandler
         JSONObject responseObject = new JSONObject();
         String cid = requestParams.getString("cid");
         String pallet = requestParams.getString("pallet");
+        
         PalletDataManager palletDataManager = new PalletDataManager();
         //ENSURE PALLET IS IN COMPANY
         if(!palletDataManager.getPalletCID(pallet).equals(cid)){

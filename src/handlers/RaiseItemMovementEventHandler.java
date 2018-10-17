@@ -13,7 +13,7 @@ import java.io.OutputStream;
 public class RaiseItemMovementEventHandler extends HandlerPrototype implements HttpHandler {
 
     public RaiseItemMovementEventHandler(){
-        requiredKeys = new String[] {"mid", "type", "fromcid", "tocid", "token"};
+        requiredKeys = new String[] {"mid", "type", "cid", "token"};
         handlerName = "RaiseItemMovementEventHandler";
     }
 
@@ -22,10 +22,9 @@ public class RaiseItemMovementEventHandler extends HandlerPrototype implements H
         //Get params from request params objects
         String itemid = requestParams.getString("mid");
         String type = requestParams.getString("type");
-        String fromcid = requestParams.getString("fromcid");
-        String tocid = requestParams.getString("tocid");
+        String cid = requestParams.getString("cid");
         //Create item movement event object from parameters
-        DeviceMovementEvent deviceMovementEvent = new DeviceMovementEvent(itemid, fromcid, tocid, MovementEventManager.parseMovementType(type));
+        DeviceMovementEvent deviceMovementEvent = new DeviceMovementEvent(itemid, cid, MovementEventManager.parseMovementType(type));
         //Validate movement event and commit if valid
         if(deviceMovementEvent.isValid()){
             //Item movement event is valid and legal, commit to database

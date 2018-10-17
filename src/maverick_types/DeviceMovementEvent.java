@@ -5,20 +5,18 @@ import managers.DeviceMovementEventManager;
 import java.util.Date;
 
 public class DeviceMovementEvent {
-    private String mid, fromCompanyId, toCompanyId;
+    private String mid, companyID;
     private MovementType type;
     private Date movementTime;
     private DeviceMovementEventManager deviceMovementEventManager = new DeviceMovementEventManager();
-    public DeviceMovementEvent(String mid, String fromCompanyId, String toCompanyId, MovementType type){
+    public DeviceMovementEvent(String mid, String companyID, MovementType type){
         this.mid = mid;
-        this.fromCompanyId = fromCompanyId;
-        this.toCompanyId = toCompanyId;
+        this.companyID = companyID;
         this.type = type;
     }
-    public DeviceMovementEvent(String mid, String fromCompanyId, String toCompanyId, MovementType type, Date movementTime){
+    public DeviceMovementEvent(String mid, String companyID, MovementType type, Date movementTime){
         this.mid = mid;
-        this.fromCompanyId = fromCompanyId;
-        this.toCompanyId = toCompanyId;
+        this.companyID = companyID;
         this.type = type;
         this.movementTime = movementTime;
     }
@@ -35,11 +33,8 @@ public class DeviceMovementEvent {
     public String getItemId(){
         return mid;
     }
-    public String getFromCid(){
-        return fromCompanyId;
-    }
-    public String getToCid(){
-        return toCompanyId;
+    public String getCompanyID(){
+        return companyID;
     }
     public MovementType getType(){
         return type;
