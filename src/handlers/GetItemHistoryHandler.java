@@ -66,8 +66,7 @@ public class GetItemHistoryHandler extends HandlerPrototype implements HttpHandl
             JSONObject thisEventObject = new JSONObject();
             //Get values from the movement event object and put into json object with corresponding key
             thisEventObject.put("movementtype", MovementEventManager.movementTypeToString(event.getType()));
-            thisEventObject.put("fromcid", event.getFromCid());
-            thisEventObject.put("tocid", event.getToCid());
+            thisEventObject.put("fromcid", event.getCompanyID());
             thisEventObject.put("movementtime", event.getMovementTime().toString());
             //Add the created JSON object to the cumulative json array
             movementEventJsonArray.put(thisEventObject);

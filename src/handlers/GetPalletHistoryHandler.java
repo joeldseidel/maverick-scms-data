@@ -69,8 +69,7 @@ public class GetPalletHistoryHandler extends HandlerPrototype implements HttpHan
             JSONObject thisEventObject = new JSONObject();
             //Get values from the movement event object and put into json object with corresponding key
             thisEventObject.put("movementtype", MovementEventManager.movementTypeToString(event.getType()));
-            thisEventObject.put("fromcid", event.getFromCompanyId());
-            thisEventObject.put("tocid", event.getToCompanyId());
+            thisEventObject.put("fromcid", event.getCompanyID());
             thisEventObject.put("movementtime", event.getMovementTime().toString());
             //Add the created JSON object to the cumulative json array
             movementEventJsonArray.put(thisEventObject);
