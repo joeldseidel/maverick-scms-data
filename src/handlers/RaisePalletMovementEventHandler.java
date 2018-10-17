@@ -23,6 +23,8 @@ public class RaisePalletMovementEventHandler extends HandlerPrototype implements
 
     @Override
     protected void fulfillRequest(JSONObject requestParams){
+        JSONObject responseObject = new JSONObject();
+        System.out.println("Entered pallet movement event!");
         //Get params from request params object
         String palletid = requestParams.getString("palletid");
         String type = requestParams.getString("type");
@@ -30,14 +32,19 @@ public class RaisePalletMovementEventHandler extends HandlerPrototype implements
         //Create a pallet movement object from parameters
         PalletMovementEvent thisPalletMovementEvent = new PalletMovementEvent(palletid, MovementEventManager.parseMovementType(type), cid);
         //Validate and commit movement event
+        System.out.println("Successfully made pallet movement event!");
         if(thisPalletMovementEvent.isValid()){
+            System.out.println("Pallet mvmt valid");
             //Pallet movement event is valid and legal, commit to database
             thisPalletMovementEvent.commit();
+            System.out.println("Successfully committed pallet movement event!");
             //Return successful message to client
-            this.response = "success";
+            responseObject.put("message", "Success");
         } else {
+            System.out.println("Pallet mvmt invalid");
             //Pallet movement was invalid
-            this.response = "invalid request";
+            responseObject.put("message", "Invalid Request");
         }
+        this.response = responseObject.toString();
     }
 }

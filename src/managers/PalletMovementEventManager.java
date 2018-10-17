@@ -20,11 +20,13 @@ public class PalletMovementEventManager extends MovementEventManager {
     public MovementStatus getCurrentStatus(MaverickPallet pallet){
         String getCurrentStatusSql = "SELECT * FROM pallet_movements WHERE palletid = ? ORDER BY movementtime DESC LIMIT 1";
         PreparedStatement currentStatusStmt = database.prepareStatement(getCurrentStatusSql);
+        System.out.println("Checking for PID " + pallet.getPalletID());
         try{
             currentStatusStmt.setString(1, pallet.getPalletID());
             ResultSet currentStatusResult = database.query(currentStatusStmt);
             if(currentStatusResult.next()){
                 String movementTypeStr = currentStatusResult.getString("movementtype");
+                 System.out.println("Got movment type " + movementTypeStr);
                 MovementType movementType = parseMovementType(movementTypeStr);
                 return convertToMovementStatus(movementType);
             }

@@ -94,7 +94,7 @@ public abstract class MovementEventManager {
                 return MovementStatus.CycledOut;
             case CycleIn:
                 //Most recent move was a cycle in, pallet went from not existing to being indeterminate - this shouldn't happen
-                return null;
+                return MovementStatus.InStorage;
             default:
                 return null;
         }

@@ -22,9 +22,12 @@ public class PalletMovementEvent {
     }
     public boolean isValid(){
         MovementStatus currentStatus = palletMovementEventManager.getCurrentStatus(getPallet());
+        System.out.println("Got current status " + currentStatus);
         if(!palletMovementEventManager.isLegalMovement(currentStatus, type)){
+            System.out.println("Illegal movmement");
             return false;
         }
+        System.out.println("Legal movmement");
         //Todo: implement checks for the companies
         return true;
     }
