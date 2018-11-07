@@ -71,29 +71,25 @@ public class ItemDataManager {
         return lotNumber.generateLotNumber(LotType.Item);
     }
 
-    public static boolean itemExists(String mid){
+    public boolean itemExists(String mid){
         System.out.println("Attempting to get item count for item with mid : " + mid);
-        DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
         String itemCountSQL = "SELECT rowid FROM table_items WHERE mid = ?";
         PreparedStatement itemCountStatement = database.prepareStatement(itemCountSQL);
         try{
             itemCountStatement.setString(1, mid);
             ResultSet getItemResults = database.query(itemCountStatement);
-            while(getItemResults.next()){
+            if (getItemResults.next()){
                 return true;
             }
         } catch(SQLException sqlEx){
             sqlEx.printStackTrace();
             return false;
-        } finally {
-            database.closeConnection();
         }
         return false;
     }
 
-    public static String getItemCID(String mid){
+    public String getItemCID(String mid){
         String cid = "notfound";
-        DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
         String getItemCIDSql = "SELECT cid FROM table_items WHERE mid = ?";
         PreparedStatement getItemCIDStatement = database.prepareStatement(getItemCIDSql);
         try{
@@ -103,8 +99,6 @@ public class ItemDataManager {
             cid = CIDResults.getString("cid");
         } catch(SQLException sqlEx){
             sqlEx.printStackTrace();
-        } finally {
-            database.closeConnection();
         }
         System.out.println("Got Item CID : " + cid);
         return cid;
@@ -113,8 +107,7 @@ public class ItemDataManager {
     /**
      * editName changes an item's name
      */
-    public static void editName(String mid, String newname) {
-        DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
+    public void editName(String mid, String newname) {
         String qryString = "UPDATE table_items SET name = ? WHERE mid = ?";
         PreparedStatement qryStatement = database.prepareStatement(qryString);
         try{
@@ -131,8 +124,7 @@ public class ItemDataManager {
     /**
      * editCategory changes an item's category
      */
-    public static void editCategory(String mid, String newcategory) {
-        DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
+    public void editCategory(String mid, String newcategory) {
         String qryString = "UPDATE table_items SET category = ? WHERE mid = ?";
         PreparedStatement qryStatement = database.prepareStatement(qryString);
         try{
@@ -149,8 +141,7 @@ public class ItemDataManager {
     /**
      * removeItem removes an item from the database
      */
-    public static void removeItem(String mid) {
-        DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
+    public void removeItem(String mid) {
         String qryString = "DELETE FROM table_items WHERE mid = ?";
         PreparedStatement qryStatement = database.prepareStatement(qryString);
         try{
@@ -166,8 +157,7 @@ public class ItemDataManager {
     /**
      * removeFromPallet removes an item from a pallet
      */
-    public static void removeFromPallet(String mid) {
-        DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
+    public void removeFromPallet(String mid) {
         String qryString = "DELETE FROM table_itempalletmapping WHERE mid = ?";
         PreparedStatement qryStatement = database.prepareStatement(qryString);
         try{
@@ -183,9 +173,8 @@ public class ItemDataManager {
     /**
      * updatePallet changes an item's pallet
      */
-    public static void updatePallet(String mid, String pallet) {
-        DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
-        String qryString = "INSERT INTO table_itempalletmapping (mid, pallet) VALUES (?, ?) ON DUPLICATE KEY UPDATE pallet=?";
+    public void updatePallet(String mid, String pallet) {
+        String qryString = "INSERT INTO table_itempalletmapping (mid, mlot) VALUES (?, ?) ON DUPLICATE KEY UPDATE mlot=?";
         PreparedStatement qryStatement = database.prepareStatement(qryString);
         try{
             qryStatement.setString(1, mid);

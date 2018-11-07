@@ -22,29 +22,12 @@ import java.sql.SQLException;
  */
 
 public class GetCompanyItemsHandler extends HandlerPrototype implements HttpHandler {
-    private String response;
+
     public GetCompanyItemsHandler(){
         requiredKeys = new String[]{"cid", "token"};
+        handlerName = "GetCompanyItemsHandler";
     }
-    public void handle(HttpExchange httpExchange) throws IOException {
-        System.out.println("Entered Get Items Handler");
-        JSONObject requestParams = GetParameterObject(httpExchange);
-        boolean isValidRequest = isRequestValid(requestParams);
-        displayRequestValidity(isValidRequest);
-        if(isValidRequest){
-            fulfillRequest(requestParams);
-        } else {
-            this.response = "invalid request";
-        }
-        int responseCode = isValidRequest ? 200 : 400;
-        Headers headers = httpExchange.getResponseHeaders();
-        headers.add("Access-Control-Allow-Origin", "*");
-        httpExchange.sendResponseHeaders(responseCode, this.response.length());
-        System.out.println("Response to Get Item Request : " + this.response);
-        OutputStream os = httpExchange.getResponseBody();
-        os.write(this.response.getBytes());
-        os.close();
-    }
+
     @Override
     protected void fulfillRequest(JSONObject requestParams){
         String cid = requestParams.getString("cid");

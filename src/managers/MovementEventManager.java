@@ -9,6 +9,11 @@ package managers;
 import maverick_types.*;
 
 public abstract class MovementEventManager {
+    /**
+     * Convert a movement type string to a movement type type
+     * @param movementTypeString the string to convert to a type
+     * @return the equivalent movement type type of the provided string
+     */
     public static MovementType parseMovementType(String movementTypeString){
         switch(movementTypeString){
             case "checkin":
@@ -25,10 +30,18 @@ public abstract class MovementEventManager {
                 return MovementType.HoldReworked;
             case "cycleout":
                 return MovementType.CycleOut;
+            case "cyclein":
+                return MovementType.CycleIn;
             default:
                 return null;
         }
     }
+
+    /**
+     * Convert a movement type type to its equivalent string
+     * @param movementType the type to convert to string
+     * @return the string equivalent to the movement type type specified
+     */
     public static String movementTypeToString(MovementType movementType){
         switch(movementType){
             case CheckIn:
@@ -45,10 +58,17 @@ public abstract class MovementEventManager {
                 return "holdreworked";
             case CycleOut:
                 return "cycleout";
+            case CycleIn:
+                return "cyclein";
             default: return null;
         }
     }
 
+    /**
+     * Convert a movement type to a movement status based on last movement
+     * @param movementType the movement to convert
+     * @return the movement status determined from provided movement type
+     */
     static MovementStatus convertToMovementStatus(MovementType movementType){
         switch(movementType){
             case CheckIn:
@@ -72,11 +92,19 @@ public abstract class MovementEventManager {
             case CycleOut:
                 //Most recent move was a cycle out, pallet went from a status to cycled out, pallet is currently cycled out
                 return MovementStatus.CycledOut;
+            case CycleIn:
+                //Most recent move was a cycle in, pallet went from not existing to being indeterminate - this shouldn't happen
+                return MovementStatus.InStorage;
             default:
                 return null;
         }
     }
 
+    /**
+     * Convert a movement status type to its equivalent string
+     * @param movementStatus the movement status to convert
+     * @return the equivalent string of the provided movement status
+     */
     public static String movementStatusToString(MovementStatus movementStatus){
         switch(movementStatus){
             case InTransit:
@@ -92,6 +120,13 @@ public abstract class MovementEventManager {
         }
     }
 
+    /**
+     * Determine if the current movement status will allow the intended movement type to occur
+     * THIS IS THE LOGICAL DETERMINATE OF A PALLET MOVEMENT'S VALIDITY
+     * @param currentStatus the current movement status of the pallet
+     * @param intendedMovementType the movement type of the intended movement
+     * @return true if the movement is legal and false if the move is illegal
+     */
     public boolean isLegalMovement(MovementStatus currentStatus, MovementType intendedMovementType) {
         switch (currentStatus) {
             case InTransit:

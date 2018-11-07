@@ -20,11 +20,13 @@ public class PalletMovementEventManager extends MovementEventManager {
     public MovementStatus getCurrentStatus(MaverickPallet pallet){
         String getCurrentStatusSql = "SELECT * FROM pallet_movements WHERE palletid = ? ORDER BY movementtime DESC LIMIT 1";
         PreparedStatement currentStatusStmt = database.prepareStatement(getCurrentStatusSql);
+        System.out.println("Checking for PID " + pallet.getPalletID());
         try{
             currentStatusStmt.setString(1, pallet.getPalletID());
             ResultSet currentStatusResult = database.query(currentStatusStmt);
             if(currentStatusResult.next()){
                 String movementTypeStr = currentStatusResult.getString("movementtype");
+                 System.out.println("Got movment type " + movementTypeStr);
                 MovementType movementType = parseMovementType(movementTypeStr);
                 return convertToMovementStatus(movementType);
             }
@@ -34,13 +36,12 @@ public class PalletMovementEventManager extends MovementEventManager {
         return null;
     }
     public void commitMovement(PalletMovementEvent committedEvent){
-        String writeMovementEventSql = "INSERT INTO pallet_movements(palletid, movementtype, fromcid, tocid, movementtime) VALUES (?, ?, ?, ?, NOW())";
+        String writeMovementEventSql = "INSERT INTO pallet_movements(palletid, movementtype, cid, movementtime) VALUES (?, ?, ?, NOW())";
         PreparedStatement writeMovementEventStatement = database.prepareStatement(writeMovementEventSql);
         try{
             writeMovementEventStatement.setString(1, committedEvent.getPallet().getPalletID());
             writeMovementEventStatement.setString(2, MovementEventManager.movementTypeToString(committedEvent.getType()));
-            writeMovementEventStatement.setString(3, committedEvent.getFromCompanyId());
-            writeMovementEventStatement.setString(4, committedEvent.getToCompanyId());
+            writeMovementEventStatement.setString(3, committedEvent.getCompanyID());
             database.nonQuery(writeMovementEventStatement);
         } catch(SQLException sqlEx){
             sqlEx.printStackTrace();
@@ -60,10 +61,9 @@ public class PalletMovementEventManager extends MovementEventManager {
             List<PalletMovementEvent> palletMovementEvents = new ArrayList<>();
             while(getMovementsResult.next()){
                 MovementType type = MovementEventManager.parseMovementType(getMovementsResult.getString("movementtype"));
-                String fromCid = getMovementsResult.getString("fromcid");
-                String toCid = getMovementsResult.getString("tocid");
+                String cid = getMovementsResult.getString("cid");
                 Date movementTime = getMovementsResult.getDate("movementtime");
-                PalletMovementEvent thisPalletMovementEvent = new PalletMovementEvent(pallet.getPalletID(), type, fromCid, toCid, movementTime);
+                PalletMovementEvent thisPalletMovementEvent = new PalletMovementEvent(pallet.getPalletID(), type, cid, movementTime);
                 palletMovementEvents.add(thisPalletMovementEvent);
             }
             return palletMovementEvents;
@@ -71,5 +71,26 @@ public class PalletMovementEventManager extends MovementEventManager {
             sqlEx.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * Create the initial pallet movement record which will active the pallet and allow it to be moved
+     * @param pallet the pallet to be initialized
+     */
+    public void initializePalletMovement(MaverickPallet pallet){
+        //Create the SQL statement for the nonquery to insert the movement record
+        String createInitialPalletMovementSql = "INSERT INTO pallet_movements(movementtype, cid, movementtime, palletid) VALUES (?, ?, NOW(), ?)";
+        PreparedStatement createInitialPalletMovementStatement = database.prepareStatement(createInitialPalletMovementSql);
+        try{
+            //Set the insert nonquery parameters
+            createInitialPalletMovementStatement.setString(1, movementTypeToString(MovementType.CycleIn));
+            createInitialPalletMovementStatement.setString(2, pallet.getCustomerID());
+            createInitialPalletMovementStatement.setString(3, pallet.getPalletID());
+            //Perform the nonquery and insert the movement record
+            database.nonQuery(createInitialPalletMovementStatement);
+        } catch(SQLException sqlEx){
+            //I'll take things that ain't it for 500 Alex
+            sqlEx.printStackTrace();
+        }
     }
 }

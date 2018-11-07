@@ -22,28 +22,11 @@ import java.sql.SQLException;
  */
 
 public class GetCompanyPalletsHandler extends HandlerPrototype implements HttpHandler {
-    private String response;
+
+
     public GetCompanyPalletsHandler(){
         requiredKeys = new String[] {"cid", "token"};
-    }
-    public void handle(HttpExchange httpExchange) throws IOException {
-        System.out.println("Entered Get Pallets Handler");
-        JSONObject requestParams = GetParameterObject(httpExchange);
-        boolean isValidRequest = isRequestValid(requestParams);
-        displayRequestValidity(isValidRequest);
-        if(isValidRequest){
-            fulfillRequest(requestParams);
-        } else {
-            this.response = "invalid request";
-        }
-        int responseCode = isValidRequest ? 200 : 400;
-        Headers headers = httpExchange.getResponseHeaders();
-        headers.add("Access-Control-Allow-Origin", "*");
-        httpExchange.sendResponseHeaders(responseCode, this.response.length());
-        System.out.println("Response to Get Pallets Request : " + this.response);
-        OutputStream os = httpExchange.getResponseBody();
-        os.write(this.response.getBytes());
-        os.close();
+        handlerName = "GetCompanyPalletsHandler";
     }
 
     @Override
@@ -58,7 +41,7 @@ public class GetCompanyPalletsHandler extends HandlerPrototype implements HttpHa
     private JSONObject getItemDataByCompany(String cid){
         System.out.println("Attempting to get item data for company : " + cid);
         DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
-        String getItemDataSql = "SELECT id FROM table_pallets WHERE cid = ?";
+        String getItemDataSql = "SELECT mlot FROM table_pallets WHERE cid = ?";
         PreparedStatement getItemDataStatement = database.prepareStatement(getItemDataSql);
         JSONObject itemDataObject = new JSONObject();
         try{

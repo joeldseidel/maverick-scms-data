@@ -7,5 +7,6 @@ public enum MovementType {
     HoldReleased,
     HoldMisplaced,
     HoldReworked,
-    CycleOut
+    CycleOut,
+    CycleIn
 }

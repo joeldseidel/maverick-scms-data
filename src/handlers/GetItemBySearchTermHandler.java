@@ -17,44 +17,14 @@ import java.util.List;
  * @author Joel Seidel
  */
 public class GetItemBySearchTermHandler extends HandlerPrototype implements HttpHandler {
-    private String response;
+
     /**
      * Constructor to set the required keys with the super class
      */
     public GetItemBySearchTermHandler(){
         //Set the required keys within the super class
         requiredKeys = new String[] {"cid", "term", "token"};
-    }
-    /**
-     * Entry point for handler. Get parameters, verify request validity, fulfill request, return response to client
-     * @param httpExchange inherited from super class, set from client with params
-     * @throws IOException thrown if there is an issue with writing response data to client
-     */
-    @Override
-    public void handle(HttpExchange httpExchange) throws IOException{
-        //Get parameters from client
-        JSONObject requestParams = GetParameterObject(httpExchange);
-        //Determine validity of request parameters and validate token
-        boolean isValidRequest = isRequestValid(requestParams);
-        //Display in server console validity of the request for testing purposes
-        displayRequestValidity(isValidRequest);
-        if (isValidRequest) {
-            //Request was valid, fulfill the request with params
-            fulfillRequest(requestParams);
-        } else {
-            //Request was invalid, set response to reflect this
-            this.response = "invalid request";
-        }
-        //Create response to client
-        int responseCode = isValidRequest ? 200 : 400;
-        Headers headers = httpExchange.getResponseHeaders();
-        headers.add("Access-Control-Allow-Origin", "*");
-        httpExchange.sendResponseHeaders(responseCode, this.response.length());
-        System.out.println("Response to Get Item By Search Term Handler : " + this.response);
-        //Write response to the client
-        OutputStream os = httpExchange.getResponseBody();
-        os.write(this.response.getBytes());
-        os.close();
+        handlerName = "GetItemBySearchTermHandler";
     }
 
     /**

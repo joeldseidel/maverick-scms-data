@@ -4,10 +4,20 @@ import maverick_data.DatabaseInteraction;
 import maverick_types.DatabaseType;
 import maverick_types.LotType;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.concurrent.ThreadLocalRandom;
+
+import net.sourceforge.barbecue.Barcode;
+import net.sourceforge.barbecue.BarcodeFactory;
+import net.sourceforge.barbecue.BarcodeImageHandler;
+import org.apache.commons.codec.binary.Base64OutputStream;
+
+import javax.imageio.ImageIO;
 
 /*
  * @author Joel Seidel
@@ -60,5 +70,31 @@ public class LotNumberManager {
             sqlEx.printStackTrace();
         }
         return matchingLotCount == 0;
+    }
+
+    /**
+     * Create a barcode image from provided lot number and converts to base 64 string for return
+     * @param lotNumber lot number to generate barcode for
+     * @return Base64 string containing the barcode image
+     */
+    public String generateLotBarcodeString(long lotNumber){
+        String barcodeString = "";
+        try {
+            //Generate the Codabar barcode image
+            Barcode barCode = BarcodeFactory.createCodabar(Long.toString(lotNumber));
+            //Convert the barcode into a buffered image
+            BufferedImage barcodeImage = BarcodeImageHandler.getImage(barCode);
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            OutputStream b64 = new Base64OutputStream(os);
+            //Convert the image to a base64 string from png
+            ImageIO.write(barcodeImage, "png", b64);
+            //Convert the base 64 string to a UTF-8 string for return
+            barcodeString = os.toString("UTF-8");
+        } catch(Exception barcodeException){
+            //Things this ain't: it
+            barcodeException.printStackTrace();
+            return null;
+        }
+        return barcodeString;
     }
 }

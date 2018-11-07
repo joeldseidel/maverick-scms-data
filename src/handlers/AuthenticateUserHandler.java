@@ -25,43 +25,14 @@ import com.auth0.jwt.*;
  */
 
 public class AuthenticateUserHandler extends HandlerPrototype implements HttpHandler {
-    private String response;
+
     /**
      * Constructor to set this handler's required keys on handler context creation
      */
     public AuthenticateUserHandler(){
         //Set required keys in array inherited from HandlerPrototype super class
         requiredKeys = new String[] {"username", "password", "returnUserData"};
-    }
-    /**
-     * Entry point for handler. Get parameters, verify request validity, fulfill request, return response to client
-     * @param httpExchange inherited from super class, set from client with params
-     * @throws IOException thrown if there is an issue with writing response data to client
-     */
-    public void handle(HttpExchange httpExchange) throws IOException {
-        //Get parameters from client
-        JSONObject requestParams = GetParameterObject(httpExchange);
-        //Determine validity of request parameters and validate token
-        boolean isValidRequest = isRequestValid(requestParams);
-        //Display in server console validity of the request for testing purposes
-        displayRequestValidity(isValidRequest);
-        if(isValidRequest){
-            //Request was valid, fulfill the request with params
-            fulfillRequest(requestParams);
-        } else {
-            //Request was invalid, set response to reflect this
-            this.response = "invalid request";
-        }
-        //Create response to client
-        int responseCode = isValidRequest ? 200 : 400;
-        Headers headers = httpExchange.getResponseHeaders();
-        headers.add("Access-Control-Allow-Origin", "*");
-        httpExchange.sendResponseHeaders(responseCode, this.response.length());
-        System.out.println("Response to Add Pallet Request : " + this.response);
-        //Write response to the client
-        OutputStream os = httpExchange.getResponseBody();
-        os.write(this.response.getBytes());
-        os.close();
+        handlerName = "AuthenticateUserHandler";
     }
 
     /**
@@ -114,12 +85,13 @@ public class AuthenticateUserHandler extends HandlerPrototype implements HttpHan
      */
     private boolean isUserValid(String username, String password){
         boolean userIsValid;
-        boolean userExists = (UserDataManager.getUserCount(username) == 1);
+        UserDataManager userDataManager = new UserDataManager();
+        boolean userExists = (userDataManager.getUserCount(username) == 1);
         if(userExists){
             //Get UUID for password checking
-            long userUUID = UserDataManager.getUserUUID(username);
+            long userUUID = userDataManager.getUserUUID(username);
             //Query the password from the users table and see if it matches
-            userIsValid = UserDataManager.checkPasswordMatch(userUUID, password);
+            userIsValid = userDataManager.checkPasswordMatch(userUUID, password);
         } else {
             userIsValid = false;
         }

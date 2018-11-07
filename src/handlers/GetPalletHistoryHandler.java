@@ -21,44 +21,14 @@ import java.util.List;
  */
 
 public class GetPalletHistoryHandler extends HandlerPrototype implements HttpHandler{
-    private String response;
+
     /**
      * Constructor to set the required keys inherited from super class on creation of handler context
      */
     public GetPalletHistoryHandler(){
         //Set inherited required keys property to unique handler required keys
         requiredKeys = new String[]{"palletid", "cid", "token"};
-    }
-
-    /**
-     * Entry point for the handler. Get params, determine request validity, fulfill request, format and write return
-     * @param httpExchange inherited from super class to access request parameters from client.
-     */
-    @Override
-    public void handle(HttpExchange httpExchange) throws IOException {
-        //Get parameters from request http exchange
-        JSONObject requestParams = GetParameterObject(httpExchange);
-        //Determine validity of request parameters and validate token
-        boolean isValidRequest = isRequestValid(requestParams);
-        //Display in server console the validity of the request for testing purposes
-        displayRequestValidity(isValidRequest);
-        if(isValidRequest){
-            //Request was valid, fulfill the request with params
-            fulfillRequest(requestParams);
-        } else {
-            //Request was invalid, set response to reflect this
-            this.response = "invalid request";
-        }
-        //Create reponse to client
-        int responseCode = isValidRequest ? 200 : 400;
-        Headers headers = httpExchange.getResponseHeaders();
-        headers.add("Access-Control-Allow-Origin", "*");
-        httpExchange.sendResponseHeaders(responseCode, this.response.length());
-        System.out.println("Response to get pallet history request: " + this.response);
-        //Write response to the client
-        OutputStream os = httpExchange.getResponseBody();
-        os.write(this.response.getBytes());
-        os.close();
+        handlerName = "GetPalletHistoryHandler";
     }
 
     /**
@@ -99,8 +69,7 @@ public class GetPalletHistoryHandler extends HandlerPrototype implements HttpHan
             JSONObject thisEventObject = new JSONObject();
             //Get values from the movement event object and put into json object with corresponding key
             thisEventObject.put("movementtype", MovementEventManager.movementTypeToString(event.getType()));
-            thisEventObject.put("fromcid", event.getFromCompanyId());
-            thisEventObject.put("tocid", event.getToCompanyId());
+            thisEventObject.put("fromcid", event.getCompanyID());
             thisEventObject.put("movementtime", event.getMovementTime().toString());
             //Add the created JSON object to the cumulative json array
             movementEventJsonArray.put(thisEventObject);

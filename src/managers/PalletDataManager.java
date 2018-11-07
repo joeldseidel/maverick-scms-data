@@ -4,12 +4,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import maverick_data.DatabaseInteraction;
-import maverick_types.DatabaseType;
-import maverick_types.MaverickItem;
-import maverick_types.MaverickPallet;
+import maverick_types.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -38,17 +37,23 @@ public class PalletDataManager {
      * addPallet adds a pallet to the database
      */
     public void addPallet(MaverickPallet pallet) {
+        System.out.println("Trying to create pallet");
         String qryString = "INSERT INTO table_pallets (cid, mlot) VALUES (?, ?)";
         try{
             PreparedStatement qryStatement = this.database.prepareStatement(qryString);
             qryStatement.setString(1, pallet.getCustomerID());
             qryStatement.setString(2, pallet.getPalletID());
+            System.out.println("Trying to query with CID " + pallet.getCustomerID() + " and PID " + pallet.getPalletID());
             this.database.nonQuery(qryStatement);
         }catch(SQLException sqlEx){
             sqlEx.printStackTrace();
         }
+        PalletMovementEventManager palletMovementEventManager = new PalletMovementEventManager();
+        palletMovementEventManager.initializePalletMovement(pallet);
+        DeviceMovementEventManager deviceMovementEventManager = new DeviceMovementEventManager();
         for(MaverickItem item : pallet.getItems()){
             this.addItemToPallet(item, pallet.getPalletID());
+            deviceMovementEventManager.initializeItemMovement(item);
         }
     }
 
@@ -95,9 +100,8 @@ public class PalletDataManager {
         return palletItems;
     }
 
-    public static boolean palletExists(String palletId){
+    public boolean palletExists(String palletId){
         System.out.println("Attempting to get pallet validity for pallet with id : " + palletId);
-        DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
         String palletCountSql = "SELECT * FROM table_pallets WHERE mlot = ?";
         PreparedStatement palletCountStatement = database.prepareStatement(palletCountSql);
         try{
@@ -109,15 +113,12 @@ public class PalletDataManager {
         } catch(SQLException sqlEx){
             sqlEx.printStackTrace();
             return false;
-        } finally {
-            database.closeConnection();
         }
         return false;
     }
 
-    public static String getPalletCID(String palletId){
+    public String getPalletCID(String palletId){
         String cid = "notfound";
-        DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
         String getPalletCIDSql = "SELECT cid FROM table_pallets WHERE mlot = ?";
         PreparedStatement getPalletCIDStatement = database.prepareStatement(getPalletCIDSql);
         try{
@@ -127,8 +128,6 @@ public class PalletDataManager {
             cid = CIDResults.getString("cid");
         } catch(SQLException sqlEx){
             sqlEx.printStackTrace();
-        } finally {
-            database.closeConnection();
         }
         System.out.println("Got Pallet CID : " + cid);
         return cid;
@@ -137,9 +136,8 @@ public class PalletDataManager {
     /**
      * removePallet removes a pallet from the database
      */
-    public static void removePallet(String palletId) {
+    public void removePallet(String palletId) {
         //First, remove any items from the pallet
-        DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
         String qryString = "DELETE FROM table_itempalletmapping WHERE mlot = ?";
         PreparedStatement qryStatement = database.prepareStatement(qryString);
         try{
@@ -156,8 +154,6 @@ public class PalletDataManager {
             database.nonQuery(qryStatement);
         }catch(SQLException sqlEx){
             sqlEx.printStackTrace();
-        } finally {
-            database.closeConnection();
         }
     }
 
