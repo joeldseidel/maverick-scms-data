@@ -27,7 +27,8 @@ public class GetDeviceDataHandler extends HandlerPrototype implements HttpHandle
 
     @Override
     protected void fulfillRequest(JSONObject requestParams){
-        List<String> deviceIds = getParameterDeviceIds(requestParams.getJSONArray("devices"));
+        JSONArray deviceJsonArray = requestParams.getJSONArray("devices");
+        List<String> deviceIds = getParameterDeviceIds(deviceJsonArray);
         List<FDADevice> devices = getDeviceDataObjects(deviceIds);
         JSONArray deviceDataArray = getDeviceJsonArray(devices);
         this.response = new JSONObject().put("device_data", deviceDataArray).toString();

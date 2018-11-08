@@ -21,7 +21,7 @@ public class FDADevice {
             ResultSetMetaData metaData = resultSet.getMetaData();
             int columnCount = metaData.getColumnCount();
             //Loop through all the columns, get the column name and column value, and create a device property
-            for(int i = 0; i < columnCount; i++){
+            for(int i = 1; i <= columnCount; i++){
                 //Get the property value from the specified column
                 Object propertyValue = resultSet.getObject(i);
                 //Get the column name of the specified column

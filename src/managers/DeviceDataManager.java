@@ -26,7 +26,7 @@ public class DeviceDataManager {
 
     public FDADevice getDeviceByFdaId(String fdaId) throws SQLException{
         //Fetch the fda device from the database, create query to do so
-        String getDeviceRecordSql = "SELECT * FROM fda_data_devices WHERE fdaid = ?";
+        String getDeviceRecordSql = "SELECT * FROM devices WHERE fda_id = ?";
         PreparedStatement getDeviceRecordQuery = database.prepareStatement(getDeviceRecordSql);
         getDeviceRecordQuery.setString(1, fdaId);
         //Get the device from the database from prepared statement by fda id
