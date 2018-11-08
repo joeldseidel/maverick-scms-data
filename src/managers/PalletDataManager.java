@@ -41,6 +41,7 @@ public class PalletDataManager {
         String qryString = "INSERT INTO table_pallets (cid, mlot) VALUES (?, ?)";
         try{
             PreparedStatement qryStatement = this.database.prepareStatement(qryString);
+            System.out.println("Attempting add with " + pallet.getCustomerID() + " and " + pallet.getPalletID());
             qryStatement.setString(1, pallet.getCustomerID());
             qryStatement.setString(2, pallet.getPalletID());
             System.out.println("Trying to query with CID " + pallet.getCustomerID() + " and PID " + pallet.getPalletID());

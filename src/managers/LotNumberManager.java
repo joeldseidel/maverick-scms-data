@@ -39,7 +39,16 @@ public class LotNumberManager {
             } while(!isUniqueLot(lotType, randomLot));
             return randomLot;
         }
-        //TODO: write the pallet manifest generation when pallet manifests are built
+        else if(lotType == LotType.Pallet){
+            //Generate an item lot number until the generated lot is unique
+            long randomLot;
+            do{
+                //Generate the random lot number
+                randomLot = getRandomLotNumber(lotType);
+                //Generate lot numbers until unique
+            } while(!isUniqueLot(lotType, randomLot));
+            return randomLot;
+        }
         return 0;
     }
 
@@ -56,7 +65,8 @@ public class LotNumberManager {
 
     private boolean isUniqueLot(LotType lotType, long generatedLot){
         String checkTable = lotType == LotType.Item ? "table_items" : "table_pallets";
-        String getMatchingLotNumberSql = "SELECT COUNT(1) FROM " + checkTable + " WHERE mid = ?";
+        String checkField = lotType == LotType.Item ? "mid" : "mlot";
+        String getMatchingLotNumberSql = "SELECT COUNT(1) FROM " + checkTable + " WHERE " + checkField + " = ?";
         DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
         int matchingLotCount = 0;
         try{
