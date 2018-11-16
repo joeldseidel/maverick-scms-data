@@ -105,6 +105,33 @@ public class ItemDataManager {
     }
 
     /**
+     *getItemDataByCompany returns getItemDataResults
+     */
+
+    public ResultSet getItemDataByCompany(/*cid?*/String cid){
+
+        String getItemDataSql = "SELECT table_items.mid, table_items.fdaid, table_items.name, table_items.category, table_itempalletmapping.mlot FROM table_items LEFT JOIN table_itempalletmapping ON table_items.mid = table_itempalletmapping.mid AND table_items.cid = ?";
+        PreparedStatement getItemDataStatement = database.prepareStatement(getItemDataSql);
+
+        JSONObject itemDataObject = new JSONObject();
+        ResultSet getItemDataResults;
+        try {
+            getItemDataStatement.setString(1, cid);
+            getItemDataResults = database.query(getItemDataStatement);
+
+        }
+          catch(SQLException sqlEx) {
+              sqlEx.printStackTrace();
+              getItemDataResults = null;
+
+          }
+        return getItemDataResults;
+    }
+
+
+
+
+    /**
      * editName changes an item's name
      */
     public void editName(String mid, String newname) {
