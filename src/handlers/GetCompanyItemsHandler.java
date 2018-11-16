@@ -5,6 +5,7 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.Headers;
 import maverick_data.DatabaseInteraction;
 import maverick_types.DatabaseType;
+import managers.ItemDataManager;
 import org.json.JSONObject;
 import org.json.JSONArray;
 
@@ -39,23 +40,23 @@ public class GetCompanyItemsHandler extends HandlerPrototype implements HttpHand
     private JSONObject getItemDataByCompany(String cid){
         System.out.println("Attempting to get item data for company : " + cid);
         DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
-        String getItemDataSql = "SELECT table_items.mid, table_items.fdaid, table_items.name, table_items.category, table_itempalletmapping.mlot FROM table_items LEFT JOIN table_itempalletmapping ON table_items.mid = table_itempalletmapping.mid AND table_items.cid = ?";
-        PreparedStatement getItemDataStatement = database.prepareStatement(getItemDataSql);
-        JSONObject itemDataObject = new JSONObject();
-        try{
-            getItemDataStatement.setString(1, cid);
-            ResultSet getItemDataResults = database.query(getItemDataStatement);
+
+        ItemDataManager itemDataManager = new ItemDataManager();
+        ResultSet getItemDataResults = itemDataManager.getItemDataByCompany(cid);
+
+         JSONObject itemDataObject = new JSONObject();
             try{
                 itemDataObject.put("arrayResult",getItemDataFormattedResponse(getItemDataResults));
+            }
+            catch(SQLException sqlEx){
+                sqlEx.printStackTrace();
+                itemDataObject = null;
             }
             catch(Exception e){
                 System.out.println("Failed to get Formatted Response for " + e);
                 itemDataObject = null;
             }
-        } catch(SQLException sqlEx){
-            sqlEx.printStackTrace();
-            itemDataObject = null;
-        }
+
         finally{
             database.closeConnection();
         }
