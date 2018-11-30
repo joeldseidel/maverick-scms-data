@@ -2,6 +2,7 @@ package managers;
 
 import maverick_data.DatabaseInteraction;
 import maverick_types.DatabaseType;
+import org.json.JSONObject;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -98,6 +99,25 @@ public class UserDataManager {
         }
         System.out.println("Got User CID : " + cid);
         return cid;
+    }
+
+    /**
+     * getUserData returns getUserDataResults
+     */
+    public ResultSet getUserData(String username) {
+        String getUserDataSql = "SELECT * FROM table_users WHERE username = ?";
+        PreparedStatement getUserDataStatement = database.prepareStatement(getUserDataSql);
+        JSONObject userDataObject = new JSONObject();
+        ResultSet getUserDataResults;
+        try {
+            getUserDataStatement.setString(1, username);
+            getUserDataResults = database.query(getUserDataStatement);
+        }
+        catch(SQLException sqlEx){
+            sqlEx.printStackTrace();
+            getUserDataResults = null;
+        }
+     return getUserDataResults;
     }
 
     //Method to take byte array returned from hashing, and turn it into one string to compare with one from database

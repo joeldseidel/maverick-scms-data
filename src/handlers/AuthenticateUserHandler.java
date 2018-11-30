@@ -99,32 +99,29 @@ public class AuthenticateUserHandler extends HandlerPrototype implements HttpHan
         return userIsValid;
     }
 
-    /**
-     * Get user data from database by username as key
-     * @param username key of username to query by
-     * @return JSONObject containing structured user data from database query
-     */
-    //Todo: Migrate this method functionality to use manager class
+
     private JSONObject getUserData(String username){
         System.out.println("Attempting to get user data for username : " + username);
         DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
-        String getUserDataSql = "SELECT * FROM table_users WHERE username = ?";
-        PreparedStatement getUserDataStatement = database.prepareStatement(getUserDataSql);
+
+        UserDataManager userDataManager = new UserDataManager();
+        ResultSet getUserDataResults = userDataManager.getUserData(username);
         JSONObject userDataObject = new JSONObject();
         try{
-            getUserDataStatement.setString(1, username);
-            ResultSet getUserDataResults = database.query(getUserDataStatement);
-            try{
             userDataObject.put("arrayResult",getUserDataFormattedResponse(getUserDataResults));
+            }
+            catch(SQLException sqlEx) {
+                sqlEx.printStackTrace();
+                userDataObject = null;
             }
             catch(Exception e){
                 System.out.println("Failed to get Formatted Response");
                 userDataObject = null;
             }
-        } catch(SQLException sqlEx){
-            sqlEx.printStackTrace();
-            userDataObject = null;
-        }
+         finally{
+                database.closeConnection();
+            }
+
         System.out.println("Got User Data Object : " + userDataObject);
         return userDataObject;
     }

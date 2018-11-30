@@ -59,7 +59,7 @@ public class GetCompanyItemsHandler extends HandlerPrototype implements HttpHand
 
         finally{
             database.closeConnection();
-        }
+            }
         System.out.println("Got Item Data Object : " + itemDataObject);
         return itemDataObject;
     }
