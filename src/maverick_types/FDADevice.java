@@ -1,5 +1,7 @@
 package maverick_types;
 
+import com.joelseidel.java_datatable.Field;
+import com.joelseidel.java_datatable.TableRow;
 import org.json.JSONObject;
 
 import java.sql.ResultSet;
@@ -11,6 +13,9 @@ import java.util.List;
 public class FDADevice {
     List<FDADeviceProperty> deviceProperties = new ArrayList<>();
     public FDADevice() { }
+    public FDADevice(TableRow deviceRecordRow){
+        parseDevice(deviceRecordRow);
+    }
     /**
      * parseDevice parses a device from its database record to an FDADevice object which access to its properties
      * @param resultSet the incremented result set containing the row/record from the database
@@ -33,6 +38,11 @@ public class FDADevice {
             sqlEx.printStackTrace();
         }
     }
+    public void parseDevice(TableRow deviceRecordRow){
+        for(Field devicePropertyField : deviceRecordRow.getFields()){
+            deviceProperties.add(new FDADeviceProperty(devicePropertyField.getColumn().getName(), devicePropertyField.getValue()));
+        }
+    }
     /**
      * getPropertyCount returns the size of the device properties array
      * @return the size of the device properties array
@@ -47,6 +57,15 @@ public class FDADevice {
      */
     public FDADeviceProperty getProperty(int propertyIndex){
         return this.deviceProperties.get(propertyIndex);
+    }
+
+    public FDADeviceProperty getProperty(String propertyName){
+        for(FDADeviceProperty property : this.deviceProperties){
+            if(property.getPropertyName().equals(propertyName)){
+                return property;
+            }
+        }
+        return null;
     }
     /**
      * serializeToJson converts a device object back into a json object of its properties

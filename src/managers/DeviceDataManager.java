@@ -4,6 +4,8 @@ package managers;
  * Manages the database interaction of getting fda device data from the fda database
  */
 
+import com.joelseidel.java_datatable.DataTable;
+import com.joelseidel.java_datatable.TableRow;
 import maverick_data.DatabaseInteraction;
 import maverick_types.DatabaseType;
 import maverick_types.FDADevice;
@@ -11,6 +13,8 @@ import maverick_types.FDADevice;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DeviceDataManager {
     private DatabaseInteraction database;
@@ -38,5 +42,23 @@ public class DeviceDataManager {
             thisDevice.parseDevice(deviceRecordResults);
         }
         return thisDevice;
+    }
+
+    public List<FDADevice> getCompanyDevicesForImport(String company_name) {
+        String getCompanyDeviceRecordSql = "SELECT fda_id, device_name, medical_specialty_description FROM devices WHERE company_name = ?";
+        PreparedStatement getCompanyDeviceStatement = database.prepareStatement(getCompanyDeviceRecordSql);
+        DataTable companyDevices;
+        try {
+            getCompanyDeviceStatement.setString(1, company_name);
+            companyDevices = new DataTable(database.query(getCompanyDeviceStatement));
+        } catch(SQLException sqlEx) {
+            sqlEx.printStackTrace();
+            return null;
+        }
+        List<FDADevice> companyDevicesList = new ArrayList<>();
+        for(TableRow companyDeviceRecord : companyDevices.getRows()){
+            companyDevicesList.add(new FDADevice(companyDeviceRecord));
+        }
+        return companyDevicesList;
     }
 }

@@ -8,6 +8,7 @@ import java.util.List;
 
 import maverick_data.DatabaseInteraction;
 import maverick_types.DatabaseType;
+import maverick_types.FDADevice;
 import maverick_types.LotType;
 import maverick_types.MaverickItem;
 import org.json.JSONArray;
@@ -275,5 +276,26 @@ public class ItemDataManager {
             jsonArray.put(mItemObj);
         }
         return jsonArray;
+    }
+
+    public void importFDADevices(List<FDADevice> fdaDevices, String cid){
+        for(FDADevice device : fdaDevices){
+            String mid = Long.toString(generateItemLotNumber());
+            String fda_id = device.getProperty("fda_id").getPropertyValue().toString();
+            String name = device.getProperty("device_name").getPropertyValue().toString();
+            String category = device.getProperty("medical_specialty_description").getPropertyValue().toString();
+            String mInsertSql = "INSERT INTO table_items (mid, fdaid, name, category, cid) VALUES (?, ?, ?, ?, ?)";
+            PreparedStatement mInsertStmt = database.prepareStatement(mInsertSql);
+            try{
+                mInsertStmt.setString(1, mid);
+                mInsertStmt.setString(2, fda_id);
+                mInsertStmt.setString(3, name);
+                mInsertStmt.setString(4, category);
+                mInsertStmt.setString(5, cid);
+                database.nonQuery(mInsertStmt);
+            } catch(SQLException sqlEx) {
+                sqlEx.printStackTrace();
+            }
+        }
     }
 }
