@@ -27,6 +27,8 @@ import javax.imageio.ImageIO;
 
 
 public class LotNumberManager {
+    private DatabaseInteraction database;
+    public LotNumberManager(){ database = new DatabaseInteraction(DatabaseType.AppData); }
     public long generateLotNumber(LotType lotType){
         //Generate a random lot number to lot specifications, check if unique, and re-gen until unique
         if(lotType == LotType.Item){
@@ -67,14 +69,13 @@ public class LotNumberManager {
         String checkTable = lotType == LotType.Item ? "table_items" : "table_pallets";
         String checkField = lotType == LotType.Item ? "mid" : "mlot";
         String getMatchingLotNumberSql = "SELECT COUNT(1) FROM " + checkTable + " WHERE " + checkField + " = ?";
-        DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
         int matchingLotCount = 0;
         try{
             PreparedStatement matchingLotQuery = database.prepareStatement(getMatchingLotNumberSql);
             matchingLotQuery.setString(1, Long.toString(generatedLot));
             ResultSet matchingLotResult = database.query(matchingLotQuery);
             if(matchingLotResult.next()){
-                matchingLotCount = matchingLotResult.getInt(0);
+                matchingLotCount = matchingLotResult.getInt(1);
             }
         } catch(SQLException sqlEx){
             sqlEx.printStackTrace();

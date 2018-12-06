@@ -47,12 +47,8 @@ public class GetDeviceDataHandler extends HandlerPrototype implements HttpHandle
         DeviceDataManager deviceDataManager = new DeviceDataManager();
         List<FDADevice> devices = new ArrayList<>();
         for(String fdaId : deviceIds){
-            try {
-                FDADevice thisDevice = deviceDataManager.getDeviceByFdaId(fdaId);
-                devices.add(thisDevice);
-            } catch (SQLException sqlEx) {
-                sqlEx.printStackTrace();
-            }
+            FDADevice thisDevice = deviceDataManager.getDeviceByFdaId(fdaId);
+            devices.add(thisDevice);
         }
         return devices;
     }

@@ -28,18 +28,22 @@ public class DeviceDataManager {
      * @throws SQLException if and when the database fetching does not work or the results are null
      */
 
-    public FDADevice getDeviceByFdaId(String fdaId) throws SQLException{
+    public FDADevice getDeviceByFdaId(String fdaId) {
         //Fetch the fda device from the database, create query to do so
         String getDeviceRecordSql = "SELECT * FROM devices WHERE fda_id = ?";
         PreparedStatement getDeviceRecordQuery = database.prepareStatement(getDeviceRecordSql);
-        getDeviceRecordQuery.setString(1, fdaId);
-        //Get the device from the database from prepared statement by fda id
-        ResultSet deviceRecordResults = database.query(getDeviceRecordQuery);
         FDADevice thisDevice = new FDADevice();
-        //Increment the device record results to the first (and only) row matching the id
-        if(deviceRecordResults.next()){
-            //Parse the device from the row result
-            thisDevice.parseDevice(deviceRecordResults);
+        try {
+            getDeviceRecordQuery.setString(1, fdaId);
+            //Get the device from the database from prepared statement by fda id
+            ResultSet deviceRecordResults = database.query(getDeviceRecordQuery);
+            //Increment the device record results to the first (and only) row matching the id
+            if (deviceRecordResults.next()) {
+                //Parse the device from the row result
+                thisDevice.parseDevice(deviceRecordResults);
+            }
+        } catch(SQLException sqlEx){
+            sqlEx.printStackTrace();
         }
         return thisDevice;
     }

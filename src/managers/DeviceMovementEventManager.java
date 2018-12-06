@@ -71,6 +71,7 @@ public class DeviceMovementEventManager extends MovementEventManager {
             }
             //Execute created nonquery batch
             database.batchNonQuery(writeThisDeviceStatement);
+            database.commitBatches();
             //Reset database connection auto commit property now that the batch is completed
             database.setAutoCommit(true);
         } catch(SQLException sqlEx){
@@ -118,5 +119,23 @@ public class DeviceMovementEventManager extends MovementEventManager {
             //u failed nerd
             sqlEx.printStackTrace();
         }
+    }
+
+    public void initializeItemMovement(List<MaverickItem> items){
+        database.setAutoCommit(false);
+        PreparedStatement initItemMovementStmt = database.prepareStatement("INSERT INTO device_movements(movementtype, cid, movementtime, mid) VALUES(?, ?, NOW(), ?)");
+        for(MaverickItem item : items){
+            try{
+                initItemMovementStmt.setString(1, MovementEventManager.movementTypeToString(MovementType.CycleIn));
+                initItemMovementStmt.setString(2, item.getCustomerID());
+                initItemMovementStmt.setString(3, item.getMaverickID());
+                initItemMovementStmt.addBatch();
+            } catch (SQLException sqlEx) {
+                sqlEx.printStackTrace();
+            }
+        }
+        database.batchNonQuery(initItemMovementStmt);
+        database.commitBatches();
+        database.setAutoCommit(true);
     }
 }

@@ -151,13 +151,24 @@ public class DatabaseInteraction {
     public void batchNonQuery(PreparedStatement batchNonQueryStatement){
         try{
             batchNonQueryStatement.executeBatch();
+        } catch(SQLException sqlEx){
+            sqlEx.printStackTrace();
+        }
+    }
+
+    public void commitBatches(){
+        try{
             dbConn.commit();
         } catch(SQLException sqlEx){
             sqlEx.printStackTrace();
         }
     }
 
-    public void setAutoCommit(boolean isAutoCommit) throws SQLException{
-        dbConn.setAutoCommit(isAutoCommit);
+    public void setAutoCommit(boolean isAutoCommit) {
+        try{
+            dbConn.setAutoCommit(isAutoCommit);
+        } catch(SQLException sqlEx) {
+            sqlEx.printStackTrace();
+        }
     }
 }

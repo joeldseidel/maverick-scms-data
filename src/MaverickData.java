@@ -80,6 +80,7 @@ public class MaverickData {
         server.createContext("/get_items", new GetCompanyItemsHandler());
         server.createContext("/get_pallets", new GetCompanyPalletsHandler());
         server.createContext("/get_device_data", new GetDeviceDataHandler());
+        server.createContext("/get_item_device_data", new GetItemDeviceDataHandler());
         server.createContext("/add_po", new AddPurchaseOrderHandler());
         server.createContext("/add_pallet", new AddPalletHandler());
         server.createContext("/remove_pallet", new RemovePalletHandler());

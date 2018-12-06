@@ -3,14 +3,12 @@ package managers;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
 import maverick_data.DatabaseInteraction;
-import maverick_types.DatabaseType;
-import maverick_types.FDADevice;
-import maverick_types.LotType;
-import maverick_types.MaverickItem;
+import maverick_types.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -35,15 +33,18 @@ public class ItemDataManager {
      * addItem adds an item to the database
      */
     public void addItem(MaverickItem item) {
-        String qryString = "INSERT INTO table_items (mid, fdaid, name, category, cid) " + "VALUES (\"" +
-                item.getMaverickID() + "\", \"" +
-                item.getFdaID() + "\", \"" +
-                item.getItemName() + "\", \"" +
-                item.getItemCategory() + "\", \"" +
-                item.getCustomerID() + "\")";
-
-        PreparedStatement qryStatement = this.database.prepareStatement(qryString);
-        this.database.nonQuery(qryStatement);
+        String qryString = "INSERT INTO table_items (mid, fdaid, name, category, cid) " + "VALUES (?, ?, ?, ?, ?)";
+        PreparedStatement addItemStmt = database.prepareStatement(qryString);
+        try{
+            addItemStmt.setString(1, item.getMaverickID());
+            addItemStmt.setString(2, item.getFdaID());
+            addItemStmt.setString(3, item.getItemName());
+            addItemStmt.setString(4, item.getItemCategory());
+            addItemStmt.setString(5, item.getCustomerID());
+        } catch (SQLException sqlEx){
+            sqlEx.printStackTrace();
+        }
+        this.database.nonQuery(addItemStmt);
     }
 
     public MaverickItem getItem(String mid){
@@ -279,23 +280,38 @@ public class ItemDataManager {
     }
 
     public void importFDADevices(List<FDADevice> fdaDevices, String cid){
+        List<MaverickItem> importedMItems = new ArrayList<MaverickItem>();
+        LotNumberManager lotNumberManager = new LotNumberManager();
         for(FDADevice device : fdaDevices){
-            String mid = Long.toString(generateItemLotNumber());
+            String mid = Long.toString(lotNumberManager.generateLotNumber(LotType.Item));
             String fda_id = device.getProperty("fda_id").getPropertyValue().toString();
             String name = device.getProperty("device_name").getPropertyValue().toString();
             String category = device.getProperty("medical_specialty_description").getPropertyValue().toString();
-            String mInsertSql = "INSERT INTO table_items (mid, fdaid, name, category, cid) VALUES (?, ?, ?, ?, ?)";
-            PreparedStatement mInsertStmt = database.prepareStatement(mInsertSql);
+            MaverickItem thisItem = new MaverickItem(mid, fda_id, name, category, cid);
+            importedMItems.add(thisItem);
+        }
+        addItem(importedMItems);
+        DeviceMovementEventManager deviceMovementEventManager = new DeviceMovementEventManager();
+        deviceMovementEventManager.initializeItemMovement(importedMItems);
+    }
+
+    public void addItem(List<MaverickItem> items){
+        database.setAutoCommit(false);
+        PreparedStatement addItemStmt = database.prepareStatement("INSERT INTO table_items(mid, fdaid, name, category, cid) VALUES (?, ?, ?, ?, ?)");
+        for(MaverickItem item : items){
             try{
-                mInsertStmt.setString(1, mid);
-                mInsertStmt.setString(2, fda_id);
-                mInsertStmt.setString(3, name);
-                mInsertStmt.setString(4, category);
-                mInsertStmt.setString(5, cid);
-                database.nonQuery(mInsertStmt);
+                addItemStmt.setString(1, item.getMaverickID());
+                addItemStmt.setString(2, item.getFdaID());
+                addItemStmt.setString(3, item.getItemName());
+                addItemStmt.setString(4, item.getItemCategory());
+                addItemStmt.setString(5, item.getCustomerID());
+                addItemStmt.addBatch();
             } catch(SQLException sqlEx) {
                 sqlEx.printStackTrace();
             }
         }
+        database.batchNonQuery(addItemStmt);
+        database.commitBatches();
+        database.setAutoCommit(true);
     }
 }
