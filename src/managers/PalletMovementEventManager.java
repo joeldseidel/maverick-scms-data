@@ -63,7 +63,8 @@ public class PalletMovementEventManager extends MovementEventManager {
                 MovementType type = MovementEventManager.parseMovementType(getMovementsResult.getString("movementtype"));
                 String cid = getMovementsResult.getString("cid");
                 Date movementTime = getMovementsResult.getDate("movementtime");
-                PalletMovementEvent thisPalletMovementEvent = new PalletMovementEvent(pallet.getPalletID(), type, cid, movementTime);
+                String opid = getMovementsResult.getString("operatorid");
+                PalletMovementEvent thisPalletMovementEvent = new PalletMovementEvent(pallet.getPalletID(), type, cid, movementTime, opid);
                 palletMovementEvents.add(thisPalletMovementEvent);
             }
             return palletMovementEvents;
