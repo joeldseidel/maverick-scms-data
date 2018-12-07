@@ -108,13 +108,13 @@ public abstract class MovementEventManager {
     public static String movementStatusToString(MovementStatus movementStatus){
         switch(movementStatus){
             case InTransit:
-                return "InTransit";
+                return "In Transit";
             case InStorage:
-                return "InStorage";
+                return "In Storage";
             case OnHold:
-                return "OnHold";
+                return "On Hold";
             case CycledOut:
-                return "CycledOut";
+                return "Cycled Out";
              default:
                  return null;
         }
