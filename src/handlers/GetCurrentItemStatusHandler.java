@@ -10,6 +10,7 @@ import org.json.JSONObject;
 public class GetCurrentItemStatusHandler extends HandlerPrototype implements HttpHandler {
     public GetCurrentItemStatusHandler(){
         requiredKeys = new String[] {"mid", "cid", "token"};
+        handlerName = "GetCurrentItemStatusHandler";
     }
     @Override
     protected void fulfillRequest(JSONObject requestParams){
@@ -18,6 +19,11 @@ public class GetCurrentItemStatusHandler extends HandlerPrototype implements Htt
         MaverickItem mItem = new MaverickItem(mid);
         DeviceMovementEventManager deviceMovementEventManager = new DeviceMovementEventManager();
         MovementStatus currentStatus = deviceMovementEventManager.getCurrentStatus(mItem);
-        this.response = MovementEventManager.movementStatusToString(currentStatus);
+        if(currentStatus == null){
+            this.response = new JSONObject(0).put("status", "undefined pallet").toString();
+        } else {
+            String currentStatusString = MovementEventManager.movementStatusToString(currentStatus);
+            this.response = new JSONObject().put("status", currentStatusString).toString();
+        }
     }
 }

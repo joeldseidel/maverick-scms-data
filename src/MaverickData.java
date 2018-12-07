@@ -92,6 +92,7 @@ public class MaverickData {
         server.createContext("/get_item_by_lot", new GetItemByLotHandler());
         server.createContext("/get_item_by_search_term", new GetItemBySearchTermHandler());
         server.createContext("/get_current_pallet_status", new GetCurrentPalletStatusHandler());
+        server.createContext("/get_current_item_status", new GetCurrentItemStatusHandler());
         server.createContext("/import_company_devices", new ImportCompanyDevicesHandler());
         return server;
     }
