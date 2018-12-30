@@ -17,7 +17,7 @@ public class RaisePalletMovementEventHandler extends HandlerPrototype implements
      */
     public RaisePalletMovementEventHandler(){
         //Define the required keys in the super class
-        requiredKeys = new String[] {"palletid", "type", "cid", "opid", "token"};
+        requiredKeys = new String[] {"palletid", "type", "cid", "token"};
         handlerName = "RaisePalletMovementEventHandler";
     }
 
@@ -29,9 +29,8 @@ public class RaisePalletMovementEventHandler extends HandlerPrototype implements
         String palletid = requestParams.getString("palletid");
         String type = requestParams.getString("type");
         String cid = requestParams.getString("cid");
-        String opid = requestParams.getString("operatorid");
         //Create a pallet movement object from parameters
-        PalletMovementEvent thisPalletMovementEvent = new PalletMovementEvent(palletid, MovementEventManager.parseMovementType(type), cid, opid);
+        PalletMovementEvent thisPalletMovementEvent = new PalletMovementEvent(palletid, MovementEventManager.parseMovementType(type), cid, "");
         //Validate and commit movement event
         System.out.println("Successfully made pallet movement event!");
         if(thisPalletMovementEvent.isValid()){

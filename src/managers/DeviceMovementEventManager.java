@@ -37,7 +37,7 @@ public class DeviceMovementEventManager extends MovementEventManager {
         return null;
     }
     public void commitMovement(DeviceMovementEvent committedEvent){
-        String writeMovementEventSql = "INSERT INTO device_movements(mid, movementtype, cid movementtime) VALUES (?, ?, ?, NOW())";
+        String writeMovementEventSql = "INSERT INTO device_movements(mid, movementtype, cid, movementtime) VALUES (?, ?, ?, NOW())";
         PreparedStatement writeMovementEventStatement = database.prepareStatement(writeMovementEventSql);
         try{
             writeMovementEventStatement.setString(1, committedEvent.getItemId());

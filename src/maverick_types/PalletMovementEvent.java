@@ -55,7 +55,7 @@ public class PalletMovementEvent {
         palletMovementEventManager.commitMovement(this);
     }
     public MaverickPallet getPallet(){
-        return new MaverickPallet(palletid);
+        return new MaverickPallet(companyID, palletid);
     }
     public String getCompanyID(){
         return companyID;
