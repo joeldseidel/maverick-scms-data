@@ -49,7 +49,7 @@ public class DeviceMovementEventManager extends MovementEventManager {
         }
     }
     public void relatedDeviceMovementCommit(PalletMovementEvent palletMovementEvent){
-        String getPalletRelatedDevicesSql = "SELECT * FROM table_itempalletmapping WHERE mlot = ? ORDER BY movementtime DESC LIMIT 1";
+        String getPalletRelatedDevicesSql = "SELECT * FROM table_itempalletmapping WHERE mlot = ?";
         PreparedStatement getPalletRelatedDevicesStatement = database.prepareStatement(getPalletRelatedDevicesSql);
         try{
             getPalletRelatedDevicesStatement.setString(1, palletMovementEvent.getPallet().getPalletID());
