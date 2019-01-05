@@ -8,7 +8,7 @@ public class DeviceMovementEvent {
     private String mid, companyID;
     private MovementType type;
     private Date movementTime;
-    private DeviceMovementEventManager deviceMovementEventManager = new DeviceMovementEventManager();
+    private DeviceMovementEventManager deviceMovementEventManager;
     public DeviceMovementEvent(String mid, String companyID, MovementType type){
         this.mid = mid;
         this.companyID = companyID;
@@ -21,6 +21,7 @@ public class DeviceMovementEvent {
         this.movementTime = movementTime;
     }
     public boolean isValid(){
+        deviceMovementEventManager = new DeviceMovementEventManager();
         MovementStatus currentStatus = deviceMovementEventManager.getCurrentStatus(getItem());
         if(!deviceMovementEventManager.isLegalMovement(currentStatus, type)){
             return false;
@@ -28,7 +29,7 @@ public class DeviceMovementEvent {
         //Todo: implement checks for other things probably
         return true;
     }
-    public void commit(){ deviceMovementEventManager.commitMovement(this); }
+    public void commit(){ new DeviceMovementEventManager().commitMovement(this); }
 
     public String getItemId(){
         return mid;
