@@ -8,9 +8,7 @@ import com.joelseidel.java_datatable.DataTable;
 import com.joelseidel.java_datatable.TableRow;
 import maverick_data.DatabaseInteraction;
 import maverick_types.DatabaseType;
-import maverick_types.FDADeviceTypes.FDADevice;
-import maverick_types.FDADeviceTypes.FDADeviceCustomerContact;
-import maverick_types.FDADeviceTypes.FDADeviceProperty;
+import maverick_types.FDADeviceTypes.*;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -81,6 +79,44 @@ public class DeviceDataManager {
             sqlEx.printStackTrace();
         }
         return customerContacts;
+    }
+
+    private List<FDADeviceSize> getDeviceSizes(String fdaId){
+        List<FDADeviceSize> deviceSizes = new ArrayList<>();
+        String getDeviceSizesSql = "SELECT * FROM device_device_sizes WHERE fda_id = ?";
+        PreparedStatement getDeviceSizesQuery = database.prepareStatement(getDeviceSizesSql);
+        try{
+            getDeviceSizesQuery.setString(1, fdaId);
+            DataTable deviceSizesResult = new DataTable(database.query(getDeviceSizesQuery));
+            for(TableRow deviceSizeRecord : deviceSizesResult.getRows()){
+                String text = deviceSizeRecord.getField(0).getValue().toString();
+                String type = deviceSizeRecord.getField(1).getValue().toString();
+                String value = deviceSizeRecord.getField(2).getValue().toString();
+                String unit = deviceSizeRecord.getField(3).getValue().toString();
+                deviceSizes.add(new FDADeviceSize(text, type, value, unit));
+            }
+        } catch(SQLException sqlEx) {
+            sqlEx.printStackTrace();
+        }
+        return deviceSizes;
+    }
+
+    private List<FDADeviceGmdnTerm> getGmdnTerms(String fdaId){
+        List<FDADeviceGmdnTerm> gmdnTerms = new ArrayList<>();
+        String getGmdnTermsSql = "SELECT * FROM device_gmdn_terms WHERE fda_id = ?";
+        PreparedStatement getGmdnTermsQuery = database.prepareStatement(getGmdnTermsSql);
+        try{
+            getGmdnTermsQuery.setString(1, fdaId);
+            DataTable gmdnTermsResult = new DataTable(database.query(getGmdnTermsQuery));
+            for(TableRow gmdnTermRecord : gmdnTermsResult.getRows()){
+                String name = gmdnTermRecord.getField(0).getValue().toString();
+                String definition = gmdnTermRecord.getField(1).getValue().toString();
+                gmdnTerms.add(new FDADeviceGmdnTerm(name, definition));
+            }
+        } catch(SQLException sqlEx){
+            sqlEx.printStackTrace();
+        }
+        return gmdnTerms;
     }
 
     public List<FDADevice> getCompanyDevicesForImport(String company_name) {
