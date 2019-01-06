@@ -9,6 +9,7 @@ import com.joelseidel.java_datatable.TableRow;
 import maverick_data.DatabaseInteraction;
 import maverick_types.DatabaseType;
 import maverick_types.FDADeviceTypes.FDADevice;
+import maverick_types.FDADeviceTypes.FDADeviceCustomerContact;
 import maverick_types.FDADeviceTypes.FDADeviceProperty;
 
 import java.sql.PreparedStatement;
@@ -53,18 +54,33 @@ public class DeviceDataManager {
         return thisDevice;
     }
 
-    private List<FDADeviceProperty> getDeviceCustomerContacts(String fdaId){
-        String getDeviceCustomerContacts = "SELECT * FROM device_customer_contacts WHERE fda_id = ?";
-        PreparedStatement getDeviceCustomerContactsQuery = database.prepareStatement(getDeviceCustomerContacts);
-        try {
-            getDeviceCustomerContactsQuery.setString(1, fdaId);
-            DataTable customerContactsResults = new DataTable(database.query(getDeviceCustomerContactsQuery));
-            for (TableRow ccRecord : customerContactsResults.getRows()) {
-
+    /**
+     * Create a list of customer contacts for a given fda id from the database
+     * @param fdaId fda id of device
+     * @return list of customer contacts for device
+     */
+    private List<FDADeviceCustomerContact> getCustomerContacts(String fdaId){
+        List<FDADeviceCustomerContact> customerContacts = new ArrayList<>();
+        //Prepare query statement to get customer contacts for the specified device id
+        String getCustomerContactsSql = "SELECT * FROM device_customer_contacts WHERE fda_id = ?";
+        PreparedStatement getCustomerContactsQuery = database.prepareStatement(getCustomerContactsSql);
+        try{
+            getCustomerContactsQuery.setString(1, fdaId);
+            //Get data table result of customer contact query
+            DataTable customerContactsResult = new DataTable(database.query(getCustomerContactsQuery));
+            //Create a customer contact object for each query result record
+            for(TableRow customerContactRecord : customerContactsResult.getRows()){
+                //Get the necessary data from each of the record
+                String email = customerContactRecord.getField(0).getValue().toString();
+                String phone = customerContactRecord.getField(1).getValue().toString();
+                String text = customerContactRecord.getField(2).getValue().toString();
+                //Add the customer contact record to the object list
+                customerContacts.add(new FDADeviceCustomerContact(email, phone, text));
             }
-        } catch(SQLException sqlEx) {
+        } catch(SQLException sqlEx){
             sqlEx.printStackTrace();
         }
+        return customerContacts;
     }
 
     public List<FDADevice> getCompanyDevicesForImport(String company_name) {
