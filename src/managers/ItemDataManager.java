@@ -3,12 +3,12 @@ package managers;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
 import maverick_data.DatabaseInteraction;
 import maverick_types.*;
+import maverick_types.FDADeviceTypes.FDADevice;
 import org.json.JSONArray;
 import org.json.JSONObject;
 

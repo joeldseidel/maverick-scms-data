@@ -1,4 +1,4 @@
-package maverick_types;
+package maverick_types.FDADeviceTypes;
 
 import com.joelseidel.java_datatable.Field;
 import com.joelseidel.java_datatable.TableRow;
@@ -12,6 +12,15 @@ import java.util.List;
 
 public class FDADevice {
     List<FDADeviceProperty> deviceProperties = new ArrayList<>();
+    //FIXME: devices need to be connected with their property categories, which need to be their own types
+    List<FDADeviceCustomerContact> deviceCustomerContacts = new ArrayList<>();
+    List<FDADeviceSize> deviceSizes = new ArrayList<>();
+    List<FDADeviceGmdnTerm> deviceGmdnTerms = new ArrayList<>();
+    List<FDADeviceIdentifier> deviceIdentifiers = new ArrayList<>();
+    List<FDADevicePremarketSubmission> devicePremarketSubmissions = new ArrayList<>();
+    List<FDADeviceProductCode> deviceProductCodes = new ArrayList<>();
+    List<FDADeviceStorage> deviceStorages = new ArrayList<>();
+
     public FDADevice() { }
     public FDADevice(TableRow deviceRecordRow){
         parseDevice(deviceRecordRow);
@@ -67,6 +76,17 @@ public class FDADevice {
         }
         return null;
     }
+
+    /**
+     * Add a property to this fda device
+     * @param propertyName Name of the property to add
+     * @param propertyValue Value of the property to add
+     */
+    public void addProperty(String propertyName, Object propertyValue){
+        FDADeviceProperty thisProperty = new FDADeviceProperty(propertyName, propertyValue);
+        deviceProperties.add(thisProperty);
+    }
+
     /**
      * serializeToJson converts a device object back into a json object of its properties
      * @param fdaDevice the device to be serialized into a json object

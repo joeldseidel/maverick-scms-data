@@ -8,7 +8,8 @@ import com.joelseidel.java_datatable.DataTable;
 import com.joelseidel.java_datatable.TableRow;
 import maverick_data.DatabaseInteraction;
 import maverick_types.DatabaseType;
-import maverick_types.FDADevice;
+import maverick_types.FDADeviceTypes.FDADevice;
+import maverick_types.FDADeviceTypes.FDADeviceProperty;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -29,10 +30,14 @@ public class DeviceDataManager {
      */
 
     public FDADevice getDeviceByFdaId(String fdaId) {
+        FDADevice thisDevice = new FDADevice();
         //Fetch the fda device from the database, create query to do so
+        thisDevice = getDeviceDetails(thisDevice, fdaId);
+    }
+
+    private FDADevice getDeviceDetails(FDADevice thisDevice, String fdaId) {
         String getDeviceRecordSql = "SELECT * FROM devices WHERE fda_id = ?";
         PreparedStatement getDeviceRecordQuery = database.prepareStatement(getDeviceRecordSql);
-        FDADevice thisDevice = new FDADevice();
         try {
             getDeviceRecordQuery.setString(1, fdaId);
             //Get the device from the database from prepared statement by fda id
@@ -46,6 +51,20 @@ public class DeviceDataManager {
             sqlEx.printStackTrace();
         }
         return thisDevice;
+    }
+
+    private List<FDADeviceProperty> getDeviceCustomerContacts(String fdaId){
+        String getDeviceCustomerContacts = "SELECT * FROM device_customer_contacts WHERE fda_id = ?";
+        PreparedStatement getDeviceCustomerContactsQuery = database.prepareStatement(getDeviceCustomerContacts);
+        try {
+            getDeviceCustomerContactsQuery.setString(1, fdaId);
+            DataTable customerContactsResults = new DataTable(database.query(getDeviceCustomerContactsQuery));
+            for (TableRow ccRecord : customerContactsResults.getRows()) {
+
+            }
+        } catch(SQLException sqlEx) {
+            sqlEx.printStackTrace();
+        }
     }
 
     public List<FDADevice> getCompanyDevicesForImport(String company_name) {

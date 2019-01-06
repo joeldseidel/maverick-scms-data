@@ -1,16 +1,12 @@
 package handlers;
 
-import com.sun.net.httpserver.Headers;
-import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import managers.DeviceDataManager;
 import maverick_data.DatabaseInteraction;
-import maverick_types.FDADevice;
+import maverick_types.FDADeviceTypes.FDADevice;
 import org.json.JSONObject;
 import org.json.JSONArray;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;

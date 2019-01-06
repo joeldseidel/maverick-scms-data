@@ -3,7 +3,7 @@ package handlers;
 import com.sun.net.httpserver.HttpHandler;
 import managers.DeviceDataManager;
 import managers.ItemDataManager;
-import maverick_types.FDADevice;
+import maverick_types.FDADeviceTypes.FDADevice;
 import maverick_types.MaverickItem;
 import org.json.JSONObject;
 
