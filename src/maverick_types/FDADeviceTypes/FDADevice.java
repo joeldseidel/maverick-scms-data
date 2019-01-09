@@ -2,6 +2,8 @@ package maverick_types.FDADeviceTypes;
 
 import com.joelseidel.java_datatable.Field;
 import com.joelseidel.java_datatable.TableRow;
+import managers.DeviceDataManager;
+import maverick_types.DeviceMovementEvent;
 import org.json.JSONObject;
 
 import java.sql.ResultSet;
@@ -12,7 +14,6 @@ import java.util.List;
 
 public class FDADevice {
     List<FDADeviceProperty> deviceProperties = new ArrayList<>();
-    //FIXME: devices need to be connected with their property categories, which need to be their own types
     List<FDADeviceCustomerContact> deviceCustomerContacts = new ArrayList<>();
     List<FDADeviceSize> deviceSizes = new ArrayList<>();
     List<FDADeviceGmdnTerm> deviceGmdnTerms = new ArrayList<>();
@@ -52,6 +53,16 @@ public class FDADevice {
             deviceProperties.add(new FDADeviceProperty(devicePropertyField.getColumn().getName(), devicePropertyField.getValue()));
         }
     }
+    public void getDevicePropertyObjects(DeviceDataManager deviceDataManager){
+        String fdaId = getProperty("fda_id").getPropertyValue().toString();
+        this.deviceCustomerContacts = deviceDataManager.getCustomerContacts(fdaId);
+        this.deviceSizes = deviceDataManager.getDeviceSizes(fdaId);
+        this.deviceGmdnTerms = deviceDataManager.getGmdnTerms(fdaId);
+        this.deviceIdentifiers = deviceDataManager.getIdentifiers(fdaId);
+        this.devicePremarketSubmissions = deviceDataManager.getPremarketSubmissions(fdaId);
+        this.deviceProductCodes = deviceDataManager.getProductCodes(fdaId);
+        this.deviceStorages = deviceDataManager.getStorages(fdaId);
+    }
     /**
      * getPropertyCount returns the size of the device properties array
      * @return the size of the device properties array
@@ -75,16 +86,6 @@ public class FDADevice {
             }
         }
         return null;
-    }
-
-    /**
-     * Add a property to this fda device
-     * @param propertyName Name of the property to add
-     * @param propertyValue Value of the property to add
-     */
-    public void addProperty(String propertyName, Object propertyValue){
-        FDADeviceProperty thisProperty = new FDADeviceProperty(propertyName, propertyValue);
-        deviceProperties.add(thisProperty);
     }
 
     /**
