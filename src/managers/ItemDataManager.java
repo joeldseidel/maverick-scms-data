@@ -15,18 +15,12 @@ import org.json.JSONObject;
 /**
  * Abstracts away all of the database interaction necessary to work with items in our databases
  */
-public class ItemDataManager {
-
-    /**
-     * The database connection to use when working with data
-     */
-    private DatabaseInteraction database;
-
+public class ItemDataManager extends ManagerPrototype {
     /**
      * Constructor for the ItemDataManager class
      */
     public ItemDataManager() {
-        this.database = new DatabaseInteraction(DatabaseType.AppData);
+        initDb(DatabaseType.AppData);
     }
 
     /**

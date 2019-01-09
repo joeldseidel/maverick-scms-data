@@ -8,7 +8,7 @@ package managers;
 
 import maverick_types.*;
 
-public abstract class MovementEventManager {
+public abstract class MovementEventManager extends ManagerPrototype {
     /**
      * Convert a movement type string to a movement type type
      * @param movementTypeString the string to convert to a type

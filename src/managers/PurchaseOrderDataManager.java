@@ -16,18 +16,12 @@ import maverick_types.MaverickPurchaseOrderLine;
 /**
  * Abstracts away all of the database interaction necessary to work with items in our databases
  */
-public class PurchaseOrderDataManager {
-
-    /**
-     * The database connection to use when working with data
-     */
-    private DatabaseInteraction database;
-
+public class PurchaseOrderDataManager extends ManagerPrototype {
     /**
      * Constructor for the PurchaseOrderDataManager class
      */
     public PurchaseOrderDataManager() {
-        this.database = new DatabaseInteraction(DatabaseType.AppData);
+        initDb(DatabaseType.AppData);
     }
 
     /**

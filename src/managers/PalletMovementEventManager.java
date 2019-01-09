@@ -15,8 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PalletMovementEventManager extends MovementEventManager {
-    private DatabaseInteraction database;
-    public PalletMovementEventManager(){ database = new DatabaseInteraction(DatabaseType.AppData); }
+    public PalletMovementEventManager(){ initDb(DatabaseType.AppData); }
     public MovementStatus getCurrentStatus(MaverickPallet pallet){
         String getCurrentStatusSql = "SELECT * FROM pallet_movements WHERE palletid = ? ORDER BY movementtime DESC LIMIT 1";
         PreparedStatement currentStatusStmt = database.prepareStatement(getCurrentStatusSql);

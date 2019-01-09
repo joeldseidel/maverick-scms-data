@@ -13,24 +13,16 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
- * /*
- * @author Joshua Famous
- *
  * Manager class for creating pallets, and adding/removing items from them
+ * @author Joshua Famous
  */
 
-public class PalletDataManager {
-
-    /**
-     * The database connection to use when working with data
-     */
-    private DatabaseInteraction database;
-
+public class PalletDataManager extends ManagerPrototype {
     /**
      * Constructor for the PalletDataManager class
      */
     public PalletDataManager() {
-        this.database = new DatabaseInteraction(DatabaseType.AppData);
+        initDb(DatabaseType.AppData);
     }
 
     /**

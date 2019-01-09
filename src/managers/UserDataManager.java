@@ -11,12 +11,11 @@ import java.sql.SQLException;
 import java.security.MessageDigest;
 import java.nio.charset.StandardCharsets;
 
-public class UserDataManager {
+public class UserDataManager extends ManagerPrototype {
 
     private static MessageDigest messageDigestSHA;
-    private DatabaseInteraction database;
 
-    public UserDataManager() { database = new DatabaseInteraction(DatabaseType.AppData); }
+    public UserDataManager() { initDb(DatabaseType.AppData); }
 
     public int getUserCount(String username){
         System.out.println("Attempting to get user count for username : " + username);

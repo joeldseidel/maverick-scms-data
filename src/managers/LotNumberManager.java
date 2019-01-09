@@ -20,15 +20,11 @@ import org.apache.commons.codec.binary.Base64OutputStream;
 import javax.imageio.ImageIO;
 
 /*
- * @author Joel Seidel
- *
  * Manager class for generating an maintain lot numbers for both items and pallets
+ * @author Joel Seidel
  */
-
-
-public class LotNumberManager {
-    private DatabaseInteraction database;
-    public LotNumberManager(){ database = new DatabaseInteraction(DatabaseType.AppData); }
+public class LotNumberManager extends ManagerPrototype{
+    public LotNumberManager(){ initDb(DatabaseType.AppData); }
     public long generateLotNumber(LotType lotType){
         //Generate a random lot number to lot specifications, check if unique, and re-gen until unique
         if(lotType == LotType.Item){

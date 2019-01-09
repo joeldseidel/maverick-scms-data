@@ -1,6 +1,5 @@
 package managers;
 
-import maverick_data.DatabaseInteraction;
 import maverick_types.*;
 
 import java.sql.PreparedStatement;
@@ -12,14 +11,10 @@ import java.util.List;
 
 /*
  *  @author Joel Seidel
- *
  *  Data manager for device movement events
  */
-
-
 public class DeviceMovementEventManager extends MovementEventManager {
-    private DatabaseInteraction database;
-    public DeviceMovementEventManager() { database = new DatabaseInteraction(DatabaseType.AppData); }
+    public DeviceMovementEventManager() { initDb(DatabaseType.AppData); }
     public MovementStatus getCurrentStatus(MaverickItem item){
         String getCurrentStatusSql = "SELECT * FROM device_movements WHERE mid = ? ORDER BY movementtime DESC LIMIT 1";
         PreparedStatement currentStatusStmt = database.prepareStatement(getCurrentStatusSql);
