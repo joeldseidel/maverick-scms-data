@@ -14,6 +14,7 @@ import org.json.JSONObject;
 
 /**
  * Abstracts away all of the database interaction necessary to work with items in our databases
+ * @author Joshua Famous, Joel Seidel
  */
 public class ItemDataManager extends ManagerPrototype {
     /**
@@ -24,9 +25,11 @@ public class ItemDataManager extends ManagerPrototype {
     }
 
     /**
-     * addItem adds an item to the database
+     * Add item record to the database
+     * @param item item to add to the database
      */
     public void addItem(MaverickItem item) {
+        //Create add item query
         String qryString = "INSERT INTO table_items (mid, fdaid, name, category, cid) " + "VALUES (?, ?, ?, ?, ?)";
         PreparedStatement addItemStmt = database.prepareStatement(qryString);
         try{
@@ -38,10 +41,17 @@ public class ItemDataManager extends ManagerPrototype {
         } catch (SQLException sqlEx){
             sqlEx.printStackTrace();
         }
-        this.database.nonQuery(addItemStmt);
+        //Perform add item query
+        database.nonQuery(addItemStmt);
     }
 
+    /**
+     * Get item from the database by mlot
+     * @param mid mlot of the item
+     * @return maverick item instance of specified item
+     */
     public MaverickItem getItem(String mid){
+        //Create get item query
         String getItemQuery = "SELECT * FROM table_items WHERE mid = ?";
         MaverickItem thisItem = null;
         try{
@@ -49,6 +59,7 @@ public class ItemDataManager extends ManagerPrototype {
             getItemStatement.setString(1, mid);
             ResultSet getItemResults = database.query(getItemStatement);
             if(getItemResults.next()){
+                //Get fields for instantiation of maverick item
                 String fdaid = getItemResults.getString("fdaid");
                 String name = getItemResults.getString("name");
                 String category = getItemResults.getString("category");
@@ -57,41 +68,66 @@ public class ItemDataManager extends ManagerPrototype {
             }
         } catch(SQLException sqlEx){
             sqlEx.printStackTrace();
+            //Couldn't get item
             thisItem = null;
         }
         return thisItem;
     }
 
+    /**
+     * Generate an mlot value for this item
+     * @return generated mlot value
+     */
     public static long generateItemLotNumber(){
         LotNumberManager lotNumber = new LotNumberManager();
+        //Generate an return generated lot number
         return lotNumber.generateLotNumber(LotType.Item);
     }
 
+    /**
+     * Get if an item exists in the database with a specified mlot value
+     * @param mid mlot value to check
+     * @return boolean exists in data
+     */
     public boolean itemExists(String mid){
         System.out.println("Attempting to get item count for item with mid : " + mid);
+        //Create get item query
         String itemCountSQL = "SELECT rowid FROM table_items WHERE mid = ?";
         PreparedStatement itemCountStatement = database.prepareStatement(itemCountSQL);
         try{
             itemCountStatement.setString(1, mid);
+            //Perform query
             ResultSet getItemResults = database.query(itemCountStatement);
             if (getItemResults.next()){
+                //Results have at least one row, item exists
                 return true;
             }
         } catch(SQLException sqlEx){
             sqlEx.printStackTrace();
             return false;
         }
+        //Item did not have more than one row, item does not exist
         return false;
     }
 
+    /**
+     * Get the company id associated with an item
+     * @param mid lot of the device to lookup
+     * @return company id of the item
+     */
     public String getItemCID(String mid){
         String cid = "notfound";
+        //Create the get company id query
         String getItemCIDSql = "SELECT cid FROM table_items WHERE mid = ?";
         PreparedStatement getItemCIDStatement = database.prepareStatement(getItemCIDSql);
         try{
             getItemCIDStatement.setString(1, mid);
+            //Perform the query
             ResultSet CIDResults = database.query(getItemCIDStatement);
+            //Advance result set cursor as there will only be one result
+            //FIXME: remove the not found and change to a null return type
             CIDResults.next();
+            //Get customer id field
             cid = CIDResults.getString("cid");
         } catch(SQLException sqlEx){
             sqlEx.printStackTrace();
@@ -101,110 +137,134 @@ public class ItemDataManager extends ManagerPrototype {
     }
 
     /**
-     *getItemDataByCompany returns getItemDataResults
+     * Get item data related to a specific company
+     * @param cid company id of the specified company
+     * @return result set containing the item data for the company
      */
-
     public ResultSet getItemDataByCompany(String cid){
-
+        //Create the get item data by company query
         String getItemDataSql = "SELECT table_items.mid, table_items.fdaid, table_items.name, table_items.category, table_itempalletmapping.mlot FROM table_items LEFT JOIN table_itempalletmapping ON table_items.mid = table_itempalletmapping.mid AND table_items.cid = ?";
         PreparedStatement getItemDataStatement = database.prepareStatement(getItemDataSql);
 
+        //FIXME remove this unused variable
         JSONObject itemDataObject = new JSONObject();
         ResultSet getItemDataResults;
         try {
+            //Perform query
             getItemDataStatement.setString(1, cid);
             getItemDataResults = database.query(getItemDataStatement);
-
         }
           catch(SQLException sqlEx) {
               sqlEx.printStackTrace();
               getItemDataResults = null;
-
           }
         return getItemDataResults;
     }
 
 
     /**
-     * editName changes an item's name
+     * Change the name of an item in the database
+     * @param mid mlot of the item to edit
+     * @param newname name to update the item to have
      */
     public void editName(String mid, String newname) {
+        //Create the update item query
         String qryString = "UPDATE table_items SET name = ? WHERE mid = ?";
         PreparedStatement qryStatement = database.prepareStatement(qryString);
         try{
             qryStatement.setString(1, newname);
             qryStatement.setString(2, mid);
+            //Perform the update nonquery
             database.nonQuery(qryStatement);
         }catch(SQLException sqlEx){
             sqlEx.printStackTrace();
         } finally {
+            //FIXME db conn is closed on finalize, not on the completion of a query
             database.closeConnection();
         }
     }
 
     /**
-     * editCategory changes an item's category
+     * Change the category of an item in the database
+     * @param mid mlot of the item to edit
+     * @param newcategory new category for the item
      */
     public void editCategory(String mid, String newcategory) {
+        //Create the update category query
         String qryString = "UPDATE table_items SET category = ? WHERE mid = ?";
         PreparedStatement qryStatement = database.prepareStatement(qryString);
         try{
             qryStatement.setString(1, newcategory);
             qryStatement.setString(2, mid);
+            //Perform the update nonquery
             database.nonQuery(qryStatement);
         }catch(SQLException sqlEx){
             sqlEx.printStackTrace();
         } finally {
+            //FIXME db conn is closed on finalize, not on the completion of a query
             database.closeConnection();
         }
     }
 
     /**
-     * removeItem removes an item from the database
+     * Remove an item from the database
+     * @param mid mlot of the item to remove from the database
      */
     public void removeItem(String mid) {
+        //Create the delete query
         String qryString = "DELETE FROM table_items WHERE mid = ?";
         PreparedStatement qryStatement = database.prepareStatement(qryString);
         try{
             qryStatement.setString(1, mid);
+            //Perform the delete nonquery
             database.nonQuery(qryStatement);
         }catch(SQLException sqlEx){
             sqlEx.printStackTrace();
         } finally {
+            //FIXME db conn is closed on finalize, not on the completion of a query
             database.closeConnection();
         }
     }
 
     /**
-     * removeFromPallet removes an item from a pallet
+     * Remove an item from a pallet
+     * @param mid mlot of the item to remove from its current pallet
      */
     public void removeFromPallet(String mid) {
+        //Create delete from pallet mapping query
         String qryString = "DELETE FROM table_itempalletmapping WHERE mid = ?";
         PreparedStatement qryStatement = database.prepareStatement(qryString);
         try{
             qryStatement.setString(1, mid);
+            //Perform delete nonquery
             database.nonQuery(qryStatement);
         }catch(SQLException sqlEx){
             sqlEx.printStackTrace();
         } finally {
+            //FIXME db conn is closed on finalize, not on the completion of a query
             database.closeConnection();
         }
     }
 
     /**
-     * updatePallet changes an item's pallet
+     * Change an items pallet
+     * @param mid mlot of the item to change the pallet for
+     * @param pallet mlot of the pallet to change this item mapping to
      */
     public void updatePallet(String mid, String pallet) {
+        //Create pallet mapping record insert query
         String qryString = "INSERT INTO table_itempalletmapping (mid, mlot) VALUES (?, ?) ON DUPLICATE KEY UPDATE mlot=?";
         PreparedStatement qryStatement = database.prepareStatement(qryString);
         try{
             qryStatement.setString(1, mid);
             qryStatement.setString(2, pallet);
             qryStatement.setString(3, pallet);
+            //Perform pallet mapping record insert query
             database.nonQuery(qryStatement);
         }catch(SQLException sqlEx){
             sqlEx.printStackTrace();
         } finally {
+            //FIXME db conn is closed on finalize, not on the completion of a query
             database.closeConnection();
         }
     }
@@ -273,39 +333,62 @@ public class ItemDataManager extends ManagerPrototype {
         return jsonArray;
     }
 
+    /**
+     * Create a record for each fda device that is imported into the Maverick system from FDA data
+     * @param fdaDevices list of fda devices to import
+     * @param cid company id to assign the company to
+     */
     public void importFDADevices(List<FDADevice> fdaDevices, String cid){
         List<MaverickItem> importedMItems = new ArrayList<MaverickItem>();
         LotNumberManager lotNumberManager = new LotNumberManager();
+        //Create a new maverick item record for each of the passed devices
         for(FDADevice device : fdaDevices){
+            //Get the necessary fields for instantiation
             String mid = Long.toString(lotNumberManager.generateLotNumber(LotType.Item));
             String fda_id = device.getProperty("fda_id").getPropertyValue().toString();
             String name = device.getProperty("device_name").getPropertyValue().toString();
             String category = device.getProperty("medical_specialty_description").getPropertyValue().toString();
+            //Instantiate a new maverick item to import
             MaverickItem thisItem = new MaverickItem(mid, fda_id, name, category, cid);
+            //Add the new maverick item to the collection
             importedMItems.add(thisItem);
         }
+        //Create item database records for each of the imported maverick items
         addItem(importedMItems);
         DeviceMovementEventManager deviceMovementEventManager = new DeviceMovementEventManager();
+        //Create the cycle in movement for the imported devices
         deviceMovementEventManager.initializeItemMovement(importedMItems);
     }
 
-    public void addItem(List<MaverickItem> items){
+    /**
+     * Batch add items to the database
+     * @param items list of items that to be imported into the data
+     */
+    private void addItem(List<MaverickItem> items){
+        //Set auto commit to off to allow batch creation
         database.setAutoCommit(false);
+        //Create add item query
         PreparedStatement addItemStmt = database.prepareStatement("INSERT INTO table_items(mid, fdaid, name, category, cid) VALUES (?, ?, ?, ?, ?)");
+        //Prepare a statement for each of the items
         for(MaverickItem item : items){
             try{
+                //Create single item statement
                 addItemStmt.setString(1, item.getMaverickID());
                 addItemStmt.setString(2, item.getFdaID());
                 addItemStmt.setString(3, item.getItemName());
                 addItemStmt.setString(4, item.getItemCategory());
                 addItemStmt.setString(5, item.getCustomerID());
+                //Add single item statement to the query batch
                 addItemStmt.addBatch();
             } catch(SQLException sqlEx) {
                 sqlEx.printStackTrace();
             }
         }
+        //Run batch
         database.batchNonQuery(addItemStmt);
+        //Commit batch changes to the database
         database.commitBatches();
+        //Set auto commit back to on as we are done batching
         database.setAutoCommit(true);
     }
 }
