@@ -1,12 +1,12 @@
 package managers;
 
-/*
+import maverick_types.*;
+
+/**
  * @author Joel Seidel
  *
  * Super class for pallet and device movement events. Abstracts movement event mechanics
  */
-
-import maverick_types.*;
 
 public abstract class MovementEventManager extends ManagerPrototype {
     /**
