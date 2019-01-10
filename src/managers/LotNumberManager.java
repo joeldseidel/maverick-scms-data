@@ -19,12 +19,18 @@ import org.apache.commons.codec.binary.Base64OutputStream;
 
 import javax.imageio.ImageIO;
 
-/*
+/**
  * Manager class for generating an maintain lot numbers for both items and pallets
  * @author Joel Seidel
  */
 public class LotNumberManager extends ManagerPrototype{
     public LotNumberManager(){ initDb(DatabaseType.AppData); }
+
+    /**
+     * Generate a new lot number given a specific lot type argument
+     * @param lotType type of lot number to generate
+     * @return a new lot number of the specified type
+     */
     public long generateLotNumber(LotType lotType){
         //Generate a random lot number to lot specifications, check if unique, and re-gen until unique
         if(lotType == LotType.Item){
@@ -50,32 +56,52 @@ public class LotNumberManager extends ManagerPrototype{
         return 0;
     }
 
+    /**
+     * Generate a random lot number of the specified type
+     * @param lotType type of lot to generate
+     * @return lot number of a specified type
+     */
     private long getRandomLotNumber(LotType lotType){
+        //Create a new thread local random long generator
         ThreadLocalRandom randomLot = ThreadLocalRandom.current();
         long generatedLotNumber = 0;
         if(lotType == LotType.Item){
+            //Generate an item mlot number
             generatedLotNumber = randomLot.nextLong(10_000_000L, 100_000_000L);
         } else if(lotType == LotType.Pallet) {
+            //Generate a pallet mlot number
             generatedLotNumber = randomLot.nextLong(1_000_000_000L, 10_000_000_000L);
         }
         return generatedLotNumber;
     }
 
+    /**
+     * Determine if the generated lot number is unique
+     * @param lotType type of lot number that was generated
+     * @param generatedLot lot number to check
+     * @return is generated lot number unique?
+     */
     private boolean isUniqueLot(LotType lotType, long generatedLot){
+        //Determine which table to check based on hte type of lot
         String checkTable = lotType == LotType.Item ? "table_items" : "table_pallets";
+        //Determine which field to check based on the type of lot
         String checkField = lotType == LotType.Item ? "mid" : "mlot";
+        //Create get count of this lot number
         String getMatchingLotNumberSql = "SELECT COUNT(1) FROM " + checkTable + " WHERE " + checkField + " = ?";
         int matchingLotCount = 0;
         try{
+            //Perform get lot number instance count query
             PreparedStatement matchingLotQuery = database.prepareStatement(getMatchingLotNumberSql);
             matchingLotQuery.setString(1, Long.toString(generatedLot));
             ResultSet matchingLotResult = database.query(matchingLotQuery);
             if(matchingLotResult.next()){
+                //Get the instance count of the lot number
                 matchingLotCount = matchingLotResult.getInt(1);
             }
         } catch(SQLException sqlEx){
             sqlEx.printStackTrace();
         }
+        //Return if the instance is unique or not
         return matchingLotCount == 0;
     }
 
