@@ -79,6 +79,11 @@ public class FDADevice {
         return this.deviceProperties.get(propertyIndex);
     }
 
+    /**
+     * Get a property by its name
+     * @param propertyName name of the property
+     * @return property of that name
+     */
     public FDADeviceProperty getProperty(String propertyName){
         for(FDADeviceProperty property : this.deviceProperties){
             if(property.getPropertyName().equals(propertyName)){
@@ -88,4 +93,59 @@ public class FDADevice {
         return null;
     }
 
+    /**
+     * Getter for the customer contacts objects
+     * @return list of customer contacts objects
+     */
+    public List<FDADeviceCustomerContact> getDeviceCustomerContacts(){
+        return this.deviceCustomerContacts;
+    }
+
+    /**
+     * Getter for the device sizes objects
+     * @return list of device size objects
+     */
+    public List<FDADeviceSize> getDeviceSizes(){
+        return this.getDeviceSizes();
+    }
+
+    /**
+     * Getter for the Gmdn terms objects
+     * @return list of gmdn terms objects
+     */
+    public List<FDADeviceGmdnTerm> getDeviceGmdnTerms(){
+        return this.deviceGmdnTerms;
+    }
+
+    /**
+     * Getter for the device identifier objects
+     * @return list of device identifier objects
+     */
+    public List<FDADeviceIdentifier> getDeviceIdentifiers(){
+        return this.deviceIdentifiers;
+    }
+
+    /**
+     * Getter for the premarket submissions objects
+     * @return list of premarket submission objects
+     */
+    public List<FDADevicePremarketSubmission> getDevicePremarketSubmissions(){
+        return this.devicePremarketSubmissions;
+    }
+
+    /**
+     * Getter for the product code objects
+     * @return list of product code objects
+     */
+    public List<FDADeviceProductCode> getDeviceProductCodes(){
+        return this.deviceProductCodes;
+    }
+
+    /**
+     * Getter for the device storage objects
+     * @return list of device storage objects
+     */
+    public List<FDADeviceStorage> getDeviceStorages(){
+        return this.deviceStorages;
+    }
 }
