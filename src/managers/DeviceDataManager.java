@@ -1,13 +1,7 @@
 package managers;
 
-/*
- * Manages the database interaction of getting fda device data from the fda database
- * @author Joel Seidel
- */
-
 import com.joelseidel.java_datatable.DataTable;
 import com.joelseidel.java_datatable.TableRow;
-import maverick_data.DatabaseInteraction;
 import maverick_types.DatabaseType;
 import maverick_types.FDADeviceTypes.*;
 
@@ -17,10 +11,18 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DeviceDataManager extends Object {
-    private DatabaseInteraction database;
+/**
+ * Manages the database interaction of the handlers as pertains to the FDA device data
+ * @author Joel Seidel
+ */
+public class DeviceDataManager extends ManagerPrototype {
+    /**
+     * Default constructor
+     * Creates database connection in the super class
+     */
     public DeviceDataManager(){
-        this.database = new DatabaseInteraction(DatabaseType.Devices);
+        //Create db connection
+        initDb(DatabaseType.Devices);
     }
 
     /**

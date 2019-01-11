@@ -16,48 +16,62 @@ import maverick_types.MaverickPurchaseOrderLine;
 /**
  * Abstracts away all of the database interaction necessary to work with items in our databases
  */
-public class PurchaseOrderDataManager {
-
+public class PurchaseOrderDataManager extends ManagerPrototype {
     /**
-     * The database connection to use when working with data
-     */
-    private DatabaseInteraction database;
-
-    /**
-     * Constructor for the PurchaseOrderDataManager class
+     * Default constructor to initialize the database connection for the manager
      */
     public PurchaseOrderDataManager() {
-        this.database = new DatabaseInteraction(DatabaseType.AppData);
+        initDb(DatabaseType.AppData);
     }
 
     /**
-     * addPurchaseOrder adds a purchase order to the database
+     * Create a new purchase order and insert record into database
+     * @param po purchase order to create
      */
     public void addPurchaseOrder(MaverickPurchaseOrder po) {
-        String qryString = "INSERT INTO table_po (cid, number, dateplaced, placingcompany) " + "VALUES (\"" +
-                po.getCustomer() + "\", \"" +
-                po.getNumber() + "\", \"" +
-                po.getDatePlaced() + "\", \"" +
-                po.getCompany() + "\")";
+        //Create new purchase order insert query
+        String qryString = "INSERT INTO table_po (cid, number, dateplaced, placingcompany) " + "VALUES (?, ?, ?, ?)";
         PreparedStatement qryStatement = this.database.prepareStatement(qryString);
+        try {
+            //Perform query preparation
+            qryStatement.setString(1, po.getCustomer());
+            qryStatement.setString(2, po.getNumber());
+            qryStatement.setString(3, po.getDatePlaced());
+            qryStatement.setString(4, po.getCompany());
+        } catch (SQLException sqlEx) {
+            sqlEx.printStackTrace();
+        }
+        //Perform the new purchase order insert query
         int poid = this.database.nonQueryWithIdCallback(qryStatement);
+        //Iterate through each of the related purchase order lines and add as records
         for(MaverickPurchaseOrderLine line : po.getLines()){
+            //Add this purchase order line to the database
             this.addPurchaseOrderLine(line, poid);
         }
     }
 
+    /**
+     * Add a new line to a purchase order and write to database
+     * @param line purchase order line to add to the purchase order
+     * @param poid id of the purchase order to add to
+     */
     public void addPurchaseOrderLine(MaverickPurchaseOrderLine line, int poid){
-        String qryString = "INSERT INTO table_polines (poid, line, supplierpartnum, partdesc, deliverydate, quantity, price) " + "VALUES (\"" + 
-                poid + "\", \"" +
-                line.getLineNumber() + "\", \"" +
-                line.getSupplierPartNumber() + "\", \"" +
-                line.getPartDescription() + "\", \"" +
-                line.getDeliveryDate() + "\", \"" +
-                line.getQuantity() + "\", \"" +
-                line.getPrice() + "\")";
-
+        //Create a new po line record query
+        String qryString = "INSERT INTO table_polines (poid, line, supplierpartnum, partdesc, deliverydate, quantity, price) " + "VALUES (?, ?, ?, ?, ?, ?, ?)";
         PreparedStatement qryStatement = this.database.prepareStatement(qryString);
-        this.database.nonQuery(qryStatement);
+        try {
+            //Perform new po line query
+            qryStatement.setInt(1, poid);
+            qryStatement.setInt(2, line.getLineNumber());
+            qryStatement.setString(3, line.getSupplierPartNumber());
+            qryStatement.setString(4, line.getPartDescription());
+            qryStatement.setString(5, line.getDeliveryDate());
+            qryStatement.setDouble(6, line.getQuantity());
+            qryStatement.setDouble(7, line.getPrice());
+            this.database.nonQuery(qryStatement);
+        } catch (SQLException sqlEx) {
+            sqlEx.printStackTrace();
+        }
     }
 
     /**
