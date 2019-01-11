@@ -52,7 +52,6 @@ public class PalletDataManager extends ManagerPrototype {
         for(MaverickItem item : pallet.getItems()){
             //Add the item to the pallet, create the mapping record
             this.addItemToPallet(item, pallet.getPalletID());
-            //TODO check if this is necessary every time, there might be some cycled in items going to pallets
             //Cycle in each device within the pallet
             deviceMovementEventManager.initializeItemMovement(item);
         }
@@ -165,7 +164,6 @@ public class PalletDataManager extends ManagerPrototype {
             //Perform get pallet cid query
             getPalletCIDStatement.setString(1, palletId);
             ResultSet CIDResults = database.query(getPalletCIDStatement);
-            //FIXME : loop next to not invoke error handler
             CIDResults.next();
             cid = CIDResults.getString("cid");
         } catch(SQLException sqlEx){

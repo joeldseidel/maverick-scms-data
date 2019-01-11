@@ -29,14 +29,18 @@ public class PurchaseOrderDataManager extends ManagerPrototype {
      * @param po purchase order to create
      */
     public void addPurchaseOrder(MaverickPurchaseOrder po) {
-        //FIXME this is not a prepared statement yet it really should be
         //Create new purchase order insert query
-        String qryString = "INSERT INTO table_po (cid, number, dateplaced, placingcompany) " + "VALUES (\"" +
-                po.getCustomer() + "\", \"" +
-                po.getNumber() + "\", \"" +
-                po.getDatePlaced() + "\", \"" +
-                po.getCompany() + "\")";
+        String qryString = "INSERT INTO table_po (cid, number, dateplaced, placingcompany) " + "VALUES (?, ?, ?, ?)";
         PreparedStatement qryStatement = this.database.prepareStatement(qryString);
+        try {
+            //Perform query preparation
+            qryStatement.setString(1, po.getCustomer());
+            qryStatement.setString(2, po.getNumber());
+            qryStatement.setString(3, po.getDatePlaced());
+            qryStatement.setString(4, po.getCompany());
+        } catch (SQLException sqlEx) {
+            sqlEx.printStackTrace();
+        }
         //Perform the new purchase order insert query
         int poid = this.database.nonQueryWithIdCallback(qryStatement);
         //Iterate through each of the related purchase order lines and add as records
@@ -53,17 +57,21 @@ public class PurchaseOrderDataManager extends ManagerPrototype {
      */
     public void addPurchaseOrderLine(MaverickPurchaseOrderLine line, int poid){
         //Create a new po line record query
-        String qryString = "INSERT INTO table_polines (poid, line, supplierpartnum, partdesc, deliverydate, quantity, price) " + "VALUES (\"" + 
-                poid + "\", \"" +
-                line.getLineNumber() + "\", \"" +
-                line.getSupplierPartNumber() + "\", \"" +
-                line.getPartDescription() + "\", \"" +
-                line.getDeliveryDate() + "\", \"" +
-                line.getQuantity() + "\", \"" +
-                line.getPrice() + "\")";
-        //Perform new po line record query
+        String qryString = "INSERT INTO table_polines (poid, line, supplierpartnum, partdesc, deliverydate, quantity, price) " + "VALUES (?, ?, ?, ?, ?, ?, ?)";
         PreparedStatement qryStatement = this.database.prepareStatement(qryString);
-        this.database.nonQuery(qryStatement);
+        try {
+            //Perform new po line query
+            qryStatement.setInt(1, poid);
+            qryStatement.setInt(2, line.getLineNumber());
+            qryStatement.setString(3, line.getSupplierPartNumber());
+            qryStatement.setString(4, line.getPartDescription());
+            qryStatement.setString(5, line.getDeliveryDate());
+            qryStatement.setDouble(6, line.getQuantity());
+            qryStatement.setDouble(7, line.getPrice());
+            this.database.nonQuery(qryStatement);
+        } catch (SQLException sqlEx) {
+            sqlEx.printStackTrace();
+        }
     }
 
     /**

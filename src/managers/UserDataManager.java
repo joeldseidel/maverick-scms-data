@@ -157,8 +157,6 @@ public class UserDataManager extends ManagerPrototype {
         //Create get user by username query
         String getUserDataSql = "SELECT * FROM table_users WHERE username = ?";
         PreparedStatement getUserDataStatement = database.prepareStatement(getUserDataSql);
-        //FIXME remove unused object
-        JSONObject userDataObject = new JSONObject();
         ResultSet getUserDataResults;
         try {
             //Perform get user by username query

@@ -125,7 +125,6 @@ public class ItemDataManager extends ManagerPrototype {
             //Perform the query
             ResultSet CIDResults = database.query(getItemCIDStatement);
             //Advance result set cursor as there will only be one result
-            //FIXME: remove the not found and change to a null return type
             CIDResults.next();
             //Get customer id field
             cid = CIDResults.getString("cid");
@@ -145,9 +144,6 @@ public class ItemDataManager extends ManagerPrototype {
         //Create the get item data by company query
         String getItemDataSql = "SELECT table_items.mid, table_items.fdaid, table_items.name, table_items.category, table_itempalletmapping.mlot FROM table_items LEFT JOIN table_itempalletmapping ON table_items.mid = table_itempalletmapping.mid AND table_items.cid = ?";
         PreparedStatement getItemDataStatement = database.prepareStatement(getItemDataSql);
-
-        //FIXME remove this unused variable
-        JSONObject itemDataObject = new JSONObject();
         ResultSet getItemDataResults;
         try {
             //Perform query
@@ -178,9 +174,6 @@ public class ItemDataManager extends ManagerPrototype {
             database.nonQuery(qryStatement);
         }catch(SQLException sqlEx){
             sqlEx.printStackTrace();
-        } finally {
-            //FIXME db conn is closed on finalize, not on the completion of a query
-            database.closeConnection();
         }
     }
 
@@ -200,9 +193,6 @@ public class ItemDataManager extends ManagerPrototype {
             database.nonQuery(qryStatement);
         }catch(SQLException sqlEx){
             sqlEx.printStackTrace();
-        } finally {
-            //FIXME db conn is closed on finalize, not on the completion of a query
-            database.closeConnection();
         }
     }
 
@@ -220,9 +210,6 @@ public class ItemDataManager extends ManagerPrototype {
             database.nonQuery(qryStatement);
         }catch(SQLException sqlEx){
             sqlEx.printStackTrace();
-        } finally {
-            //FIXME db conn is closed on finalize, not on the completion of a query
-            database.closeConnection();
         }
     }
 
@@ -240,9 +227,6 @@ public class ItemDataManager extends ManagerPrototype {
             database.nonQuery(qryStatement);
         }catch(SQLException sqlEx){
             sqlEx.printStackTrace();
-        } finally {
-            //FIXME db conn is closed on finalize, not on the completion of a query
-            database.closeConnection();
         }
     }
 
@@ -263,9 +247,6 @@ public class ItemDataManager extends ManagerPrototype {
             database.nonQuery(qryStatement);
         }catch(SQLException sqlEx){
             sqlEx.printStackTrace();
-        } finally {
-            //FIXME db conn is closed on finalize, not on the completion of a query
-            database.closeConnection();
         }
     }
 
