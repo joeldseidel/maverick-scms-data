@@ -4,6 +4,7 @@ import com.joelseidel.java_datatable.DataTable;
 import com.joelseidel.java_datatable.TableRow;
 import maverick_types.DatabaseType;
 import maverick_types.FDADeviceTypes.*;
+import org.json.JSONObject;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -80,9 +81,9 @@ public class DeviceDataManager extends ManagerPrototype {
             //Create a customer contact object for each query result record
             for(TableRow customerContactRecord : customerContactsResult.getRows()){
                 //Get the necessary data from each of the record
-                String email = customerContactRecord.getField(0).getValue().toString();
-                String phone = customerContactRecord.getField(1).getValue().toString();
-                String text = customerContactRecord.getField(2).getValue().toString();
+                String email = String.valueOf(customerContactRecord.getField(0).getValue());
+                String phone = String.valueOf(customerContactRecord.getField(1).getValue());
+                String text = String.valueOf(customerContactRecord.getField(2).getValue());
                 //Add the customer contact record to the object list
                 customerContacts.add(new FDADeviceCustomerContact(email, phone, text));
             }
@@ -108,10 +109,10 @@ public class DeviceDataManager extends ManagerPrototype {
             DataTable deviceSizesResult = new DataTable(database.query(getDeviceSizesQuery));
             for(TableRow deviceSizeRecord : deviceSizesResult.getRows()){
                 //Get necessary fields values for the object instantiation
-                String text = deviceSizeRecord.getField(0).getValue().toString();
-                String type = deviceSizeRecord.getField(1).getValue().toString();
-                String value = deviceSizeRecord.getField(2).getValue().toString();
-                String unit = deviceSizeRecord.getField(3).getValue().toString();
+                String text = String.valueOf(deviceSizeRecord.getField(0).getValue());
+                String type = String.valueOf(deviceSizeRecord.getField(1).getValue().toString());
+                String value = String.valueOf(deviceSizeRecord.getField(2).getValue());
+                String unit = String.valueOf(deviceSizeRecord.getField(3).getValue());
                 //Add device size object to the device collection
                 deviceSizes.add(new FDADeviceSize(text, type, value, unit));
             }
@@ -137,8 +138,8 @@ public class DeviceDataManager extends ManagerPrototype {
             DataTable gmdnTermsResult = new DataTable(database.query(getGmdnTermsQuery));
             for(TableRow gmdnTermRecord : gmdnTermsResult.getRows()){
                 //Get fields for gmdn term instantiation
-                String name = gmdnTermRecord.getField(0).getValue().toString();
-                String definition = gmdnTermRecord.getField(1).getValue().toString();
+                String name = String.valueOf(gmdnTermRecord.getField(0).getValue());
+                String definition = String.valueOf(gmdnTermRecord.getField(1).getValue());
                 //Add new gmdn term to device collection
                 gmdnTerms.add(new FDADeviceGmdnTerm(name, definition));
             }
@@ -163,14 +164,14 @@ public class DeviceDataManager extends ManagerPrototype {
             //Iterate through each device identifier record from query
             for(TableRow identifierRecord : new DataTable(database.query(getIdentifiersQuery)).getRows()){
                 //Get field values necessary for device identifier instantiation
-                String id = identifierRecord.getField(0).getValue().toString();
-                String type = identifierRecord.getField(1).getValue().toString();
-                String issuingAgency = identifierRecord.getField(2).getValue().toString();
-                String packageDiscontDate = identifierRecord.getField(3).getValue().toString();
-                String packageStatus = identifierRecord.getField(4).getValue().toString();
-                String packageType = identifierRecord.getField(5).getValue().toString();
-                String quantPerPack = identifierRecord.getField(6).getValue().toString();
-                String unitUseId = identifierRecord.getField(7).getValue().toString();
+                String id = String.valueOf(identifierRecord.getField(0).getValue());
+                String type = String.valueOf(identifierRecord.getField(1).getValue());
+                String issuingAgency = String.valueOf(identifierRecord.getField(2).getValue());
+                String packageDiscontDate = String.valueOf(identifierRecord.getField(3).getValue());
+                String packageStatus = String.valueOf(identifierRecord.getField(4).getValue());
+                String packageType = String.valueOf(identifierRecord.getField(5).getValue());
+                String quantPerPack = String.valueOf(identifierRecord.getField(6).getValue());
+                String unitUseId = String.valueOf(identifierRecord.getField(7).getValue());
                 //Add identifier to the device collection
                 identifers.add(new FDADeviceIdentifier(id, type, issuingAgency, packageDiscontDate, packageStatus, packageType, quantPerPack, unitUseId));
             }
@@ -195,9 +196,9 @@ public class DeviceDataManager extends ManagerPrototype {
             //Iterate through each of the premarket submission records from performed query
             for(TableRow premarkSubRecord : new DataTable(database.query(getPremarkSubsQuery)).getRows()){
                 //Get the necessary fields to instantiate a premarket submission object
-                String submissionNo = premarkSubRecord.getField(0).getValue().toString();
-                String supplementNo = premarkSubRecord.getField(1).getValue().toString();
-                String submissionType = premarkSubRecord.getField(2).getValue().toString();
+                String submissionNo = String.valueOf(premarkSubRecord.getField(0).getValue());
+                String supplementNo = String.valueOf(premarkSubRecord.getField(1).getValue());
+                String submissionType = String.valueOf(premarkSubRecord.getField(2).getValue());
                 //Add the new premarket submission to the device collection
                 premarkSubs.add(new FDADevicePremarketSubmission(submissionNo, supplementNo, submissionType));
             }
@@ -222,8 +223,8 @@ public class DeviceDataManager extends ManagerPrototype {
             //Iterate through each of the product code records from the performed query
             for(TableRow productCodeRecord : new DataTable(database.query(getProductCodesQuery)).getRows()){
                 //Get the field values necessary to instantiate a new product code object
-                String code = productCodeRecord.getField(0).getValue().toString();
-                String name = productCodeRecord.getField(1).getValue().toString();
+                String code = String.valueOf(productCodeRecord.getField(0).getValue());
+                String name = String.valueOf(productCodeRecord.getField(1).getValue());
                 //Add a new product code to the device collection
                 productCodes.add(new FDADeviceProductCode(code, name));
             }
@@ -248,12 +249,12 @@ public class DeviceDataManager extends ManagerPrototype {
             //Iterate through each of the storage records from the performed query
             for(TableRow storageRecord : new DataTable(database.query(getStorageQuery)).getRows()){
                 //Get the fields necessary for instantiation of a storage object
-                String highValue = storageRecord.getField(0).getValue().toString();
-                String highUnit = storageRecord.getField(1).getValue().toString();
-                String lowValue = storageRecord.getField(2).getValue().toString();
-                String lowUnit = storageRecord.getField(3).getValue().toString();
-                String specialConditions = storageRecord.getField(4).getValue().toString();
-                String type = storageRecord.getField(5).getValue().toString();
+                String highValue = String.valueOf(storageRecord.getField(0).getValue());
+                String highUnit = String.valueOf(storageRecord.getField(1).getValue());
+                String lowValue = String.valueOf(storageRecord.getField(2).getValue());
+                String lowUnit = String.valueOf(storageRecord.getField(3).getValue());
+                String specialConditions = String.valueOf(storageRecord.getField(4).getValue());
+                String type = String.valueOf(storageRecord.getField(5).getValue());
                 //Add a new storage object to the device collection
                 deviceStorages.add(new FDADeviceStorage(highValue, highUnit, lowValue, lowUnit, specialConditions, type));
             }
@@ -289,5 +290,25 @@ public class DeviceDataManager extends ManagerPrototype {
             companyDevicesList.add(new FDADevice(companyDeviceRecord));
         }
         return companyDevicesList;
+    }
+
+    /**
+     * serializeToJson converts a device object back into a json object of its properties
+     * @param fdaDevice the device to be serialized into a json object
+     * @return the json object created from serializing the fda device object
+     */
+    public JSONObject serializeToJson(FDADevice fdaDevice){
+        //Create the empty json object for this device to be serialized into
+        JSONObject thisDeviceJson = new JSONObject();
+        //Loop through every device property and convert it to a JSON property
+        for(int i = 0; i < fdaDevice.getPropertyCount(); i++){
+            //Get the specified device property
+            FDADeviceProperty thisProperty = fdaDevice.getProperty(i);
+            //Enter the specified property into the json object with key name and value
+            thisDeviceJson.put(thisProperty.getPropertyName(), thisProperty.getPropertyValue());
+        }
+        //Serialize the property objects
+
+        return thisDeviceJson;
     }
 }

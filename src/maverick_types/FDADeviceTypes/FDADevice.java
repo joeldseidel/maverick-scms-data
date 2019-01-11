@@ -88,21 +88,4 @@ public class FDADevice {
         return null;
     }
 
-    /**
-     * serializeToJson converts a device object back into a json object of its properties
-     * @param fdaDevice the device to be serialized into a json object
-     * @return the json object created from serializing the fda device object
-     */
-    public JSONObject serializeToJson(FDADevice fdaDevice){
-        //Create the empty json object for this device to be serialized into
-        JSONObject thisDeviceJson = new JSONObject();
-        //Loop through every device property and convert it to a JSON property
-        for(int i = 0; i < fdaDevice.getPropertyCount(); i++){
-            //Get the specified device property
-            FDADeviceProperty thisProperty = fdaDevice.getProperty(i);
-            //Enter the specified property into the json object with key name and value
-            thisDeviceJson.put(thisProperty.getPropertyName(), thisProperty.getPropertyValue());
-        }
-        return thisDeviceJson;
-    }
 }

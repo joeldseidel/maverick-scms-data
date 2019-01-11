@@ -32,8 +32,9 @@ public class GetDeviceDataHandler extends HandlerPrototype implements HttpHandle
 
     private JSONArray getDeviceJsonArray(List<FDADevice> devices){
         JSONArray deviceArray = new JSONArray();
+        DeviceDataManager deviceDataManager = new DeviceDataManager();
         for(FDADevice device : devices){
-            JSONObject deviceObj = device.serializeToJson(device);
+            JSONObject deviceObj = deviceDataManager.serializeToJson(device);
             deviceArray.put(deviceObj);
         }
         return deviceArray;

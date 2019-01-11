@@ -20,6 +20,6 @@ public class GetItemDeviceDataHandler extends HandlerPrototype implements HttpHa
         String fdaId = item.getFdaID();
         DeviceDataManager deviceDataManager = new DeviceDataManager();
         FDADevice thisDevice = deviceDataManager.getDeviceByFdaId(fdaId);
-        this.response = thisDevice.serializeToJson(thisDevice).toString();
+        this.response = deviceDataManager.serializeToJson(thisDevice).toString();
     }
 }
