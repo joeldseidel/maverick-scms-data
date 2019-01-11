@@ -18,29 +18,41 @@ import maverick_types.MaverickPurchaseOrderLine;
  */
 public class PurchaseOrderDataManager extends ManagerPrototype {
     /**
-     * Constructor for the PurchaseOrderDataManager class
+     * Default constructor to initialize the database connection for the manager
      */
     public PurchaseOrderDataManager() {
         initDb(DatabaseType.AppData);
     }
 
     /**
-     * addPurchaseOrder adds a purchase order to the database
+     * Create a new purchase order and insert record into database
+     * @param po purchase order to create
      */
     public void addPurchaseOrder(MaverickPurchaseOrder po) {
+        //FIXME this is not a prepared statement yet it really should be
+        //Create new purchase order insert query
         String qryString = "INSERT INTO table_po (cid, number, dateplaced, placingcompany) " + "VALUES (\"" +
                 po.getCustomer() + "\", \"" +
                 po.getNumber() + "\", \"" +
                 po.getDatePlaced() + "\", \"" +
                 po.getCompany() + "\")";
         PreparedStatement qryStatement = this.database.prepareStatement(qryString);
+        //Perform the new purchase order insert query
         int poid = this.database.nonQueryWithIdCallback(qryStatement);
+        //Iterate through each of the related purchase order lines and add as records
         for(MaverickPurchaseOrderLine line : po.getLines()){
+            //Add this purchase order line to the database
             this.addPurchaseOrderLine(line, poid);
         }
     }
 
+    /**
+     * Add a new line to a purchase order and write to database
+     * @param line purchase order line to add to the purchase order
+     * @param poid id of the purchase order to add to
+     */
     public void addPurchaseOrderLine(MaverickPurchaseOrderLine line, int poid){
+        //Create a new po line record query
         String qryString = "INSERT INTO table_polines (poid, line, supplierpartnum, partdesc, deliverydate, quantity, price) " + "VALUES (\"" + 
                 poid + "\", \"" +
                 line.getLineNumber() + "\", \"" +
@@ -49,7 +61,7 @@ public class PurchaseOrderDataManager extends ManagerPrototype {
                 line.getDeliveryDate() + "\", \"" +
                 line.getQuantity() + "\", \"" +
                 line.getPrice() + "\")";
-
+        //Perform new po line record query
         PreparedStatement qryStatement = this.database.prepareStatement(qryString);
         this.database.nonQuery(qryStatement);
     }
