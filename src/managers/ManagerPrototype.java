@@ -3,12 +3,15 @@ package managers;
 import maverick_data.DatabaseInteraction;
 import maverick_types.DatabaseType;
 
+import java.util.Date;
+
 /**
  * Prototype for manager objects to manage database connection open and closes
  * @author Joel Seidel
  */
 public abstract class ManagerPrototype {
     protected DatabaseInteraction database;
+    private Date invokedManagerTime;
 
     /**
      * Create a new database interaction instance
@@ -16,6 +19,7 @@ public abstract class ManagerPrototype {
      */
     void initDb(DatabaseType dbType){
         database = new DatabaseInteraction(dbType);
+        invokedManagerTime = new Date();
     }
 
     /**
@@ -33,6 +37,8 @@ public abstract class ManagerPrototype {
             //This shouldn't happen because the object super is irrelevant
             ex.printStackTrace();
         }
+        long dbConnTime = new Date().getTime() - invokedManagerTime.getTime();
+        System.out.println("Closed database connection on manager finalization. Connection was open for " + Long.toString(dbConnTime));
         //Close the database connection
         database.closeConnection();
         /*        _____________
