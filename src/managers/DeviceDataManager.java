@@ -5,6 +5,7 @@ import com.joelseidel.java_datatable.TableRow;
 import com.joelseidel.java_datatable.Field;
 import maverick_types.DatabaseType;
 import maverick_types.FDADeviceTypes.*;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.sql.PreparedStatement;
@@ -123,10 +124,13 @@ public class DeviceDataManager extends ManagerPrototype {
                 getPropertyStmt.setString(1, fdaId);
                 //Perform get property object query
                 DataTable propertyResults = new DataTable(database.query(getPropertyStmt));
-                //Get the properties of the resulting property objects
-                List<FDADeviceProperty> propertyProperties = getCompositePropertySubProperties(propertyResults);
-                //Instantiate a generic composite property object object with the name in col 1 and the resulting sub properties and add to collection
-                compositePropertyObjects.add(new FDADeviceCompositePropertyObject(propertyObject[0], propertyProperties));
+                //Get records from the data table
+                for(TableRow compositePropertyRecord : propertyResults.getRows()){
+                    //Get the properties of the resulting property objects
+                    List<FDADeviceProperty> propertyProperties = getCompositePropertySubProperties(compositePropertyRecord);
+                    //Instantiate a generic composite property object object with the name in col 1 and the resulting sub properties and add to collection
+                    compositePropertyObjects.add(new FDADeviceCompositePropertyObject(propertyObject[0], propertyProperties));
+                }
             } catch (SQLException sqlEx){
                 sqlEx.printStackTrace();
             }
@@ -136,19 +140,16 @@ public class DeviceDataManager extends ManagerPrototype {
 
     /**
      * Get the properties of the composite property objects
-     * @param resultsTable db query results table
+     * @param compositePropertyRecord db query results table row
      * @return list of compositite property properties
      */
-    private List<FDADeviceProperty> getCompositePropertySubProperties(DataTable resultsTable){
+    private List<FDADeviceProperty> getCompositePropertySubProperties(TableRow compositePropertyRecord){
         List<FDADeviceProperty> compositePropertyProperties = new ArrayList<>();
-        //Get records from the data table
-        for(TableRow compositePropertyRecord : resultsTable.getRows()){
-            //Get fields from the data rows
-            for(Field compositePropertyField : compositePropertyRecord.getFields()){
-                if(compositePropertyField.getValue() != null){
-                    //This field is not null so it represents a property that this composite object has
-                    compositePropertyProperties.add(new FDADeviceProperty(compositePropertyField.getColumn().getName(), compositePropertyField.getValue().toString()));
-                }
+        //Get fields from the data rows
+        for(Field compositePropertyField : compositePropertyRecord.getFields()){
+            if(compositePropertyField.getValue() != null){
+                //This field is not null so it represents a property that this composite object has
+                compositePropertyProperties.add(new FDADeviceProperty(compositePropertyField.getColumn().getName(), compositePropertyField.getValue().toString()));
             }
         }
         return compositePropertyProperties;
@@ -203,8 +204,34 @@ public class DeviceDataManager extends ManagerPrototype {
             //Enter the specified property into the json object with key name and value
             thisDeviceJson.put(thisProperty.getPropertyName(), thisProperty.getPropertyValue());
         }
+        //Create a JSON array to hold all of the objects
+        JSONArray compositePropertyArray = new JSONArray();
         //Serialize the property objects
-
+        for(FDADeviceCompositePropertyObject compositeProperty : fdaDevice.getDeviceCompositeProperties()){
+            //Determine if this composite property is relevant to the device based on property count
+            if(compositeProperty.getPropertyCount() > 0){
+                //Create a JSON object to hold the properties of this composite property
+                JSONObject thisCompositeProperty = new JSONObject();
+                //Set the name of the composite property itself outside its property array
+                thisCompositeProperty.put("prop-name", compositeProperty.getName());
+                //Create a JSON array to hold all of the properties within this composite property
+                JSONArray compositePropertyPropertiesArray = new JSONArray();
+                for(FDADeviceProperty thisProperty : compositeProperty.getProperties()){
+                    //Create a JSON object to hold the details
+                    JSONObject thisPropertyObj = new JSONObject();
+                    //Set the property key and value from property object
+                    thisPropertyObj.put(thisProperty.getPropertyName(), thisProperty.getPropertyValue());
+                    //Add the new property object to the collection
+                    compositePropertyPropertiesArray.put(thisPropertyObj);
+                }
+                //Add the properties array to the composite property object
+                thisCompositeProperty.put("properties", compositePropertyPropertiesArray);
+                //Add the composite property object to the array of composite properties
+                compositePropertyArray.put(thisCompositeProperty);
+            }
+        }
+        //Add the device composite properties to the device JSON object
+        thisDeviceJson.put("comp-props", compositePropertyArray);
         return thisDeviceJson;
     }
 }

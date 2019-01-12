@@ -30,6 +30,14 @@ public class FDADeviceCompositePropertyObject {
     }
 
     /**
+     * Getter for the size of the properties list
+     * @return size of the properties list
+     */
+    public int getPropertyCount(){
+        return this.properties.size();
+    }
+
+    /**
      * Getter for name
      * @return name of the composite object
      */
