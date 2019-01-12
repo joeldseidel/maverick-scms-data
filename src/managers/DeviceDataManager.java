@@ -2,12 +2,14 @@ package managers;
 
 import com.joelseidel.java_datatable.DataTable;
 import com.joelseidel.java_datatable.TableRow;
+import com.joelseidel.java_datatable.Field;
 import maverick_types.DatabaseType;
 import maverick_types.FDADeviceTypes.*;
 import org.json.JSONObject;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,9 +36,6 @@ public class DeviceDataManager extends ManagerPrototype {
         FDADevice thisDevice = new FDADevice();
         //Fetch the fda device from the database
         thisDevice = getDeviceDetails(thisDevice, fdaId);
-        //Get the related property objects
-        //NOTE: this manager is passed to prevent a redundant database connection
-        thisDevice.getDevicePropertyObjects(this);
         return thisDevice;
     }
 
@@ -56,7 +55,9 @@ public class DeviceDataManager extends ManagerPrototype {
             //Increment the device record results to the first (and only) row matching the id
             if (deviceRecordResults.next()) {
                 //Parse the device from the row result
-                thisDevice.parseDevice(deviceRecordResults);
+                thisDevice.setDeviceProperties(getDeviceProperties(deviceRecordResults));
+                //Get the composite property objects of the device
+                thisDevice.setCompositeProperties(getDeviceCompositeProperties(fdaId));
             }
         } catch(SQLException sqlEx){
             sqlEx.printStackTrace();
@@ -65,203 +66,92 @@ public class DeviceDataManager extends ManagerPrototype {
     }
 
     /**
-     * Create a list of customer contacts for a given fda id from the database
-     * @param fdaId fda id of device
-     * @return list of customer contacts for device
+     * getDeviceProperties parses a device from its database record to an FDADevice object which access to its properties
+     * @param resultSet the incremented result set containing the row/record from the database
      */
-    public List<FDADeviceCustomerContact> getCustomerContacts(String fdaId){
-        List<FDADeviceCustomerContact> customerContacts = new ArrayList<>();
-        //Prepare query statement to get customer contacts for the specified device id
-        String getCustomerContactsSql = "SELECT email, phone, text FROM device_customer_contacts WHERE fda_id = ?";
-        PreparedStatement getCustomerContactsQuery = database.prepareStatement(getCustomerContactsSql);
-        try{
-            getCustomerContactsQuery.setString(1, fdaId);
-            //Get data table result of customer contact query
-            DataTable customerContactsResult = new DataTable(database.query(getCustomerContactsQuery));
-            //Create a customer contact object for each query result record
-            for(TableRow customerContactRecord : customerContactsResult.getRows()){
-                //Get the necessary data from each of the record
-                String email = String.valueOf(customerContactRecord.getField(0).getValue());
-                String phone = String.valueOf(customerContactRecord.getField(1).getValue());
-                String text = String.valueOf(customerContactRecord.getField(2).getValue());
-                //Add the customer contact record to the object list
-                customerContacts.add(new FDADeviceCustomerContact(email, phone, text));
-            }
-        } catch(SQLException sqlEx){
-            sqlEx.printStackTrace();
-        }
-        return customerContacts;
-    }
-
-    /**
-     * Get device sizes for specific device
-     * @param fdaId fda of the device's sizes to fetch
-     * @return list of device sizes pertaining to the specifed device
-     */
-    public List<FDADeviceSize> getDeviceSizes(String fdaId){
-        List<FDADeviceSize> deviceSizes = new ArrayList<>();
-        //Prepare get device sizes sql statement
-        String getDeviceSizesSql = "SELECT text, type, value, unit FROM device_device_sizes WHERE fda_id = ?";
-        PreparedStatement getDeviceSizesQuery = database.prepareStatement(getDeviceSizesSql);
-        try{
-            getDeviceSizesQuery.setString(1, fdaId);
-            //Create data table for the result query
-            DataTable deviceSizesResult = new DataTable(database.query(getDeviceSizesQuery));
-            for(TableRow deviceSizeRecord : deviceSizesResult.getRows()){
-                //Get necessary fields values for the object instantiation
-                String text = String.valueOf(deviceSizeRecord.getField(0).getValue());
-                String type = String.valueOf(deviceSizeRecord.getField(1).getValue().toString());
-                String value = String.valueOf(deviceSizeRecord.getField(2).getValue());
-                String unit = String.valueOf(deviceSizeRecord.getField(3).getValue());
-                //Add device size object to the device collection
-                deviceSizes.add(new FDADeviceSize(text, type, value, unit));
-            }
-        } catch(SQLException sqlEx) {
-            sqlEx.printStackTrace();
-        }
-        return deviceSizes;
-    }
-
-    /**
-     * Get the GMDN term objects related to a specified device
-     * @param fdaId specified fda device id
-     * @return a list of the resulting GMDN term objects
-     */
-    public List<FDADeviceGmdnTerm> getGmdnTerms(String fdaId){
-        List<FDADeviceGmdnTerm> gmdnTerms = new ArrayList<>();
-        //Create get gmdn terms sql statement
-        String getGmdnTermsSql = "SELECT name, definition FROM device_gmdn_terms WHERE fda_id = ?";
-        PreparedStatement getGmdnTermsQuery = database.prepareStatement(getGmdnTermsSql);
-        try{
-            getGmdnTermsQuery.setString(1, fdaId);
-            //Create data table for the result
-            DataTable gmdnTermsResult = new DataTable(database.query(getGmdnTermsQuery));
-            for(TableRow gmdnTermRecord : gmdnTermsResult.getRows()){
-                //Get fields for gmdn term instantiation
-                String name = String.valueOf(gmdnTermRecord.getField(0).getValue());
-                String definition = String.valueOf(gmdnTermRecord.getField(1).getValue());
-                //Add new gmdn term to device collection
-                gmdnTerms.add(new FDADeviceGmdnTerm(name, definition));
-            }
-        } catch(SQLException sqlEx){
-            sqlEx.printStackTrace();
-        }
-        return gmdnTerms;
-    }
-
-    /**
-     * Get the identifier property objects for a specified device
-     * @param fdaId the specified device fda id
-     * @return a list of the device identifiers related to the specified device
-     */
-    public List<FDADeviceIdentifier> getIdentifiers(String fdaId){
-        List<FDADeviceIdentifier> identifers = new ArrayList<>();
-        //Create get identifiers sql statement
-        String getIdentifiers = "SELECT id, type, issuing_agency, package_discontinue_date, package_status, package_type, quantity_per_package, unit_of_use_id FROM device_identifiers WHERE fda_id = ?";
-        PreparedStatement getIdentifiersQuery = database.prepareStatement(getIdentifiers);
+    private List<FDADeviceProperty> getDeviceProperties(ResultSet resultSet){
+        List<FDADeviceProperty> deviceProperties = new ArrayList<>();
         try {
-            getIdentifiersQuery.setString(1, fdaId);
-            //Iterate through each device identifier record from query
-            for(TableRow identifierRecord : new DataTable(database.query(getIdentifiersQuery)).getRows()){
-                //Get field values necessary for device identifier instantiation
-                String id = String.valueOf(identifierRecord.getField(0).getValue());
-                String type = String.valueOf(identifierRecord.getField(1).getValue());
-                String issuingAgency = String.valueOf(identifierRecord.getField(2).getValue());
-                String packageDiscontDate = String.valueOf(identifierRecord.getField(3).getValue());
-                String packageStatus = String.valueOf(identifierRecord.getField(4).getValue());
-                String packageType = String.valueOf(identifierRecord.getField(5).getValue());
-                String quantPerPack = String.valueOf(identifierRecord.getField(6).getValue());
-                String unitUseId = String.valueOf(identifierRecord.getField(7).getValue());
-                //Add identifier to the device collection
-                identifers.add(new FDADeviceIdentifier(id, type, issuingAgency, packageDiscontDate, packageStatus, packageType, quantPerPack, unitUseId));
-            }
-        } catch(SQLException sqlEx) {
-            sqlEx.printStackTrace();
-        }
-        return identifers;
-    }
-
-    /**
-     * Get premarket submission property object for a specified device
-     * @param fdaId the specified device id
-     * @return a list of premarket submission objects related to the specified device
-     */
-    public List<FDADevicePremarketSubmission> getPremarketSubmissions(String fdaId){
-        List<FDADevicePremarketSubmission> premarkSubs = new ArrayList<>();
-        //Create the get premarket submission query
-        String getPremarkSubsSql = "SELECT submission_number, supplement_number, submission_type FROM device_premarket_submissions WHERE fda_id = ?";
-        PreparedStatement getPremarkSubsQuery = database.prepareStatement(getPremarkSubsSql);
-        try{
-            getPremarkSubsQuery.setString(1, fdaId);
-            //Iterate through each of the premarket submission records from performed query
-            for(TableRow premarkSubRecord : new DataTable(database.query(getPremarkSubsQuery)).getRows()){
-                //Get the necessary fields to instantiate a premarket submission object
-                String submissionNo = String.valueOf(premarkSubRecord.getField(0).getValue());
-                String supplementNo = String.valueOf(premarkSubRecord.getField(1).getValue());
-                String submissionType = String.valueOf(premarkSubRecord.getField(2).getValue());
-                //Add the new premarket submission to the device collection
-                premarkSubs.add(new FDADevicePremarketSubmission(submissionNo, supplementNo, submissionType));
-            }
-        } catch(SQLException sqlEx) {
-            sqlEx.printStackTrace();
-        }
-        return premarkSubs;
-    }
-
-    /**
-     * Get the product code property objects related to a specified device
-     * @param fdaId the fda id of the specified device
-     * @return a list of the product code objects related to the specified device
-     */
-    public List<FDADeviceProductCode> getProductCodes(String fdaId){
-        List<FDADeviceProductCode> productCodes = new ArrayList<>();
-        //Create the get product codes sql query
-        String getProductCodesSql = "SELECT code, name FROM device_product_codes WHERE fda_id = ?";
-        PreparedStatement getProductCodesQuery = database.prepareStatement(getProductCodesSql);
-        try {
-            getProductCodesQuery.setString(1, fdaId);
-            //Iterate through each of the product code records from the performed query
-            for(TableRow productCodeRecord : new DataTable(database.query(getProductCodesQuery)).getRows()){
-                //Get the field values necessary to instantiate a new product code object
-                String code = String.valueOf(productCodeRecord.getField(0).getValue());
-                String name = String.valueOf(productCodeRecord.getField(1).getValue());
-                //Add a new product code to the device collection
-                productCodes.add(new FDADeviceProductCode(code, name));
+            //Get the column count from the result set to allow for the increment to occur
+            ResultSetMetaData metaData = resultSet.getMetaData();
+            int columnCount = metaData.getColumnCount();
+            //Loop through all the columns, get the column name and column value, and create a device property
+            for(int i = 1; i <= columnCount; i++){
+                //Get the property value from the specified column
+                Object propertyValue = resultSet.getObject(i);
+                //Get the column name of the specified column
+                String columnName = metaData.getColumnName(i);
+                //Create the new device property and add the new property to the list of device properties
+                deviceProperties.add(new FDADeviceProperty(columnName, propertyValue));
             }
         } catch (SQLException sqlEx) {
             sqlEx.printStackTrace();
         }
-        return productCodes;
+        return deviceProperties;
+    }
+
+
+    /**
+     * It's a long story and you can read it here now and in book stores all over the world in the near future as it will be a best seller
+     *
+     * A device has a main record, this is what is pulled in and called the device details. This was just parsed. Now we must go and get the
+     *      subobjects of the device. This can be confusing because of the naming. These subobjects are called composite property objects
+     *      because they are properties made of other properties. See? It makes sense. All composite properties are generically the same and
+     *      are only unique in the fields they have, but that is all abstracted away in other classes. This method goes and gets all of them at
+     *      once in the most efficient way I could figure out. Thanks for reading, this comment dedicated to John McCain, miss you father
+     *
+     * @param fdaId fda id of the device to get the composite properties of
+     * @return a list of generic composite properties containing their generic properties if they have any
+     */
+    private List<FDADeviceCompositePropertyObject> getDeviceCompositeProperties(String fdaId){
+        //2D array, rows are sub objects, col 1 is name, col 2 is select statement to get it
+        String getPropertyObjectsSql[][] = {
+                {"Customer Contacts",       "SELECT email, phone, text FROM device_customer_contacts WHERE fda_id = ?"},
+                {"Sizes",                   "SELECT text, type, value, unit FROM device_device_sizes WHERE fda_id = ?"},
+                {"GMDN Terms",              "SELECT name, definition FROM device_gmdn_terms WHERE fda_id = ?"},
+                {"Identifiers",             "SELECT id, type, issuing_agency, package_discontinue_date, package_status, package_type, quantity_per_package, unit_of_use_id FROM device_identifiers WHERE fda_id = ?"},
+                {"Premarket Submissions",   "SELECT submission_number, supplement_number, submission_type FROM device_premarket_submissions WHERE fda_id = ?"},
+                {"Product Codes",           "SELECT code, name FROM device_product_codes WHERE fda_id = ?"},
+                {"Storage",                 "SELECT high_value, high_unit, low_value, low_unit, special_conditions, type FROM device_storage WHERE fda_id = ?"}
+        };
+        List<FDADeviceCompositePropertyObject> compositePropertyObjects = new ArrayList<>();
+        for(String propertyObject[] : getPropertyObjectsSql){
+            //Create query statement with sql string in col 2
+            PreparedStatement getPropertyStmt = database.prepareStatement(propertyObject[1]);
+            try{
+                //Prepare primary key to all statements
+                getPropertyStmt.setString(1, fdaId);
+                //Perform get property object query
+                DataTable propertyResults = new DataTable(database.query(getPropertyStmt));
+                //Get the properties of the resulting property objects
+                List<FDADeviceProperty> propertyProperties = getCompositePropertySubProperties(propertyResults);
+                //Instantiate a generic composite property object object with the name in col 1 and the resulting sub properties and add to collection
+                compositePropertyObjects.add(new FDADeviceCompositePropertyObject(propertyObject[0], propertyProperties));
+            } catch (SQLException sqlEx){
+                sqlEx.printStackTrace();
+            }
+        }
+        return compositePropertyObjects;
     }
 
     /**
-     * Get the storage property objects related to a specified device
-     * @param fdaId the specified device fda id
-     * @return list of storage objects related to the specified device
+     * Get the properties of the composite property objects
+     * @param resultsTable db query results table
+     * @return list of compositite property properties
      */
-    public List<FDADeviceStorage> getStorages(String fdaId){
-        List<FDADeviceStorage> deviceStorages = new ArrayList<>();
-        //Create the get storage query sql statement
-        String getStorageSql = "SELECT high_value, high_unit, low_value, low_unit, special_conditions, type FROM device_storage WHERE fda_id = ?";
-        PreparedStatement getStorageQuery = database.prepareStatement(getStorageSql);
-        try {
-            getStorageQuery.setString(1, fdaId);
-            //Iterate through each of the storage records from the performed query
-            for(TableRow storageRecord : new DataTable(database.query(getStorageQuery)).getRows()){
-                //Get the fields necessary for instantiation of a storage object
-                String highValue = String.valueOf(storageRecord.getField(0).getValue());
-                String highUnit = String.valueOf(storageRecord.getField(1).getValue());
-                String lowValue = String.valueOf(storageRecord.getField(2).getValue());
-                String lowUnit = String.valueOf(storageRecord.getField(3).getValue());
-                String specialConditions = String.valueOf(storageRecord.getField(4).getValue());
-                String type = String.valueOf(storageRecord.getField(5).getValue());
-                //Add a new storage object to the device collection
-                deviceStorages.add(new FDADeviceStorage(highValue, highUnit, lowValue, lowUnit, specialConditions, type));
+    private List<FDADeviceProperty> getCompositePropertySubProperties(DataTable resultsTable){
+        List<FDADeviceProperty> compositePropertyProperties = new ArrayList<>();
+        //Get records from the data table
+        for(TableRow compositePropertyRecord : resultsTable.getRows()){
+            //Get fields from the data rows
+            for(Field compositePropertyField : compositePropertyRecord.getFields()){
+                if(compositePropertyField.getValue() != null){
+                    //This field is not null so it represents a property that this composite object has
+                    compositePropertyProperties.add(new FDADeviceProperty(compositePropertyField.getColumn().getName(), compositePropertyField.getValue().toString()));
+                }
             }
-        } catch (SQLException sqlEx) {
-            sqlEx.printStackTrace();
         }
-        return deviceStorages;
+        return compositePropertyProperties;
     }
 
     /**
@@ -287,7 +177,13 @@ public class DeviceDataManager extends ManagerPrototype {
         //Parse the data table into a list of the devices it represents
         for(TableRow companyDeviceRecord : companyDevices.getRows()){
             //Add the parsed fda device to the collection
-            companyDevicesList.add(new FDADevice(companyDeviceRecord));
+            FDADevice thisDevice = new FDADevice();
+            //Parse the fda device properties from the record
+            for(Field devicePropertyField : companyDeviceRecord.getFields()){
+                thisDevice.addProperty(new FDADeviceProperty(devicePropertyField.getColumn().getName(), devicePropertyField.getValue()));
+            }
+            //Add the new device to the collection
+            companyDevicesList.add(thisDevice);
         }
         return companyDevicesList;
     }

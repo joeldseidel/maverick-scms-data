@@ -1,68 +1,14 @@
 package maverick_types.FDADeviceTypes;
 
-import com.joelseidel.java_datatable.Field;
-import com.joelseidel.java_datatable.TableRow;
-import managers.DeviceDataManager;
-import maverick_types.DeviceMovementEvent;
-import org.json.JSONObject;
-
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class FDADevice {
-    List<FDADeviceProperty> deviceProperties = new ArrayList<>();
-    List<FDADeviceCustomerContact> deviceCustomerContacts = new ArrayList<>();
-    List<FDADeviceSize> deviceSizes = new ArrayList<>();
-    List<FDADeviceGmdnTerm> deviceGmdnTerms = new ArrayList<>();
-    List<FDADeviceIdentifier> deviceIdentifiers = new ArrayList<>();
-    List<FDADevicePremarketSubmission> devicePremarketSubmissions = new ArrayList<>();
-    List<FDADeviceProductCode> deviceProductCodes = new ArrayList<>();
-    List<FDADeviceStorage> deviceStorages = new ArrayList<>();
+    private List<FDADeviceProperty> deviceProperties = new ArrayList<>();
+    private List<FDADeviceCompositePropertyObject> compositeProperties = new ArrayList<>();
 
     public FDADevice() { }
-    public FDADevice(TableRow deviceRecordRow){
-        parseDevice(deviceRecordRow);
-    }
-    /**
-     * parseDevice parses a device from its database record to an FDADevice object which access to its properties
-     * @param resultSet the incremented result set containing the row/record from the database
-     */
-    public void parseDevice(ResultSet resultSet){
-        try {
-            //Get the column count from the result set to allow for the increment to occur
-            ResultSetMetaData metaData = resultSet.getMetaData();
-            int columnCount = metaData.getColumnCount();
-            //Loop through all the columns, get the column name and column value, and create a device property
-            for(int i = 1; i <= columnCount; i++){
-                //Get the property value from the specified column
-                Object propertyValue = resultSet.getObject(i);
-                //Get the column name of the specified column
-                String columnName = metaData.getColumnName(i);
-                //Create the new device property and add the new property to the list of device properties
-                deviceProperties.add(new FDADeviceProperty(columnName, propertyValue));
-            }
-        } catch (SQLException sqlEx) {
-            sqlEx.printStackTrace();
-        }
-    }
-    public void parseDevice(TableRow deviceRecordRow){
-        for(Field devicePropertyField : deviceRecordRow.getFields()){
-            deviceProperties.add(new FDADeviceProperty(devicePropertyField.getColumn().getName(), devicePropertyField.getValue()));
-        }
-    }
-    public void getDevicePropertyObjects(DeviceDataManager deviceDataManager){
-        String fdaId = getProperty("fda_id").getPropertyValue().toString();
-        this.deviceCustomerContacts = deviceDataManager.getCustomerContacts(fdaId);
-        this.deviceSizes = deviceDataManager.getDeviceSizes(fdaId);
-        this.deviceGmdnTerms = deviceDataManager.getGmdnTerms(fdaId);
-        this.deviceIdentifiers = deviceDataManager.getIdentifiers(fdaId);
-        this.devicePremarketSubmissions = deviceDataManager.getPremarketSubmissions(fdaId);
-        this.deviceProductCodes = deviceDataManager.getProductCodes(fdaId);
-        this.deviceStorages = deviceDataManager.getStorages(fdaId);
-    }
+
     /**
      * getPropertyCount returns the size of the device properties array
      * @return the size of the device properties array
@@ -94,58 +40,34 @@ public class FDADevice {
     }
 
     /**
-     * Getter for the customer contacts objects
-     * @return list of customer contacts objects
+     * Add a property to the device property collection
+     * @param deviceProperty property to add
      */
-    public List<FDADeviceCustomerContact> getDeviceCustomerContacts(){
-        return this.deviceCustomerContacts;
+    public void addProperty(FDADeviceProperty deviceProperty){
+        this.deviceProperties.add(deviceProperty);
     }
 
     /**
-     * Getter for the device sizes objects
-     * @return list of device size objects
+     * Getter for device composite properties
+     * @return list of composite properties
      */
-    public List<FDADeviceSize> getDeviceSizes(){
-        return this.getDeviceSizes();
+    public List<FDADeviceCompositePropertyObject> getDeviceCompositeProperties(){
+        return this.compositeProperties;
     }
 
     /**
-     * Getter for the Gmdn terms objects
-     * @return list of gmdn terms objects
+     * Setter for the composite properties of this device from their objects
+     * @param compositeProperties list of composite properties to relate to this device
      */
-    public List<FDADeviceGmdnTerm> getDeviceGmdnTerms(){
-        return this.deviceGmdnTerms;
+    public void setCompositeProperties(List<FDADeviceCompositePropertyObject> compositeProperties){
+        this.compositeProperties = compositeProperties;
     }
 
     /**
-     * Getter for the device identifier objects
-     * @return list of device identifier objects
+     * Setter for the generic device properties
+     * @param deviceProperties list of device properties
      */
-    public List<FDADeviceIdentifier> getDeviceIdentifiers(){
-        return this.deviceIdentifiers;
-    }
-
-    /**
-     * Getter for the premarket submissions objects
-     * @return list of premarket submission objects
-     */
-    public List<FDADevicePremarketSubmission> getDevicePremarketSubmissions(){
-        return this.devicePremarketSubmissions;
-    }
-
-    /**
-     * Getter for the product code objects
-     * @return list of product code objects
-     */
-    public List<FDADeviceProductCode> getDeviceProductCodes(){
-        return this.deviceProductCodes;
-    }
-
-    /**
-     * Getter for the device storage objects
-     * @return list of device storage objects
-     */
-    public List<FDADeviceStorage> getDeviceStorages(){
-        return this.deviceStorages;
+    public void setDeviceProperties(List<FDADeviceProperty> deviceProperties){
+        this.deviceProperties = deviceProperties;
     }
 }
