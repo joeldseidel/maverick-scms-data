@@ -225,7 +225,7 @@ public class DeviceDataManager extends ManagerPrototype {
                     compositePropertyPropertiesArray.put(thisPropertyObj);
                 }
                 //Add the properties array to the composite property object
-                thisCompositeProperty.put("properties", compositePropertyPropertiesArray);
+                thisCompositeProperty.put("props", compositePropertyPropertiesArray);
                 //Add the composite property object to the array of composite properties
                 compositePropertyArray.put(thisCompositeProperty);
             }
