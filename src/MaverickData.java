@@ -2,10 +2,14 @@ import com.sun.net.httpserver.HttpsConfigurator;
 import com.sun.net.httpserver.HttpsParameters;
 import com.sun.net.httpserver.HttpsServer;
 import handlers.*;
+import maverick_data.DatabaseInteraction;
 
 import javax.net.ssl.*;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.net.InetSocketAddress;
+import java.net.URL;
 import java.security.KeyStore;
 
 public class MaverickData {
@@ -22,7 +26,7 @@ public class MaverickData {
             //Initialize the keystore
             char[] password = "password".toCharArray();
             KeyStore keyStore = KeyStore.getInstance("JKS");
-            FileInputStream inputStream = new FileInputStream("testkey.jks");
+            InputStream inputStream = DatabaseInteraction.class.getClassLoader().getResourceAsStream("maverick_data/testkey.jks");
             keyStore.load(inputStream, password);
 
             //Create key manager factory
