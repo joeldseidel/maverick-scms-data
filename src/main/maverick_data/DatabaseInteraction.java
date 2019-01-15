@@ -21,15 +21,12 @@ public class DatabaseInteraction {
 
     /**
      * Create a new DatabaseInteraction object by fetching the database connection properties and creating a connection
-     *
      * @param databaseType the database type which needs to have its specific name fetched from the properties
      */
-
     public DatabaseInteraction(DatabaseType databaseType) {
         Properties properties = new Properties();
-        InputStream input = null;
         try{
-            input = getClass().getResourceAsStream("database.properties");
+            InputStream input = getClass().getResourceAsStream("database.properties");
             properties.load(input);
             String host = properties.getProperty("host");
             int port = Integer.parseInt(properties.getProperty("port"));
@@ -80,12 +77,15 @@ public class DatabaseInteraction {
 
     /**
      * closeConnection closes the current DB connection
+     * @return success / fail boolean
      */
-    public void closeConnection(){
+    public boolean closeConnection(){
         try{
             dbConn.close();
+            return true;
         } catch(SQLException sqlE){
             System.out.println("Could not close data connection");
+            return false;
         }
     }
 
@@ -126,11 +126,13 @@ public class DatabaseInteraction {
      * nonQuery runs a non-query PreparedStatement against the connected database
      * @param nonQueryStatement the statement to execute
      */
-    public void nonQuery(PreparedStatement nonQueryStatement){
+    public boolean nonQuery(PreparedStatement nonQueryStatement){
         try{
             nonQueryStatement.executeUpdate();
+            return true;
         } catch(SQLException sqlException){
             System.out.println(sqlException.getMessage());
+            return false;
         }
     }
 
