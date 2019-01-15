@@ -1,14 +1,14 @@
 package managers;
 
-/*
+import maverick_types.*;
+
+/**
  * @author Joel Seidel
  *
  * Super class for pallet and device movement events. Abstracts movement event mechanics
  */
 
-import maverick_types.*;
-
-public abstract class MovementEventManager {
+public abstract class MovementEventManager extends ManagerPrototype {
     /**
      * Convert a movement type string to a movement type type
      * @param movementTypeString the string to convert to a type
@@ -108,13 +108,13 @@ public abstract class MovementEventManager {
     public static String movementStatusToString(MovementStatus movementStatus){
         switch(movementStatus){
             case InTransit:
-                return "InTransit";
+                return "In Transit";
             case InStorage:
-                return "InStorage";
+                return "In Storage";
             case OnHold:
-                return "OnHold";
+                return "On Hold";
             case CycledOut:
-                return "CycledOut";
+                return "Cycled Out";
              default:
                  return null;
         }

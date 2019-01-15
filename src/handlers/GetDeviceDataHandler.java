@@ -1,16 +1,12 @@
 package handlers;
 
-import com.sun.net.httpserver.Headers;
-import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import managers.DeviceDataManager;
 import maverick_data.DatabaseInteraction;
-import maverick_types.FDADevice;
+import maverick_types.FDADeviceTypes.FDADevice;
 import org.json.JSONObject;
 import org.json.JSONArray;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -27,7 +23,8 @@ public class GetDeviceDataHandler extends HandlerPrototype implements HttpHandle
 
     @Override
     protected void fulfillRequest(JSONObject requestParams){
-        List<String> deviceIds = getParameterDeviceIds(requestParams.getJSONArray("devices"));
+        JSONArray deviceJsonArray = requestParams.getJSONArray("devices");
+        List<String> deviceIds = getParameterDeviceIds(deviceJsonArray);
         List<FDADevice> devices = getDeviceDataObjects(deviceIds);
         JSONArray deviceDataArray = getDeviceJsonArray(devices);
         this.response = new JSONObject().put("device_data", deviceDataArray).toString();
@@ -35,8 +32,9 @@ public class GetDeviceDataHandler extends HandlerPrototype implements HttpHandle
 
     private JSONArray getDeviceJsonArray(List<FDADevice> devices){
         JSONArray deviceArray = new JSONArray();
+        DeviceDataManager deviceDataManager = new DeviceDataManager();
         for(FDADevice device : devices){
-            JSONObject deviceObj = device.serializeToJson(device);
+            JSONObject deviceObj = deviceDataManager.serializeToJson(device);
             deviceArray.put(deviceObj);
         }
         return deviceArray;
@@ -46,12 +44,8 @@ public class GetDeviceDataHandler extends HandlerPrototype implements HttpHandle
         DeviceDataManager deviceDataManager = new DeviceDataManager();
         List<FDADevice> devices = new ArrayList<>();
         for(String fdaId : deviceIds){
-            try {
-                FDADevice thisDevice = deviceDataManager.getDeviceByFdaId(fdaId);
-                devices.add(thisDevice);
-            } catch (SQLException sqlEx) {
-                sqlEx.printStackTrace();
-            }
+            FDADevice thisDevice = deviceDataManager.getDeviceByFdaId(fdaId);
+            devices.add(thisDevice);
         }
         return devices;
     }

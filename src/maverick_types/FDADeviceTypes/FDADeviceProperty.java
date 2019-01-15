@@ -1,4 +1,4 @@
-package maverick_types;
+package maverick_types.FDADeviceTypes;
 
 public class FDADeviceProperty {
     private String propertyName;

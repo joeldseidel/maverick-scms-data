@@ -30,7 +30,7 @@ public class RaisePalletMovementEventHandler extends HandlerPrototype implements
         String type = requestParams.getString("type");
         String cid = requestParams.getString("cid");
         //Create a pallet movement object from parameters
-        PalletMovementEvent thisPalletMovementEvent = new PalletMovementEvent(palletid, MovementEventManager.parseMovementType(type), cid);
+        PalletMovementEvent thisPalletMovementEvent = new PalletMovementEvent(palletid, MovementEventManager.parseMovementType(type), cid, "");
         //Validate and commit movement event
         System.out.println("Successfully made pallet movement event!");
         if(thisPalletMovementEvent.isValid()){

@@ -41,7 +41,11 @@ public class GetCurrentPalletStatusHandler extends HandlerPrototype implements H
         PalletMovementEventManager palletMovementEventManager = new PalletMovementEventManager();
         //Get the current movement status from manager query
         MovementStatus currentStatus = palletMovementEventManager.getCurrentStatus(thisPallet);
-        //Convert the movement status to string and return as response
-        this.response = MovementEventManager.movementStatusToString(currentStatus);
+        if(currentStatus == null){
+            this.response = new JSONObject().put("status", "undefined pallet").toString();
+        } else {
+            //Convert the movement status to string and return as response object
+            this.response = new JSONObject().put("status", MovementEventManager.movementStatusToString(currentStatus)).toString();
+        }
     }
 }

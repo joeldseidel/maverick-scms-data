@@ -1,6 +1,5 @@
 package managers;
 
-import maverick_data.DatabaseInteraction;
 import maverick_types.*;
 
 import java.sql.PreparedStatement;
@@ -12,23 +11,33 @@ import java.util.List;
 
 /*
  *  @author Joel Seidel
- *
  *  Data manager for device movement events
  */
-
-
 public class DeviceMovementEventManager extends MovementEventManager {
-    private DatabaseInteraction database;
-    public DeviceMovementEventManager() { database = new DatabaseInteraction(DatabaseType.AppData); }
+    /**
+     * Default constructor to initialize the database connection for manager
+     */
+    public DeviceMovementEventManager() { initDb(DatabaseType.AppData); }
+
+    /**
+     * Get movement status of a specified device
+     * @param item maverick item representing the specified device
+     * @return status of the specified device
+     */
     public MovementStatus getCurrentStatus(MaverickItem item){
+        //Create get movement status sql query
         String getCurrentStatusSql = "SELECT * FROM device_movements WHERE mid = ? ORDER BY movementtime DESC LIMIT 1";
         PreparedStatement currentStatusStmt = database.prepareStatement(getCurrentStatusSql);
         try{
             currentStatusStmt.setString(1, item.getMaverickID());
+            //Perform get movement status sql query
             ResultSet currentStatusResult = database.query(currentStatusStmt);
             if(currentStatusResult.next()){
+                //Get the most recent movement type string
                 String movementTypeStr = currentStatusResult.getString("movementtype");
+                //Convert the movement type string to a movement type object
                 MovementType movementType = parseMovementType(movementTypeStr);
+                //Convert most recent movement type to a movement status
                 return convertToMovementStatus(movementType);
             }
         } catch(SQLException sqlEx){
@@ -36,20 +45,34 @@ public class DeviceMovementEventManager extends MovementEventManager {
         }
         return null;
     }
+
+    /**
+     * Write the device movement record to the database
+     * @param committedEvent event instance to be written into the database
+     */
     public void commitMovement(DeviceMovementEvent committedEvent){
-        String writeMovementEventSql = "INSERT INTO device_movements(mid, movementtype, cid movementtime) VALUES (?, ?, ?, NOW())";
+        //Create the device movement record insert query
+        String writeMovementEventSql = "INSERT INTO device_movements(mid, movementtype, cid, movementtime) VALUES (?, ?, ?, NOW())";
         PreparedStatement writeMovementEventStatement = database.prepareStatement(writeMovementEventSql);
         try{
+            //Prepare the device movement event statement
             writeMovementEventStatement.setString(1, committedEvent.getItemId());
             writeMovementEventStatement.setString(2, MovementEventManager.movementTypeToString(committedEvent.getType()));
             writeMovementEventStatement.setString(3, committedEvent.getCompanyID());
+            //Perform the nonquery
             database.nonQuery(writeMovementEventStatement);
         } catch(SQLException sqlEx){
             sqlEx.printStackTrace();
         }
     }
-    public void relatedDeviceMovementCommit(PalletMovementEvent palletMovementEvent){
-        String getPalletRelatedDevicesSql = "SELECT * FROM table_itempalletmapping WHERE mlot = ? ORDER BY movementtime DESC LIMIT 1";
+
+    /**
+     * Write records of devices on the same pallet to mirror the movement of this device
+     * @param palletMovementEvent the pallet movement event that invokes this method
+     */
+    public void relatedDeviceMovementCommit(PalletMovementEvent palletMovementEvent) {
+        //Create the get related devices sql query
+        String getPalletRelatedDevicesSql = "SELECT * FROM table_itempalletmapping WHERE mlot = ?";
         PreparedStatement getPalletRelatedDevicesStatement = database.prepareStatement(getPalletRelatedDevicesSql);
         try{
             getPalletRelatedDevicesStatement.setString(1, palletMovementEvent.getPallet().getPalletID());
@@ -71,25 +94,38 @@ public class DeviceMovementEventManager extends MovementEventManager {
             }
             //Execute created nonquery batch
             database.batchNonQuery(writeThisDeviceStatement);
+            database.commitBatches();
             //Reset database connection auto commit property now that the batch is completed
             database.setAutoCommit(true);
         } catch(SQLException sqlEx){
             sqlEx.printStackTrace();
         }
     }
+
+    /**
+     * Get the movement events of a specified device
+     * @param maverickItem specified device object
+     * @return a list of device movement event objects
+     */
     public List<DeviceMovementEvent> getMovements(MaverickItem maverickItem){
+        //Create get movement events sql query
         String getItemMovementsSql = "SELECT * FROM device_movements WHERE mid = ? ORDER BY movementtime DESC";
         PreparedStatement getItemMovementsStatement = database.prepareStatement(getItemMovementsSql);
         try{
             getItemMovementsStatement.setString(1, maverickItem.getMaverickID());
+            //Perform get movement events sql query
             ResultSet getItemMovementsResults = database.query(getItemMovementsStatement);
             List<DeviceMovementEvent> deviceMovementEvents = new ArrayList<>();
+            //Iterate through each of the movement event records to create a movement event object
             while(getItemMovementsResults.next()){
+                //Get necessary fields to create a device movement event from record
                 String mid = maverickItem.getMaverickID();
                 MovementType movementType = MovementEventManager.parseMovementType(getItemMovementsResults.getString("movementtype"));
                 String cid = getItemMovementsResults.getString("cid");
                 Date movementTime = getItemMovementsResults.getDate("movementtime");
+                //Instantiate the movement class from the fields
                 DeviceMovementEvent thisMovementEvent = new DeviceMovementEvent(mid, cid, movementType, movementTime);
+                //Add to device movement collection
                 deviceMovementEvents.add(thisMovementEvent);
             }
             return deviceMovementEvents;
@@ -118,5 +154,35 @@ public class DeviceMovementEventManager extends MovementEventManager {
             //u failed nerd
             sqlEx.printStackTrace();
         }
+    }
+
+    /**
+     * Create the 'cycle in' movement of a device when it is imported
+     * @param items list of items to be cycled in
+     */
+    public void initializeItemMovement(List<MaverickItem> items){
+        //Toggle auto commit to allow the creation of a query batch
+        database.setAutoCommit(false);
+        //Create insert device movement sql query
+        PreparedStatement initItemMovementStmt = database.prepareStatement("INSERT INTO device_movements(movementtype, cid, movementtime, mid) VALUES(?, ?, NOW(), ?)");
+        //Iterate through each of the specified items to cycle in
+        for(MaverickItem item : items){
+            try{
+                //Prepare cycle in nonquery statement
+                initItemMovementStmt.setString(1, MovementEventManager.movementTypeToString(MovementType.CycleIn));
+                initItemMovementStmt.setString(2, item.getCustomerID());
+                initItemMovementStmt.setString(3, item.getMaverickID());
+                //Add nonquery statement to the query batch
+                initItemMovementStmt.addBatch();
+            } catch (SQLException sqlEx) {
+                sqlEx.printStackTrace();
+            }
+        }
+        //Run query batch
+        database.batchNonQuery(initItemMovementStmt);
+        //Commit query batch to the database. complete batch transaction
+        database.commitBatches();
+        //Toggle auto commit back to default on
+        database.setAutoCommit(true);
     }
 }

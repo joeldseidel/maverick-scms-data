@@ -2,10 +2,14 @@ import com.sun.net.httpserver.HttpsConfigurator;
 import com.sun.net.httpserver.HttpsParameters;
 import com.sun.net.httpserver.HttpsServer;
 import handlers.*;
+import maverick_data.DatabaseInteraction;
 
 import javax.net.ssl.*;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.net.InetSocketAddress;
+import java.net.URL;
 import java.security.KeyStore;
 
 public class MaverickData {
@@ -22,7 +26,7 @@ public class MaverickData {
             //Initialize the keystore
             char[] password = "password".toCharArray();
             KeyStore keyStore = KeyStore.getInstance("JKS");
-            FileInputStream inputStream = new FileInputStream("testkey.jks");
+            InputStream inputStream = DatabaseInteraction.class.getClassLoader().getResourceAsStream("maverick_data/testkey.jks");
             keyStore.load(inputStream, password);
 
             //Create key manager factory
@@ -79,6 +83,8 @@ public class MaverickData {
         server.createContext("/get_users", new GetUsersHandler());
         server.createContext("/get_items", new GetCompanyItemsHandler());
         server.createContext("/get_pallets", new GetCompanyPalletsHandler());
+        server.createContext("/get_device_data", new GetDeviceDataHandler());
+        server.createContext("/get_item_device_data", new GetItemDeviceDataHandler());
         server.createContext("/add_po", new AddPurchaseOrderHandler());
         server.createContext("/add_pallet", new AddPalletHandler());
         server.createContext("/remove_pallet", new RemovePalletHandler());
@@ -90,6 +96,8 @@ public class MaverickData {
         server.createContext("/get_item_by_lot", new GetItemByLotHandler());
         server.createContext("/get_item_by_search_term", new GetItemBySearchTermHandler());
         server.createContext("/get_current_pallet_status", new GetCurrentPalletStatusHandler());
+        server.createContext("/get_current_item_status", new GetCurrentItemStatusHandler());
+        server.createContext("/import_company_devices", new ImportCompanyDevicesHandler());
         return server;
     }
 }

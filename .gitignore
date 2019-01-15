@@ -60,3 +60,5 @@ fabric.properties
 
 # Editor-based Rest Client
 .idea/httpRequests
+*.xml___jb_tmp___
+.idea/inspectionProfiles/profiles_settings.xml

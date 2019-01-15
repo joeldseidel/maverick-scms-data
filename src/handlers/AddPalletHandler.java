@@ -24,7 +24,7 @@ public class AddPalletHandler extends HandlerPrototype implements HttpHandler {
      */
     public AddPalletHandler(){
         //Set required keys in array inherited from HandlerPrototype super class
-        requiredKeys = new String[] {"cid", "items", "token"};
+        requiredKeys = new String[] {"cid", "token"};
         handlerName = "addPalletHandler";
     }
 

@@ -8,17 +8,37 @@ public class PalletMovementEvent {
     private String palletid, companyID;
     private MovementType type;
     private Date movementTime;
+    private String opid;
     private PalletMovementEventManager palletMovementEventManager = new PalletMovementEventManager();
-    public PalletMovementEvent(String palletid, MovementType type, String companyID){
+
+    /**
+     * Construct a pallet movement event that has not occurred
+     * @param palletid mlot number
+     * @param type type of movement
+     * @param companyID move to company id
+     * @param opid operator id of user who made this movement
+     */
+    public PalletMovementEvent(String palletid, MovementType type, String companyID, String opid){
         this.palletid = palletid;
         this.type = type;
         this.companyID = companyID;
+        this.opid = opid;
     }
-    public PalletMovementEvent(String palletid, MovementType type, String companyID, Date movementTime){
+
+    /**
+     * Construct a pallet movement that has already occurred
+     * @param palletid mlot number
+     * @param type movement type
+     * @param companyID move to company id
+     * @param movementTime time the movement occurred
+     * @param opid operator id of user who made this movement
+     */
+    public PalletMovementEvent(String palletid, MovementType type, String companyID, Date movementTime, String opid){
         this.palletid = palletid;
         this.type = type;
         this.companyID = companyID;
         this.movementTime = movementTime;
+        this.opid = opid;
     }
     public boolean isValid(){
         MovementStatus currentStatus = palletMovementEventManager.getCurrentStatus(getPallet());
@@ -35,7 +55,7 @@ public class PalletMovementEvent {
         palletMovementEventManager.commitMovement(this);
     }
     public MaverickPallet getPallet(){
-        return new MaverickPallet(palletid);
+        return new MaverickPallet(companyID, palletid);
     }
     public String getCompanyID(){
         return companyID;
