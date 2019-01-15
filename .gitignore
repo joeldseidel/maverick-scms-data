@@ -62,3 +62,6 @@ fabric.properties
 .idea/httpRequests
 *.xml___jb_tmp___
 .idea/inspectionProfiles/profiles_settings.xml
+.idea/encodings.xml
+.idea/artifacts/maverick_scms_data_jar.xml
+maverick-scms-data.iml
