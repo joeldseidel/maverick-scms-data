@@ -27,8 +27,9 @@ public class ItemDataManager extends ManagerPrototype {
     /**
      * Add item record to the database
      * @param item item to add to the database
+     * @return success / fail boolean
      */
-    public void addItem(MaverickItem item) {
+    public boolean addItem(MaverickItem item) {
         //Create add item query
         String qryString = "INSERT INTO table_items (mid, fdaid, name, category, cid) " + "VALUES (?, ?, ?, ?, ?)";
         PreparedStatement addItemStmt = database.prepareStatement(qryString);
@@ -38,11 +39,13 @@ public class ItemDataManager extends ManagerPrototype {
             addItemStmt.setString(3, item.getItemName());
             addItemStmt.setString(4, item.getItemCategory());
             addItemStmt.setString(5, item.getCustomerID());
+            //Perform add item query
+            database.nonQuery(addItemStmt);
+            return true;
         } catch (SQLException sqlEx){
             sqlEx.printStackTrace();
+            return false;
         }
-        //Perform add item query
-        database.nonQuery(addItemStmt);
     }
 
     /**
@@ -135,6 +138,7 @@ public class ItemDataManager extends ManagerPrototype {
         return cid;
     }
 
+    //FIXME this method returns a result set and that is not okay, see issue #32
     /**
      * Get item data related to a specific company
      * @param cid company id of the specified company
@@ -213,6 +217,7 @@ public class ItemDataManager extends ManagerPrototype {
         }
     }
 
+    //FIXME this method is never used?
     /**
      * Remove an item from a pallet
      * @param mid mlot of the item to remove from its current pallet
