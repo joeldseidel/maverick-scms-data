@@ -125,6 +125,7 @@ public class DatabaseInteraction {
     /**
      * nonQuery runs a non-query PreparedStatement against the connected database
      * @param nonQueryStatement the statement to execute
+     * @return success / fail boolean
      */
     public boolean nonQuery(PreparedStatement nonQueryStatement){
         try{
@@ -136,6 +137,7 @@ public class DatabaseInteraction {
         }
     }
 
+    //FIXME Remove this method
     public int nonQueryWithIdCallback(PreparedStatement nonQueryIdCallbackStatement){
         try{
             nonQueryIdCallbackStatement.executeUpdate();
@@ -150,24 +152,43 @@ public class DatabaseInteraction {
         }
     }
 
-    public void batchNonQuery(PreparedStatement batchNonQueryStatement){
+    /**
+     * Run a batch non query using a prepared statement built as a batch
+     * @param batchNonQueryStatement batch statement to run as batch
+     * @return success / fail boolean
+     */
+    public boolean batchNonQuery(PreparedStatement batchNonQueryStatement){
         try{
+            //Execute batch non query
             batchNonQueryStatement.executeBatch();
+            return true;
         } catch(SQLException sqlEx){
             sqlEx.printStackTrace();
+            return false;
         }
     }
 
+    /**
+     * Commit performed batch to the database
+     */
     public void commitBatches(){
         try{
+            //Commit batch to database
             dbConn.commit();
         } catch(SQLException sqlEx){
             sqlEx.printStackTrace();
         }
     }
 
+    /**
+     * Toggle auto commit property of the database connection
+     * This is typically used before and after creating a batch
+     * Default value for auto commit is true
+     * @param isAutoCommit desired auto commit state
+     */
     public void setAutoCommit(boolean isAutoCommit) {
         try{
+            //Change auto commit to desired state
             dbConn.setAutoCommit(isAutoCommit);
         } catch(SQLException sqlEx) {
             sqlEx.printStackTrace();
