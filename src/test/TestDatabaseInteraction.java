@@ -1,7 +1,6 @@
 import com.joelseidel.java_datatable.DataTable;
 import maverick_data.DatabaseInteraction;
 import maverick_types.DatabaseType;
-import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Test;
 
