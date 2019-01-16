@@ -5,9 +5,10 @@ import org.junit.runner.notification.Failure;
 public class TestRunner {
     public static void main(String args[]){
         Result result = JUnitCore.runClasses(TestDatabaseInteraction.class);
+        System.out.println("\n\nFailures:");
         for(Failure failure : result.getFailures()){
             System.out.println(failure.toString());
         }
-        System.out.println(result.wasSuccessful());
+        System.out.println("\n\n\n-------------------Result----------------------------\n\n\nAll tests passed: " +result.wasSuccessful());
     }
 }
