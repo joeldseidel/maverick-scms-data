@@ -49,8 +49,9 @@ public class DeviceMovementEventManager extends MovementEventManager {
     /**
      * Write the device movement record to the database
      * @param committedEvent event instance to be written into the database
+     * @return success / fail boolean
      */
-    public void commitMovement(DeviceMovementEvent committedEvent){
+    public boolean commitMovement(DeviceMovementEvent committedEvent){
         //Create the device movement record insert query
         String writeMovementEventSql = "INSERT INTO device_movements(mid, movementtype, cid, movementtime) VALUES (?, ?, ?, NOW())";
         PreparedStatement writeMovementEventStatement = database.prepareStatement(writeMovementEventSql);
@@ -61,11 +62,15 @@ public class DeviceMovementEventManager extends MovementEventManager {
             writeMovementEventStatement.setString(3, committedEvent.getCompanyID());
             //Perform the nonquery
             database.nonQuery(writeMovementEventStatement);
+            return true;
         } catch(SQLException sqlEx){
             sqlEx.printStackTrace();
+            return false;
         }
     }
 
+
+    //FIXME this needs to be moved to the pallet movement event class. Its really an egregious example of screwed up encapsulation
     /**
      * Write records of devices on the same pallet to mirror the movement of this device
      * @param palletMovementEvent the pallet movement event that invokes this method

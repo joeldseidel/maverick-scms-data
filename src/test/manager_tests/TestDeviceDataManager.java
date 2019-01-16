@@ -3,7 +3,6 @@ package manager_tests;
 import managers.DeviceDataManager;
 import maverick_types.FDADeviceTypes.FDADevice;
 import org.json.JSONObject;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.List;
@@ -12,7 +11,6 @@ import static org.junit.Assert.*;
 
 public class TestDeviceDataManager {
     private DeviceDataManager deviceDataManager = new DeviceDataManager();
-
 
     private static final String fdaId = "e124c470-a338-4033-b23c-48863b11367f";
     private static final int testFdaDevicePropertyCount = 42;

@@ -4,11 +4,11 @@ import org.junit.runner.notification.Failure;
 
 public class TestRunner {
     public static void main(String args[]){
-        System.out.println("----------DatabaseInteraction----------\n\n");
-        Result result = JUnitCore.runClasses(TestDatabaseInteraction.class);
-        displayTestResults(result);
+        //System.out.println("----------DatabaseInteraction----------\n\n");
+        //Result result = JUnitCore.runClasses(TestDatabaseInteraction.class);
+        //displayTestResults(result);
         System.out.println("----------------Managers---------------\n\n");
-        result = JUnitCore.runClasses(ManagerTestSuite.class);
+        Result result = JUnitCore.runClasses(ManagerTestSuite.class);
         displayTestResults(result);
     }
 

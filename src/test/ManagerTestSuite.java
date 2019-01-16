@@ -1,4 +1,5 @@
 import manager_tests.TestDeviceDataManager;
+import manager_tests.TestDeviceMovementEventManager;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -6,6 +7,7 @@ import org.junit.runners.Suite;
 
 @Suite.SuiteClasses({
         TestDeviceDataManager.class,
+        TestDeviceMovementEventManager.class
 })
 
 public class ManagerTestSuite { }
