@@ -3,6 +3,7 @@ package managers;
 import com.joelseidel.java_datatable.DataTable;
 import com.joelseidel.java_datatable.TableRow;
 import com.joelseidel.java_datatable.Field;
+import maverick_data.DatabaseInteraction;
 import maverick_types.DatabaseType;
 import maverick_types.FDADeviceTypes.*;
 import org.json.JSONArray;
@@ -24,9 +25,8 @@ public class DeviceDataManager extends ManagerPrototype {
      * Default constructor
      * Creates database connection in the super class
      */
-    public DeviceDataManager(){
-        //Create db connection
-        initDb(DatabaseType.Devices);
+    public DeviceDataManager(DatabaseInteraction database){
+        this.database = database;
     }
 
     /**

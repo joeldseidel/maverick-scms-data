@@ -6,6 +6,8 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
+import maverick_data.DatabaseInteraction;
+import maverick_types.DatabaseType;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -14,8 +16,9 @@ public abstract class HandlerPrototype {
     protected String[] requiredKeys;
     protected String response;
     protected String handlerName;
+    protected DatabaseInteraction database;
 
-    JSONObject GetParameterObject(HttpExchange httpExchange) throws IOException {
+    private JSONObject GetParameterObject(HttpExchange httpExchange) throws IOException {
         //Fetch the parameter text from the request
         InputStream paramInStream = httpExchange.getRequestBody();
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -33,7 +36,7 @@ public abstract class HandlerPrototype {
         }
     }
 
-    void displayRequestValidity(boolean isValidRequest){
+    private void displayRequestValidity(boolean isValidRequest){
         if(isValidRequest){
             System.out.println("Valid Request");
         } else {
@@ -103,4 +106,12 @@ public abstract class HandlerPrototype {
     }
 
     protected abstract void fulfillRequest(JSONObject requestParams);
+
+    protected void initDb(DatabaseType databaseType){
+        this.database = new DatabaseInteraction(databaseType);
+    }
+
+    protected void disposeDb(){
+        this.database.closeConnection();
+    }
 }

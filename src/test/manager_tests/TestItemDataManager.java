@@ -104,7 +104,7 @@ public class TestItemDataManager {
         }
     }
 
-    private static String testRemoveMLot = "2";
+    private static final String testRemoveMLot = "2";
 
     @Test
     public void testRemoveItem(){
