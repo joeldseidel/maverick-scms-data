@@ -75,7 +75,7 @@ public class PalletMovementEventManager extends MovementEventManager {
     private void updatePalletRelatedDevices(PalletMovementEvent committedEvent){
         //All of this occurs within the device movement event manager
         //LMAO pranked you thought it was gonna be processed here didn't you nerd
-        DeviceMovementEventManager deviceMovementEventManager = new DeviceMovementEventManager();
+        DeviceMovementEventManager deviceMovementEventManager = new DeviceMovementEventManager(database);
         deviceMovementEventManager.relatedDeviceMovementCommit(committedEvent);
     }
 

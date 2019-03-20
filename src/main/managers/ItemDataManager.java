@@ -82,7 +82,7 @@ public class ItemDataManager extends ManagerPrototype {
      * @return generated mlot value
      */
     public static long generateItemLotNumber(){
-        LotNumberManager lotNumber = new LotNumberManager();
+        LotNumberManager lotNumber = new LotNumberManager(new DatabaseInteraction(DatabaseType.AppData));
         //Generate an return generated lot number
         return lotNumber.generateLotNumber(LotType.Item);
     }
@@ -326,7 +326,7 @@ public class ItemDataManager extends ManagerPrototype {
      */
     public void importFDADevices(List<FDADevice> fdaDevices, String cid){
         List<MaverickItem> importedMItems = new ArrayList<MaverickItem>();
-        LotNumberManager lotNumberManager = new LotNumberManager();
+        LotNumberManager lotNumberManager = new LotNumberManager(database);
         //Create a new maverick item record for each of the passed devices
         for(FDADevice device : fdaDevices){
             //Get the necessary fields for instantiation
@@ -341,7 +341,7 @@ public class ItemDataManager extends ManagerPrototype {
         }
         //Create item database records for each of the imported maverick items
         addItem(importedMItems);
-        DeviceMovementEventManager deviceMovementEventManager = new DeviceMovementEventManager();
+        DeviceMovementEventManager deviceMovementEventManager = new DeviceMovementEventManager(database);
         //Create the cycle in movement for the imported devices
         deviceMovementEventManager.initializeItemMovement(importedMItems);
     }

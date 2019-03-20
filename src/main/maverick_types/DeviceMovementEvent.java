@@ -1,6 +1,7 @@
 package maverick_types;
 
 import managers.DeviceMovementEventManager;
+import maverick_data.DatabaseInteraction;
 
 import java.util.Date;
 
@@ -21,7 +22,7 @@ public class DeviceMovementEvent {
         this.movementTime = movementTime;
     }
     public boolean isValid(){
-        deviceMovementEventManager = new DeviceMovementEventManager();
+        deviceMovementEventManager = new DeviceMovementEventManager(new DatabaseInteraction(DatabaseType.AppData));
         MovementStatus currentStatus = deviceMovementEventManager.getCurrentStatus(getItem());
         if(!deviceMovementEventManager.isLegalMovement(currentStatus, type)){
             return false;
@@ -29,7 +30,7 @@ public class DeviceMovementEvent {
         //Todo: implement checks for other things probably
         return true;
     }
-    public void commit(){ new DeviceMovementEventManager().commitMovement(this); }
+    public void commit(){ new DeviceMovementEventManager(new DatabaseInteraction(DatabaseType.AppData)).commitMovement(this); }
 
     public String getItemId(){
         return mid;

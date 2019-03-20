@@ -44,10 +44,10 @@ public class PalletDataManager extends ManagerPrototype {
         }catch(SQLException sqlEx){
             sqlEx.printStackTrace();
         }
-        PalletMovementEventManager palletMovementEventManager = new PalletMovementEventManager();
+        PalletMovementEventManager palletMovementEventManager = new PalletMovementEventManager(database);
         //Initialize a pallet movement, essentially the cycle in of the apllet
         palletMovementEventManager.initializePalletMovement(pallet);
-        DeviceMovementEventManager deviceMovementEventManager = new DeviceMovementEventManager();
+        DeviceMovementEventManager deviceMovementEventManager = new DeviceMovementEventManager(database);
         //Add all of the items within the pallet to the new pallet and initialize their cycle in
         for(MaverickItem item : pallet.getItems()){
             //Add the item to the pallet, create the mapping record
@@ -109,7 +109,7 @@ public class PalletDataManager extends ManagerPrototype {
             PreparedStatement palletItemsStatement = this.database.prepareStatement(getPalletItemsSql);
             palletItemsStatement.setString(1, palletId);
             ResultSet palletItemsResults = database.query(palletItemsStatement);
-            ItemDataManager itemDataManager = new ItemDataManager();
+            ItemDataManager itemDataManager = new ItemDataManager(database);
             //Create a maverick item object instance for each of the resulting item records
             while(palletItemsResults.next()){
                 //Get the mid from the pallet mapping
