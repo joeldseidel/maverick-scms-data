@@ -4,6 +4,7 @@ import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import managers.ItemDataManager;
+import maverick_types.DatabaseType;
 import maverick_types.MaverickItem;
 import org.json.JSONObject;
 
@@ -23,6 +24,7 @@ public class GetItemByLotHandler extends HandlerPrototype implements HttpHandler
         //Set required keys in array inherited from HandlerPrototype super class
         requiredKeys = new String[] {"mid", "token"};
         handlerName = "GetItemByLotHandler";
+        initDb(DatabaseType.AppData);
     }
 
     /**
@@ -34,7 +36,7 @@ public class GetItemByLotHandler extends HandlerPrototype implements HttpHandler
         //Parse params from the request parameters object
         String mlot = requestParams.getString("mid");
         //Instantiate item manager to get item from database with lot number
-        ItemDataManager itemDataManager = new ItemDataManager();
+        ItemDataManager itemDataManager = new ItemDataManager(database);
         //Get maverick item from database by lot number
         MaverickItem thisItem = itemDataManager.getItem(mlot);
         //Format maverick object into a json object to stringify and send back as response

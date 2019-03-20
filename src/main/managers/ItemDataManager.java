@@ -20,8 +20,8 @@ public class ItemDataManager extends ManagerPrototype {
     /**
      * Constructor for the ItemDataManager class
      */
-    public ItemDataManager() {
-        initDb(DatabaseType.AppData);
+    public ItemDataManager(DatabaseInteraction database) {
+        this.database = database;
     }
 
     /**

@@ -16,7 +16,7 @@ public abstract class HandlerPrototype {
     protected String[] requiredKeys;
     protected String response;
     protected String handlerName;
-    protected DatabaseInteraction database;
+    protected DatabaseInteraction database = null;
 
     private JSONObject GetParameterObject(HttpExchange httpExchange) throws IOException {
         //Fetch the parameter text from the request
@@ -99,19 +99,23 @@ public abstract class HandlerPrototype {
         headers.add("Access-Control-Allow-Origin", "*");
         httpExchange.sendResponseHeaders(responseCode, this.response.length());
         System.out.println("Response to " + handlerName + ": " + this.response);
+        closeDataConnection();
         //Write response to the client
         OutputStream os = httpExchange.getResponseBody();
         os.write(this.response.getBytes());
         os.close();
     }
 
-    protected abstract void fulfillRequest(JSONObject requestParams);
-
-    protected void initDb(DatabaseType databaseType){
-        this.database = new DatabaseInteraction(databaseType);
+    /**
+     * Close the database connection if it exists
+     */
+    private void closeDataConnection(){
+        try{ database.closeConnection(); } catch (NullPointerException ignored){}
     }
 
-    protected void disposeDb(){
-        this.database.closeConnection();
+    protected abstract void fulfillRequest(JSONObject requestParams);
+
+    void initDb(DatabaseType databaseType) {
+        this.database = new DatabaseInteraction(databaseType);
     }
 }

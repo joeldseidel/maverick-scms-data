@@ -24,7 +24,7 @@ import javax.imageio.ImageIO;
  * @author Joel Seidel
  */
 public class LotNumberManager extends ManagerPrototype{
-    public LotNumberManager(){ initDb(DatabaseType.AppData); }
+    public LotNumberManager(DatabaseInteraction database){ this.database = database; }
 
     /**
      * Generate a new lot number given a specific lot type argument

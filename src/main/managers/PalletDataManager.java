@@ -21,8 +21,8 @@ public class PalletDataManager extends ManagerPrototype {
     /**
      * Constructor for the PalletDataManager class
      */
-    public PalletDataManager() {
-        initDb(DatabaseType.AppData);
+    public PalletDataManager(DatabaseInteraction database) {
+        this.database = database;
     }
 
     /**

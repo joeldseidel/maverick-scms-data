@@ -4,6 +4,7 @@ import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import managers.UserDataManager;
+import maverick_types.DatabaseType;
 import org.json.JSONObject;
 
 
@@ -22,6 +23,7 @@ public class UserRegistrationHandler extends HandlerPrototype implements HttpHan
     public void UserRegistrationHandler(){
         requiredKeys = new String[]{"cid", "username", "password", "token"};
         handlerName = "UserRegistrationHandler";
+        initDb(DatabaseType.AppData);
     }
 
     @Override
@@ -38,7 +40,7 @@ public class UserRegistrationHandler extends HandlerPrototype implements HttpHan
             this.response = responseObject.toString();
         } else {
             //ADD USER THROUGH UserDataManager
-            UserDataManager userDataManager = new UserDataManager();
+            UserDataManager userDataManager = new UserDataManager(database);
             userDataManager.addUser(cid, username, password);
             responseObject.put("message","Success");
             this.response = responseObject.toString();

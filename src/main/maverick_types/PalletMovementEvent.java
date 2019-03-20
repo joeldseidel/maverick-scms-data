@@ -1,6 +1,7 @@
 package maverick_types;
 
 import managers.PalletMovementEventManager;
+import maverick_data.DatabaseInteraction;
 
 import java.util.Date;
 
@@ -9,7 +10,7 @@ public class PalletMovementEvent {
     private MovementType type;
     private Date movementTime;
     private String opid;
-    private PalletMovementEventManager palletMovementEventManager = new PalletMovementEventManager();
+    private PalletMovementEventManager palletMovementEventManager = new PalletMovementEventManager(new DatabaseInteraction(DatabaseType.AppData));
 
     /**
      * Construct a pallet movement event that has not occurred

@@ -4,6 +4,7 @@ import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpHandler;
 import managers.PalletDataManager;
 import managers.PurchaseOrderDataManager;
+import maverick_types.DatabaseType;
 import maverick_types.MaverickPallet;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -21,6 +22,7 @@ public class BindPurchaseOrderLinePalletsHandler extends HandlerPrototype implem
         //Define the required keys in super class
         requiredKeys = new String[] {"poid", "poline", "pallets", "token"};
         handlerName = "BindPurchaseOrderLinePalletsHandler";
+        initDb(DatabaseType.AppData);
     }
 
     /**
@@ -36,7 +38,7 @@ public class BindPurchaseOrderLinePalletsHandler extends HandlerPrototype implem
         //Parse the json array to get maverick pallet items from data
         List<MaverickPallet> palletsToBind = PalletDataManager.parseFromJsonArray(palletsArray);
         //Instantiate the data manager to interface with the pallet binding data
-        PurchaseOrderDataManager purchaseOrderDataManager = new PurchaseOrderDataManager();
+        PurchaseOrderDataManager purchaseOrderDataManager = new PurchaseOrderDataManager(database);
         for(MaverickPallet thisPallet : palletsToBind){
             //For each pallet, write the pallet binding to the database
             purchaseOrderDataManager.bindPallet(poId, poline, thisPallet);

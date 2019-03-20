@@ -22,7 +22,7 @@ public class UserDataManager extends ManagerPrototype {
     /**
      * Default constructor to initialize the database connection
      */
-    public UserDataManager() { initDb(DatabaseType.AppData); }
+    public UserDataManager(DatabaseInteraction database) { this.database = database; }
 
     /**
      * Get the number of user accounts which relate to the specified username

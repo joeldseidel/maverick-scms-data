@@ -33,6 +33,7 @@ public class AuthenticateUserHandler extends HandlerPrototype implements HttpHan
         //Set required keys in array inherited from HandlerPrototype super class
         requiredKeys = new String[] {"username", "password", "returnUserData"};
         handlerName = "AuthenticateUserHandler";
+        initDb(DatabaseType.AppData);
     }
 
     /**
@@ -85,7 +86,7 @@ public class AuthenticateUserHandler extends HandlerPrototype implements HttpHan
      */
     private boolean isUserValid(String username, String password){
         boolean userIsValid;
-        UserDataManager userDataManager = new UserDataManager();
+        UserDataManager userDataManager = new UserDataManager(database);
         boolean userExists = (userDataManager.getUserCount(username) == 1);
         if(userExists){
             //Get UUID for password checking
@@ -104,7 +105,7 @@ public class AuthenticateUserHandler extends HandlerPrototype implements HttpHan
         System.out.println("Attempting to get user data for username : " + username);
         DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
 
-        UserDataManager userDataManager = new UserDataManager();
+        UserDataManager userDataManager = new UserDataManager(database);
         ResultSet getUserDataResults = userDataManager.getUserData(username);
         JSONObject userDataObject = new JSONObject();
         try{

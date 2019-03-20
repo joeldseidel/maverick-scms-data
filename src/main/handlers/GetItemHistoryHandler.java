@@ -6,6 +6,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import managers.DeviceMovementEventManager;
 import managers.MovementEventManager;
+import maverick_types.DatabaseType;
 import maverick_types.DeviceMovementEvent;
 import maverick_types.MaverickItem;
 import org.json.JSONArray;
@@ -28,6 +29,7 @@ public class GetItemHistoryHandler extends HandlerPrototype implements HttpHandl
         //Set inherited required keys property to unique handler required keys
         requiredKeys = new String[]{"mid", "token"};
         handlerName = "GetItemHistoryHandler";
+        initDb(DatabaseType.AppData);
     }
 
     /**
@@ -41,7 +43,7 @@ public class GetItemHistoryHandler extends HandlerPrototype implements HttpHandl
         //Instantiate item object from request parameters
         MaverickItem thisItem = new MaverickItem(mid);
         //Instantiate item movement event manager to fetch device movement history records
-        DeviceMovementEventManager deviceMovementEventManager = new DeviceMovementEventManager();
+        DeviceMovementEventManager deviceMovementEventManager = new DeviceMovementEventManager(database);
         //Get device movement history on requested device
         List<DeviceMovementEvent> deviceMovementEvents = deviceMovementEventManager.getMovements(thisItem);
         //Format device movement event list into returnable JSON array

@@ -17,7 +17,7 @@ public class PalletMovementEventManager extends MovementEventManager {
     /**
      * Default constructor to initialize database connection
      */
-    public PalletMovementEventManager(){ initDb(DatabaseType.AppData); }
+    public PalletMovementEventManager(DatabaseInteraction database){ this.database = database; }
 
     /**
      * Get current status of a pallet

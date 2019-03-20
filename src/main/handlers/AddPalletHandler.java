@@ -3,6 +3,7 @@ package handlers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.Headers;
+import maverick_types.DatabaseType;
 import org.json.JSONObject;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -26,6 +27,7 @@ public class AddPalletHandler extends HandlerPrototype implements HttpHandler {
         //Set required keys in array inherited from HandlerPrototype super class
         requiredKeys = new String[] {"cid", "token"};
         handlerName = "addPalletHandler";
+        initDb(DatabaseType.AppData);
     }
 
     /**
@@ -39,7 +41,7 @@ public class AddPalletHandler extends HandlerPrototype implements HttpHandler {
         System.out.println("Entered add pallet handler with cid " + requestParams.getString("cid"));
         //Create pallet items
         MaverickPallet thisPallet = new MaverickPallet(cid);
-        PalletDataManager palletDataManager = new PalletDataManager();
+        PalletDataManager palletDataManager = new PalletDataManager(database);
         System.out.println("Created pallet and manager successfully");
         //PERFORM PALLET ADDING
         palletDataManager.addPallet(thisPallet);

@@ -3,6 +3,7 @@ import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import managers.ItemDataManager;
+import maverick_types.DatabaseType;
 import maverick_types.MaverickItem;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -25,6 +26,7 @@ public class GetItemBySearchTermHandler extends HandlerPrototype implements Http
         //Set the required keys within the super class
         requiredKeys = new String[] {"cid", "term", "token"};
         handlerName = "GetItemBySearchTermHandler";
+        initDb(DatabaseType.AppData);
     }
 
     /**
@@ -37,7 +39,7 @@ public class GetItemBySearchTermHandler extends HandlerPrototype implements Http
         String searchTerm = requestParams.getString("term");
         String cid = requestParams.getString("cid");
         //Item data manager instance for query and convert
-        ItemDataManager itemDataManager = new ItemDataManager();
+        ItemDataManager itemDataManager = new ItemDataManager(database);
         //Get the search results from the database
         List<MaverickItem> searchResults = itemDataManager.searchItemByTerm(searchTerm, cid);
         //Convert the list of items into a json array to return to client

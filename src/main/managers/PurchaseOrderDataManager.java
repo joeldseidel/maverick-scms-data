@@ -20,8 +20,8 @@ public class PurchaseOrderDataManager extends ManagerPrototype {
     /**
      * Default constructor to initialize the database connection for the manager
      */
-    public PurchaseOrderDataManager() {
-        initDb(DatabaseType.AppData);
+    public PurchaseOrderDataManager(DatabaseInteraction database) {
+        this.database = database;
     }
 
     /**
