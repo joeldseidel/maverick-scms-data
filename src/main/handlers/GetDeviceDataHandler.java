@@ -3,6 +3,7 @@ package handlers;
 import com.sun.net.httpserver.HttpHandler;
 import managers.DeviceDataManager;
 import maverick_data.DatabaseInteraction;
+import maverick_types.DatabaseType;
 import maverick_types.FDADeviceTypes.FDADevice;
 import org.json.JSONObject;
 import org.json.JSONArray;
@@ -32,7 +33,7 @@ public class GetDeviceDataHandler extends HandlerPrototype implements HttpHandle
 
     private JSONArray getDeviceJsonArray(List<FDADevice> devices){
         JSONArray deviceArray = new JSONArray();
-        DeviceDataManager deviceDataManager = new DeviceDataManager();
+        DeviceDataManager deviceDataManager = new DeviceDataManager(database);
         for(FDADevice device : devices){
             JSONObject deviceObj = deviceDataManager.serializeToJson(device);
             deviceArray.put(deviceObj);
@@ -41,12 +42,14 @@ public class GetDeviceDataHandler extends HandlerPrototype implements HttpHandle
     }
 
     private List<FDADevice> getDeviceDataObjects(List<String> deviceIds){
-        DeviceDataManager deviceDataManager = new DeviceDataManager();
+        DatabaseInteraction fdaData = new DatabaseInteraction(DatabaseType.Devices);
+        DeviceDataManager deviceDataManager = new DeviceDataManager(fdaData);
         List<FDADevice> devices = new ArrayList<>();
         for(String fdaId : deviceIds){
             FDADevice thisDevice = deviceDataManager.getDeviceByFdaId(fdaId);
             devices.add(thisDevice);
         }
+        fdaData.closeConnection();
         return devices;
     }
 

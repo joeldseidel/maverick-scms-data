@@ -27,6 +27,7 @@ public class GetCompanyPalletsHandler extends HandlerPrototype implements HttpHa
     public GetCompanyPalletsHandler(){
         requiredKeys = new String[] {"cid", "token"};
         handlerName = "GetCompanyPalletsHandler";
+        initDb(DatabaseType.AppData);
     }
 
     @Override
@@ -38,6 +39,7 @@ public class GetCompanyPalletsHandler extends HandlerPrototype implements HttpHa
         this.response = itemDataObject.toString();
     }
 
+    //FIXME remove the database interaction from this module
     private JSONObject getItemDataByCompany(String cid){
         System.out.println("Attempting to get item data for company : " + cid);
         DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
@@ -66,7 +68,7 @@ public class GetCompanyPalletsHandler extends HandlerPrototype implements HttpHa
 
     /**
      * Convert a result set into a JSON Array
-     * @param resultSet
+     * @param itemDataResults idr
      * @return a JSONArray
      * @throws Exception
      */

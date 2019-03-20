@@ -4,6 +4,7 @@ import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import managers.LotNumberManager;
+import maverick_types.DatabaseType;
 import maverick_types.LotType;
 import org.json.JSONObject;
 
@@ -15,6 +16,7 @@ public class GenerateLotNumberHandler extends HandlerPrototype implements HttpHa
     public GenerateLotNumberHandler(){
         requiredKeys = new String[] {"lot_type"};
         handlerName = "GenerateLotNumberHandler";
+        initDb(DatabaseType.AppData);
     }
 
     @Override
@@ -29,6 +31,6 @@ public class GenerateLotNumberHandler extends HandlerPrototype implements HttpHa
                 lotType = LotType.Pallet;
                 break;
         }
-        this.response = Long.toString(new LotNumberManager().generateLotNumber(lotType));
+        this.response = Long.toString(new LotNumberManager(database).generateLotNumber(lotType));
     }
 }

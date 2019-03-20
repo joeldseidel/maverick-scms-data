@@ -26,6 +26,7 @@ public class GetUsersHandler extends HandlerPrototype implements HttpHandler {
     public GetUsersHandler(){
         requiredKeys = new String[] {"cid", "token"};
         handlerName = "GetUsersHandler";
+        initDb(DatabaseType.AppData);
     }
 
     @Override
@@ -63,7 +64,7 @@ public class GetUsersHandler extends HandlerPrototype implements HttpHandler {
 
     /**
      * Convert a result set into a JSON Array
-     * @param resultSet
+     * @param userDataResults this is bad
      * @return a JSONArray
      * @throws Exception
      */

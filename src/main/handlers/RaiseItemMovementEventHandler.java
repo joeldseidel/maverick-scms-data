@@ -4,6 +4,7 @@ import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import managers.MovementEventManager;
+import maverick_types.DatabaseType;
 import maverick_types.DeviceMovementEvent;
 import org.json.JSONObject;
 

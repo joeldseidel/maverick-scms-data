@@ -3,6 +3,7 @@ package handlers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.Headers;
+import maverick_types.DatabaseType;
 import org.json.JSONObject;
 import org.json.JSONArray;
 
@@ -28,6 +29,7 @@ public class AddPurchaseOrderHandler extends HandlerPrototype implements HttpHan
         //Set required keys in array inherited from HandlerPrototype super class
         requiredKeys = new String[] {"number", "dateplaced", "placingcompany", "cid", "lines", "token"};
         handlerName = "AddPurchaseOrderHandler";
+        initDb(DatabaseType.AppData);
     }
 
     /**
@@ -43,7 +45,7 @@ public class AddPurchaseOrderHandler extends HandlerPrototype implements HttpHan
         String placingcompany = requestParams.getString("placingcompany");
         //CREATE PURCHASE ORDER
         MaverickPurchaseOrder thisOrder = new MaverickPurchaseOrder(number, dateplaced, placingcompany, cid);
-        PurchaseOrderDataManager poDataManager = new PurchaseOrderDataManager();
+        PurchaseOrderDataManager poDataManager = new PurchaseOrderDataManager(database);
         //ADD PURCHASE ORDER LINES
         JSONArray lines = requestParams.getJSONArray("lines");
         for (int i = 0; i < lines.length(); i++) {

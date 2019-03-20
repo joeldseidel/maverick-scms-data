@@ -5,6 +5,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import managers.MovementEventManager;
 import managers.PalletMovementEventManager;
+import maverick_types.DatabaseType;
 import maverick_types.MaverickPallet;
 import maverick_types.PalletMovementEvent;
 import org.json.JSONArray;
@@ -29,6 +30,7 @@ public class GetPalletHistoryHandler extends HandlerPrototype implements HttpHan
         //Set inherited required keys property to unique handler required keys
         requiredKeys = new String[]{"palletid", "cid", "token"};
         handlerName = "GetPalletHistoryHandler";
+        initDb(DatabaseType.AppData);
     }
 
     /**
@@ -43,7 +45,7 @@ public class GetPalletHistoryHandler extends HandlerPrototype implements HttpHan
         //Instantiate pallet object from request parameters
         MaverickPallet thisPallet = new MaverickPallet(palletlot, cid);
         //Instantiate pallet movement event manager to fetch pallet movement data from database
-        PalletMovementEventManager palletMovementEventManager = new PalletMovementEventManager();
+        PalletMovementEventManager palletMovementEventManager = new PalletMovementEventManager(database);
         //Get pallet movement event history on requested pallet
         List<PalletMovementEvent> palletMovementEvents = palletMovementEventManager.getMovements(thisPallet);
         //Format pallet movement event list into returnable JSON array

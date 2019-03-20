@@ -27,6 +27,7 @@ public class GetCompanyItemsHandler extends HandlerPrototype implements HttpHand
     public GetCompanyItemsHandler(){
         requiredKeys = new String[]{"cid", "token"};
         handlerName = "GetCompanyItemsHandler";
+        initDb(DatabaseType.AppData);
     }
 
     @Override
@@ -39,34 +40,30 @@ public class GetCompanyItemsHandler extends HandlerPrototype implements HttpHand
     }
     private JSONObject getItemDataByCompany(String cid){
         System.out.println("Attempting to get item data for company : " + cid);
-        DatabaseInteraction database = new DatabaseInteraction(DatabaseType.AppData);
-
-        ItemDataManager itemDataManager = new ItemDataManager();
+        ItemDataManager itemDataManager = new ItemDataManager(database);
         ResultSet getItemDataResults = itemDataManager.getItemDataByCompany(cid);
 
          JSONObject itemDataObject = new JSONObject();
-            try{
-                itemDataObject.put("arrayResult",getItemDataFormattedResponse(getItemDataResults));
-            }
-            catch(SQLException sqlEx){
-                sqlEx.printStackTrace();
-                itemDataObject = null;
-            }
-            catch(Exception e){
-                System.out.println("Failed to get Formatted Response for " + e);
-                itemDataObject = null;
-            }
-
-        finally{
-            database.closeConnection();
-            }
+         try{
+            itemDataObject.put("arrayResult",getItemDataFormattedResponse(getItemDataResults));
+         }
+         catch(SQLException sqlEx){
+            sqlEx.printStackTrace();
+            itemDataObject = null;
+         }
+         catch(Exception e){
+             System.out.println("Failed to get Formatted Response for " + e);
+             itemDataObject = null;
+         }
         System.out.println("Got Item Data Object : " + itemDataObject);
         return itemDataObject;
     }
 
+
+    //TODO: verify whether this result set is not supposed to be here or not
     /**
      * Convert a result set into a JSON Array
-     * @param resultSet
+     * @param itemDataResults
      * @return a JSONArray
      * @throws Exception
      */

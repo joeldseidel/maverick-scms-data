@@ -5,6 +5,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import managers.UserDataManager;
 
+import maverick_types.DatabaseType;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -24,6 +25,7 @@ public class EditUserHandler extends HandlerPrototype implements HttpHandler {
     public EditUserHandler(){
         requiredKeys = new String[] {"cid", "uid", "field", "newvalue", "token"};
         handlerName = "EditUserHandler";
+        initDb(DatabaseType.AppData);
     }
 
     @Override
@@ -44,7 +46,7 @@ public class EditUserHandler extends HandlerPrototype implements HttpHandler {
             this.response = responseObject.toString();
         }
         else {
-            UserDataManager userDataManager = new UserDataManager();
+            UserDataManager userDataManager = new UserDataManager(database);
             //Perform requested operation
             switch (field) {
                 case "username":

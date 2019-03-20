@@ -3,6 +3,7 @@ package handlers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.Headers;
+import maverick_types.DatabaseType;
 import org.json.JSONObject;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -22,6 +23,7 @@ public class RemovePalletHandler extends HandlerPrototype implements HttpHandler
         //Define the required keys in the super class
         requiredKeys = new String[] {"cid", "pallet", "token"};
         handlerName = "RemovePalletHandler";
+        initDb(DatabaseType.AppData);
     }
 
     @Override
@@ -29,8 +31,7 @@ public class RemovePalletHandler extends HandlerPrototype implements HttpHandler
         JSONObject responseObject = new JSONObject();
         String cid = requestParams.getString("cid");
         String pallet = requestParams.getString("pallet");
-        
-        PalletDataManager palletDataManager = new PalletDataManager();
+        PalletDataManager palletDataManager = new PalletDataManager(database);
         //ENSURE PALLET IS IN COMPANY
         if(!palletDataManager.getPalletCID(pallet).equals(cid)){
             responseObject.put("message","PalletOutsideCompanyError");

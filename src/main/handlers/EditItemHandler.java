@@ -4,6 +4,7 @@ import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import managers.ItemDataManager;
+import maverick_types.DatabaseType;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
@@ -35,6 +36,7 @@ public class EditItemHandler extends HandlerPrototype implements HttpHandler {
         //Set required keys in array inherited from HandlerPrototype super class
         requiredKeys = new String[] {"cid", "mid", "field", "newvalue", "token"};
         handlerName = "EditItemHandler";
+        initDb(DatabaseType.AppData);
     }
 
     /**
@@ -50,7 +52,7 @@ public class EditItemHandler extends HandlerPrototype implements HttpHandler {
         String field = requestParams.getString("field");
         String newvalue = requestParams.getString("newvalue");
 
-        ItemDataManager itemDataManager = new ItemDataManager();
+        ItemDataManager itemDataManager = new ItemDataManager(database);
         //Check that CID of User matches requesting CID
         if(!itemDataManager.getItemCID(mid).equals(cid)){
             responseObject.put("message","OutsideCompanyError");

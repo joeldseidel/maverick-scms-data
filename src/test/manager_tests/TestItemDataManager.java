@@ -15,7 +15,7 @@ import java.sql.SQLException;
 import static org.junit.Assert.*;
 
 public class TestItemDataManager {
-    private ItemDataManager itemDataManager = new ItemDataManager();
+    private ItemDataManager itemDataManager = new ItemDataManager(new DatabaseInteraction(DatabaseType.AppData));
 
     private static final String testMlot = "1";
 
@@ -104,7 +104,7 @@ public class TestItemDataManager {
         }
     }
 
-    private static String testRemoveMLot = "2";
+    private static final String testRemoveMLot = "2";
 
     @Test
     public void testRemoveItem(){

@@ -6,6 +6,8 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
+import maverick_data.DatabaseInteraction;
+import maverick_types.DatabaseType;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -14,8 +16,9 @@ public abstract class HandlerPrototype {
     protected String[] requiredKeys;
     protected String response;
     protected String handlerName;
+    protected DatabaseInteraction database = null;
 
-    JSONObject GetParameterObject(HttpExchange httpExchange) throws IOException {
+    private JSONObject GetParameterObject(HttpExchange httpExchange) throws IOException {
         //Fetch the parameter text from the request
         InputStream paramInStream = httpExchange.getRequestBody();
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -33,7 +36,7 @@ public abstract class HandlerPrototype {
         }
     }
 
-    void displayRequestValidity(boolean isValidRequest){
+    private void displayRequestValidity(boolean isValidRequest){
         if(isValidRequest){
             System.out.println("Valid Request");
         } else {
@@ -96,11 +99,23 @@ public abstract class HandlerPrototype {
         headers.add("Access-Control-Allow-Origin", "*");
         httpExchange.sendResponseHeaders(responseCode, this.response.length());
         System.out.println("Response to " + handlerName + ": " + this.response);
+        closeDataConnection();
         //Write response to the client
         OutputStream os = httpExchange.getResponseBody();
         os.write(this.response.getBytes());
         os.close();
     }
 
+    /**
+     * Close the database connection if it exists
+     */
+    private void closeDataConnection(){
+        try{ database.closeConnection(); } catch (NullPointerException ignored){}
+    }
+
     protected abstract void fulfillRequest(JSONObject requestParams);
+
+    void initDb(DatabaseType databaseType) {
+        this.database = new DatabaseInteraction(databaseType);
+    }
 }

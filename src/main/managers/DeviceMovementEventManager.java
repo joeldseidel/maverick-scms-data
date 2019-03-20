@@ -1,5 +1,6 @@
 package managers;
 
+import maverick_data.DatabaseInteraction;
 import maverick_types.*;
 
 import java.sql.PreparedStatement;
@@ -17,7 +18,7 @@ public class DeviceMovementEventManager extends MovementEventManager {
     /**
      * Default constructor to initialize the database connection for manager
      */
-    public DeviceMovementEventManager() { initDb(DatabaseType.AppData); }
+    public DeviceMovementEventManager(DatabaseInteraction database) { this.database = database; }
 
     /**
      * Get movement status of a specified device

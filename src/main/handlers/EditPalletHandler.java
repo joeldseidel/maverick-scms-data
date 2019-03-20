@@ -3,6 +3,7 @@ package handlers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.Headers;
+import maverick_types.DatabaseType;
 import org.json.JSONObject;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -21,6 +22,7 @@ public class EditPalletHandler extends HandlerPrototype implements HttpHandler {
     public EditPalletHandler(){
         requiredKeys = new String[] {"cid", "mid", "pallet", "token"};
         handlerName = "EditPalletHandler";
+        initDb(DatabaseType.AppData);
     }
 
     @Override
@@ -32,14 +34,14 @@ public class EditPalletHandler extends HandlerPrototype implements HttpHandler {
         String cid = requestParams.getString("cid");
         String mid = requestParams.getString("mid");
         String pallet = requestParams.getString("pallet");
-        PalletDataManager palletDataManager = new PalletDataManager();
+        PalletDataManager palletDataManager = new PalletDataManager(database);
             //ENSURE PALLET IS IN COMPANY
             if(!palletDataManager.getPalletCID(pallet).equals(cid)){
                 responseObject.put("message","PalletOutsideCompanyError");
                 this.response = responseObject.toString();
             }
             else{
-                ItemDataManager itemDataManager = new ItemDataManager();
+                ItemDataManager itemDataManager = new ItemDataManager(database);
                 //CHECK VALIDITY OF MAVERICK ITEM
                 if(itemDataManager.itemExists(mid)){
 

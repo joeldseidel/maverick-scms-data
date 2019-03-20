@@ -4,6 +4,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.Headers;
 import maverick_data.DatabaseInteraction;
+import maverick_types.DatabaseType;
 import org.json.JSONObject;
 import org.json.JSONArray;
 
@@ -41,6 +42,7 @@ public class AddItemHandler extends HandlerPrototype implements HttpHandler {
         //Set required keys in array in inherited from HandlerPrototype super class
         requiredKeys = new String[] {"fdaid", "name", "category", "cid", "token"};
         handlerName = "addItemHandler";
+        initDb(DatabaseType.AppData);
     }
 
     /**
@@ -57,7 +59,7 @@ public class AddItemHandler extends HandlerPrototype implements HttpHandler {
         //Instantiate an item object from data received within request parameters
         MaverickItem thisItem = new MaverickItem(fdaid, name, category, cid);
         //Instantiate item data manager to interact with item data
-        ItemDataManager itemDataManager = new ItemDataManager();
+        ItemDataManager itemDataManager = new ItemDataManager(database);
         //Write created item to the database
         itemDataManager.addItem(thisItem);
         //Create response object

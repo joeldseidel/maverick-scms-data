@@ -1,6 +1,7 @@
 package maverick_types;
 
 import managers.LotNumberManager;
+import maverick_data.DatabaseInteraction;
 
 import java.util.ArrayList;
 
@@ -19,14 +20,14 @@ public class MaverickPallet {
 	 */
 	public MaverickPallet(String customerID) {
 		this.customerID = customerID;
-		items = new ArrayList<MaverickItem>();
-		LotNumberManager lotNumberManager = new LotNumberManager();
+		items = new ArrayList<>();
+		LotNumberManager lotNumberManager = new LotNumberManager(new DatabaseInteraction(DatabaseType.AppData));
 		this.palletID = Long.toString(lotNumberManager.generateLotNumber(LotType.Pallet));
 	}
 
 	public MaverickPallet(String customerID, String palletID){
 		this.customerID = customerID;
-		items = new ArrayList<MaverickItem>();
+		items = new ArrayList<>();
 		this.palletID = palletID;
 	}
 

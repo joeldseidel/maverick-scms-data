@@ -5,6 +5,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import managers.MovementEventManager;
 import managers.PalletMovementEventManager;
+import maverick_types.DatabaseType;
 import maverick_types.MaverickPallet;
 import maverick_types.MovementStatus;
 import org.json.JSONObject;
@@ -24,6 +25,7 @@ public class GetCurrentPalletStatusHandler extends HandlerPrototype implements H
     public GetCurrentPalletStatusHandler(){
         requiredKeys = new String[] {"mid", "cid", "token"};
         handlerName = "GetCurrentPalletStatusHandler";
+        initDb(DatabaseType.AppData);
     }
 
     /**
@@ -38,7 +40,7 @@ public class GetCurrentPalletStatusHandler extends HandlerPrototype implements H
         //Instantiate referenced pallet object
         MaverickPallet thisPallet = new MaverickPallet(cid, mid);
         //Instantiate pallet movement manager to get the status (not moving anything just accessing that kinda data)
-        PalletMovementEventManager palletMovementEventManager = new PalletMovementEventManager();
+        PalletMovementEventManager palletMovementEventManager = new PalletMovementEventManager(database);
         //Get the current movement status from manager query
         MovementStatus currentStatus = palletMovementEventManager.getCurrentStatus(thisPallet);
         if(currentStatus == null){

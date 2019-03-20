@@ -14,7 +14,7 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 public class TestDeviceMovementEventManager {
-    private DeviceMovementEventManager deviceMovementEventManager = new DeviceMovementEventManager();
+    private DeviceMovementEventManager deviceMovementEventManager = new DeviceMovementEventManager(new DatabaseInteraction(DatabaseType.AppData));
 
     private static final String mlot = "94180632";
     private static final MovementStatus deviceMovementStatus = MovementStatus.InStorage;
@@ -22,7 +22,7 @@ public class TestDeviceMovementEventManager {
     @Test
     public void testGetCurrentStatus(){
         System.out.println("\nTesting get current status");
-        ItemDataManager itemDataManager = new ItemDataManager();
+        ItemDataManager itemDataManager = new ItemDataManager(new DatabaseInteraction(DatabaseType.AppData));
         MaverickItem mItem = itemDataManager.getItem(mlot);
         assertNotNull(mItem);
         MovementStatus currentStatus = deviceMovementEventManager.getCurrentStatus(mItem);
@@ -43,7 +43,7 @@ public class TestDeviceMovementEventManager {
 
     @Test
     public void testGetMovements(){
-        ItemDataManager itemDataManager = new ItemDataManager();
+        ItemDataManager itemDataManager = new ItemDataManager(new DatabaseInteraction(DatabaseType.AppData));
         MaverickItem mItem = itemDataManager.getItem(mlot);
         assertNotNull(mItem);
         List<DeviceMovementEvent> deviceMovementEvents = deviceMovementEventManager.getMovements(mItem);
