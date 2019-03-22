@@ -73,30 +73,40 @@ public class MaverickData {
      * @param server Reference to the HTTPS server object
      */
     private static HttpsServer createHandlerContexts(HttpsServer server){
-        server.createContext("/authenticate_user", new AuthenticateUserHandler());
-        server.createContext("/add_item", new AddItemHandler());
-        server.createContext("/add_user", new UserRegistrationHandler());
-        server.createContext("/edit_user", new EditUserHandler());
-        server.createContext("/edit_pallet", new EditPalletHandler());
-        server.createContext("/edit_item", new EditItemHandler());
-        server.createContext("/get_users", new GetUsersHandler());
-        server.createContext("/get_items", new GetCompanyItemsHandler());
-        server.createContext("/get_pallets", new GetCompanyPalletsHandler());
-        server.createContext("/get_device_data", new GetDeviceDataHandler());
-        server.createContext("/get_item_device_data", new GetItemDeviceDataHandler());
-        server.createContext("/add_po", new AddPurchaseOrderHandler());
-        server.createContext("/add_pallet", new AddPalletHandler());
-        server.createContext("/remove_pallet", new RemovePalletHandler());
-        server.createContext("/generate_item_lot_number", new GenerateLotNumberHandler());
-        server.createContext("/raise_pallet_movement_event", new RaisePalletMovementEventHandler());
-        server.createContext("/raise_item_movement_event", new RaiseItemMovementEventHandler());
-        server.createContext("/get_pallet_history", new GetPalletHistoryHandler());
-        server.createContext("/get_item_history", new GetItemHistoryHandler());
-        server.createContext("/get_item_by_lot", new GetItemByLotHandler());
-        server.createContext("/get_item_by_search_term", new GetItemBySearchTermHandler());
-        server.createContext("/get_current_pallet_status", new GetCurrentPalletStatusHandler());
-        server.createContext("/get_current_item_status", new GetCurrentItemStatusHandler());
-        server.createContext("/import_company_devices", new ImportCompanyDevicesHandler());
+        server.createContext("/item", new ItemRequestHandler());
+        server.createContext("/item/new", new ItemRequestHandler("new"));
+        server.createContext("/item/get", new ItemRequestHandler("get"));
+        server.createContext("/item/edit", new ItemRequestHandler("edit"));
+        server.createContext("/item/move", new ItemRequestHandler("move"));
+        server.createContext("/item/delete", new ItemRequestHandler("delete"));
+
+        server.createContext("/pallet", new ItemRequestHandler());
+        server.createContext("/pallet/new", new PalletRequestHandler("new"));
+        server.createContext("/pallet/add", new PalletRequestHandler("add"));
+        server.createContext("/pallet/edit", new PalletRequestHandler("edit"));
+        server.createContext("/pallet/delete", new PalletRequestHandler("delete"));
+        server.createContext("/pallet/move", new PalletRequestHandler("move"));
+        server.createContext("/pallet/get", new PalletRequestHandler("get"));
+
+        server.createContext("/po", new PurchaseOrderRequestHandler());
+        server.createContext("/po/new", new PurchaseOrderRequestHandler("new"));
+        server.createContext("/po/newline", new PurchaseOrderRequestHandler("newline"));
+        server.createContext("/po/edit", new PurchaseOrderRequestHandler("edit"));
+        server.createContext("/po/delete", new PurchaseOrderRequestHandler("delete"));
+        server.createContext("/po/update", new PurchaseOrderRequestHandler("update"));
+        server.createContext("/po/get", new PurchaseOrderRequestHandler("get"));
+
+        server.createContext("/user", new UserRequestHandler());
+        server.createContext("/user/new", new UserRequestHandler("new"));
+        server.createContext("/user/edit", new UserRequestHandler("edit"));
+        server.createContext("/user/delete", new UserRequestHandler("delete"));
+        server.createContext("/user/authenticate", new UserRequestHandler("authenticate"));
+        server.createContext("/user/get", new UserRequestHandler("get"));
+
+        server.createContext("/device", new DeviceRequestHandler());
+        server.createContext("/device/edit", new DeviceRequestHandler("edit"));
+        server.createContext("/device/import", new DeviceRequestHandler("import"));
+        server.createContext("/device/get", new DeviceRequestHandler("get"));
         return server;
     }
 }
