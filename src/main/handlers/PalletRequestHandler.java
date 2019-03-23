@@ -15,34 +15,45 @@ import java.util.List;
 
 public class PalletRequestHandler extends HandlerPrototype implements HttpHandler {
     public PalletRequestHandler(){
-
+        handlerName = "Pallet Request Handler";
+        requiredKeys = new String[] { "cmd" };
     }
 
     public PalletRequestHandler(String cmd){
+        handlerName = "Pallet Request Handler : " + cmd;
+        getRequiredKeys(cmd);
+    }
+
+    /**
+     * Get the command keys that required for each of the command types
+     * @param cmd command type name
+     */
+    private void getRequiredKeys(String cmd){
         switch(cmd){
             case "new":
-                requiredKeys = new String[] {  };
+                //Create a new pallet
+                requiredKeys = new String[] { "cid", "op", "token" };
                 break;
             case "add":
-                requiredKeys = new String[] {  };
+                //Add an item to a pallet
+                requiredKeys = new String[] { "cid", "mid", "mlot", "op", "token" };
                 break;
             case "edit":
-                requiredKeys = new String[] {  };
-                break;
+                //Edit an existing pallet
             case "delete":
-                requiredKeys = new String[] {  };
-                break;
+                //Delete a pallet
             case "move":
-                requiredKeys = new String[] {  };
-                break;
+                //Move a pallet somewhere
             case "get":
-                requiredKeys = new String[] {  };
+                //Get a pallet and its items
+                requiredKeys = new String[] { "cid", "mlot", "op", "token" };
                 break;
         }
     }
 
     @Override
     protected void fulfillRequest(JSONObject requestParams){
+        //Route the handler
         switch(handleCmd){
             case "new":
                 createNewPallet(requestParams);

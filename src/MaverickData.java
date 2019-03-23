@@ -80,7 +80,7 @@ public class MaverickData {
         server.createContext("/item/move", new ItemRequestHandler("move"));
         server.createContext("/item/delete", new ItemRequestHandler("delete"));
 
-        server.createContext("/pallet", new ItemRequestHandler());
+        server.createContext("/pallet", new PalletRequestHandler());
         server.createContext("/pallet/new", new PalletRequestHandler("new"));
         server.createContext("/pallet/add", new PalletRequestHandler("add"));
         server.createContext("/pallet/edit", new PalletRequestHandler("edit"));
