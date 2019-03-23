@@ -68,3 +68,5 @@ public class AddItemHandler extends HandlerPrototype implements HttpHandler {
         this.response = responseObject.toString();
     }
 }
+
+//FIXME: deprecated

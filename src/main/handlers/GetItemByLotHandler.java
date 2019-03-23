@@ -59,3 +59,5 @@ public class GetItemByLotHandler extends HandlerPrototype implements HttpHandler
         return responseObject;
     }
 }
+
+//FIXME: deprecated

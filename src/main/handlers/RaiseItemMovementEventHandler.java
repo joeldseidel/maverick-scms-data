@@ -38,3 +38,6 @@ public class RaiseItemMovementEventHandler extends HandlerPrototype implements H
         }
     }
 }
+
+
+//FIXME: deprecated
