@@ -17,6 +17,7 @@ public abstract class HandlerPrototype {
     protected String response;
     protected String handlerName;
     protected DatabaseInteraction database = null;
+    protected String handleCmd;
 
     private JSONObject GetParameterObject(HttpExchange httpExchange) throws IOException {
         //Fetch the parameter text from the request

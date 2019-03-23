@@ -51,3 +51,6 @@ public class AddPalletHandler extends HandlerPrototype implements HttpHandler {
         this.response = responseObject.toString();
     }
 }
+
+
+//FIXME: deprecated

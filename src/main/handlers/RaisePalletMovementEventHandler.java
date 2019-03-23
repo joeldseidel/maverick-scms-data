@@ -48,3 +48,5 @@ public class RaisePalletMovementEventHandler extends HandlerPrototype implements
         this.response = responseObject.toString();
     }
 }
+
+//fixme: deprecated
